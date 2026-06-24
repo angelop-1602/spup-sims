@@ -1,16 +1,12 @@
-"use client";
+"use client"
 
-import { MsalProvider } from "@azure/msal-react";
-import { msalInstance } from "@/lib/msalInstance";
+import * as React from "react"
+import { MsalProvider } from "@azure/msal-react"
 
-export function Providers({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    return (
-        <MsalProvider instance={msalInstance}>
-            {children}
-        </MsalProvider>
-    );
+import { createMsalInstance } from "@/lib/msal"
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [msalInstance] = React.useState(() => createMsalInstance())
+
+  return <MsalProvider instance={msalInstance}>{children}</MsalProvider>
 }

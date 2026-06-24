@@ -1,124 +1,168 @@
 "use client"
 
 import * as React from "react"
-import {
-    MsalProvider,
-    AuthenticatedTemplate,
-    UnauthenticatedTemplate,
-    useMsal,
-} from "@azure/msal-react"
-import { createMsalInstance, loginRequest } from "@/lib/msal"
+import { useIsAuthenticated, useMsal } from "@azure/msal-react"
+import { ArrowRight, LogOut, ShieldCheck } from "lucide-react"
+import { useRouter, useSearchParams } from "next/navigation"
+
 import { Button } from "@/components/ui/button"
+import { loginRequest } from "@/lib/authConfig"
 
-function AuthPageContent() {
-    const { instance, accounts } = useMsal()
-    const [errorMessage, setErrorMessage] = React.useState<string>("")
+function getSafeReturnPath(returnTo: string | null) {
+  if (!returnTo || !returnTo.startsWith("/") || returnTo.startsWith("//")) {
+    return "/hrm/dashboard"
+  }
 
-    const account = accounts[0]
+  if (returnTo === "/login") {
+    return "/hrm/dashboard"
+  }
 
-    const handleLogin = async () => {
-        setErrorMessage("")
+  return returnTo
+}
 
-        try {
-            await instance.loginPopup(loginRequest)
-        } catch (error) {
-            console.error(error)
-            setErrorMessage("Sign-in failed. Please try again.")
-        }
+function LoginContent() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { accounts, instance } = useMsal()
+  const isAuthenticated = useIsAuthenticated()
+  const [errorMessage, setErrorMessage] = React.useState("")
+  const account = accounts[0]
+  const returnTo = getSafeReturnPath(searchParams.get("returnTo"))
+
+  React.useEffect(() => {
+    if (account && !instance.getActiveAccount()) {
+      instance.setActiveAccount(account)
     }
+  }, [account, instance])
 
-    const handleLogout = async () => {
-        try {
-            await instance.logoutPopup({ account })
-        } catch (error) {
-            console.error(error)
-            setErrorMessage("Sign-out failed. Please refresh the page.")
-        }
+  const handleLogin = async () => {
+    setErrorMessage("")
+
+    try {
+      const result = await instance.loginPopup(loginRequest)
+
+      if (result.account) {
+        instance.setActiveAccount(result.account)
+      }
+
+      router.replace(returnTo)
+    } catch (error) {
+      console.error(error)
+      setErrorMessage("Sign-in failed. Please try again.")
     }
-    console.log(
-        "NEXT_PUBLIC_AZURE_CLIENT_ID:",
-        process.env.NEXT_PUBLIC_AZURE_CLIENT_ID
-    )
-    return (
-        <div className="min-h-svh flex items-center justify-center bg-background px-4 py-10 text-foreground">
-            <div className="w-full max-w-4xl rounded-[2rem] border border-border bg-card/95 p-8 shadow-xl shadow-muted/20 backdrop-blur-xl">
-                <div className="mb-8 space-y-3">
-                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                        Authentication
-                    </p>
-                    <h1 className="text-3xl font-semibold sm:text-4xl">
-                        Sign in with Microsoft
-                    </h1>
-                    <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                        Use your Azure Active Directory account to access the HR management dashboard.
-                    </p>
-                </div>
+  }
 
-                <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
-                    <div className="rounded-3xl bg-muted p-6">
-                        <h2 className="text-lg font-semibold">How this page works</h2>
-                        <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                            This page uses MSAL React to authenticate users with Azure AD. The token is cached in
-                            the browser and can be used to secure the rest of the application.
-                        </p>
+  const handleLogout = async () => {
+    setErrorMessage("")
 
-                        <ul className="mt-5 space-y-2 text-sm text-foreground/80">
-                            <li>• Popup sign-in for a streamlined experience</li>
-                            <li>• Default requested scope: User.Read</li>
-                            <li>• Local storage caching for signed-in sessions</li>
-                        </ul>
+    try {
+      await instance.logoutPopup({ account })
+    } catch (error) {
+      console.error(error)
+      setErrorMessage("Sign-out failed. Please refresh the page.")
+    }
+  }
 
-                        <p className="mt-5 text-xs text-muted-foreground">
-                            Configure your Azure AD values in <code className="rounded-md bg-slate-100 px-1 py-0.5 text-xs text-slate-900 dark:bg-slate-950 dark:text-slate-100">.env.local</code>.
-                        </p>
-                    </div>
-
-                    <div className="rounded-3xl border border-border bg-background p-6">
-                        <AuthenticatedTemplate>
-                            <div className="space-y-5">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Signed in as</p>
-                                    <p className="mt-2 text-lg font-semibold">{account?.name ?? account?.username}</p>
-                                    <p className="text-sm text-muted-foreground">{account?.username}</p>
-                                </div>
-
-                                <Button onClick={handleLogout}>Sign out</Button>
-
-                                {errorMessage ? (
-                                    <p className="rounded-2xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                                        {errorMessage}
-                                    </p>
-                                ) : null}
-                            </div>
-                        </AuthenticatedTemplate>
-
-                        <UnauthenticatedTemplate>
-                            <div className="space-y-5">
-                                <p className="text-sm text-muted-foreground">
-                                    Authenticate with Azure AD to enter the dashboard and access protected functionality.
-                                </p>
-                                <Button onClick={handleLogin}>Sign in with Microsoft</Button>
-
-                                {errorMessage ? (
-                                    <p className="rounded-2xl bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                                        {errorMessage}
-                                    </p>
-                                ) : null}
-                            </div>
-                        </UnauthenticatedTemplate>
-                    </div>
-                </div>
-            </div>
+  return (
+    <div className="flex min-h-svh items-center justify-center bg-background px-4 py-10 text-foreground">
+      <div className="w-full max-w-4xl rounded-lg border border-border bg-card p-8 shadow-sm">
+        <div className="mb-8 space-y-3">
+          <div className="flex size-11 items-center justify-center rounded-lg bg-emerald-700/10 text-emerald-700">
+            <ShieldCheck className="size-5" />
+          </div>
+          <p className="text-sm font-semibold uppercase tracking-normal text-muted-foreground">
+            Authentication
+          </p>
+          <h1 className="text-3xl font-semibold sm:text-4xl">
+            Sign in with Microsoft
+          </h1>
+          <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+            Use your Microsoft account to access protected HRM functionality.
+          </p>
         </div>
-    )
+
+        <div className="grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+          <div className="rounded-lg bg-muted p-6">
+            <h2 className="text-lg font-semibold">Protected HRM access</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              This app uses the existing MSAL configuration to authenticate
+              users with Microsoft before they enter the HRM workspace.
+            </p>
+
+            <ul className="mt-5 space-y-2 text-sm text-foreground/80">
+              <li>Popup sign-in with Microsoft Entra ID</li>
+              <li>Requested scope: User.Read</li>
+              <li>Session cached in browser session storage</li>
+            </ul>
+          </div>
+
+          <div className="rounded-lg border border-border bg-background p-6">
+            {isAuthenticated ? (
+              <div className="space-y-5">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Signed in as
+                  </p>
+                  <p className="mt-2 text-lg font-semibold">
+                    {account?.name ?? account?.username}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {account?.username}
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    className="justify-between"
+                    onClick={() => router.replace(returnTo)}
+                  >
+                    Continue to HRM
+                    <ArrowRight className="size-4" />
+                  </Button>
+                  <Button variant="outline" onClick={handleLogout}>
+                    <LogOut className="size-4" />
+                    Sign out
+                  </Button>
+                </div>
+
+                {errorMessage ? (
+                  <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                    {errorMessage}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <div className="space-y-5">
+                <p className="text-sm text-muted-foreground">
+                  Authenticate to enter the HRM dashboard and access protected
+                  functionality.
+                </p>
+                <Button onClick={handleLogin}>Sign in with Microsoft</Button>
+
+                {errorMessage ? (
+                  <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                    {errorMessage}
+                  </p>
+                ) : null}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function Page() {
-    const msalInstance = React.useMemo(() => createMsalInstance(), [])
-
-    return (
-        <MsalProvider instance={msalInstance}>
-            <AuthPageContent />
-        </MsalProvider>
-    )
+  return (
+    <React.Suspense
+      fallback={
+        <div className="flex min-h-svh items-center justify-center bg-background text-sm text-muted-foreground">
+          Loading sign-in...
+        </div>
+      }
+    >
+      <LoginContent />
+    </React.Suspense>
+  )
 }
