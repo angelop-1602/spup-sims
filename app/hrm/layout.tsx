@@ -1,14 +1,33 @@
-import { HrmAuthGuard } from "@/components/auth/hrm-auth-guard"
-import { AppShell } from "@/components/layout/app-shell"
+import { Geist, Geist_Mono, Inter } from "next/font/google"
 
-export default function HrmLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <HrmAuthGuard>
-      <AppShell>{children}</AppShell>
-    </HrmAuthGuard>
-  )
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { cn } from "@/lib/utils";
+import { Providers } from "../provider";
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
+
+const fontMono = Geist_Mono({
+    subsets: ["latin"],
+    variable: "--font-mono",
+})
+
+export default function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode
+}>) {
+    return (
+        <html
+            lang="en"
+            suppressHydrationWarning
+            className={cn("antialiased", fontMono.variable, "font-sans", inter.variable)}
+        >
+            <body>
+                <Providers>
+                    <TooltipProvider>{children}</TooltipProvider>
+                </Providers>
+            </body>
+        </html>
+    )
+>>>>>>> 3673cbcc0830e160b67e5a0acb768529d624dc8e
 }
