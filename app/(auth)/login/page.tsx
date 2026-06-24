@@ -1,12 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { InteractionStatus } from "@azure/msal-browser"
 import { useIsAuthenticated, useMsal } from "@azure/msal-react"
 import { ArrowRight, LogOut, ShieldCheck } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { loginRequest } from "@/lib/authConfig"
+import { signOutCurrentAccount } from "@/lib/msalLogout"
 
 function getSafeReturnPath(returnTo: string | null) {
   if (!returnTo || !returnTo.startsWith("/") || returnTo.startsWith("//")) {
@@ -20,14 +22,36 @@ function getSafeReturnPath(returnTo: string | null) {
   return returnTo
 }
 
+function getAuthErrorMessage(error: unknown) {
+  const authError = error as {
+    errorCode?: string
+    message?: string
+    subError?: string
+  }
+
+  if (
+    authError.errorCode === "timed_out" ||
+    authError.subError === "redirect_bridge_timeout"
+  ) {
+    return "Sign-in timed out while waiting for Microsoft. Check that the Azure redirect URI matches the app configuration."
+  }
+
+  if (authError.errorCode) {
+    return `Sign-in failed (${authError.errorCode}). Please try again.`
+  }
+
+  return authError.message ?? "Sign-in failed. Please try again."
+}
+
 function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { accounts, instance } = useMsal()
+  const { accounts, inProgress, instance } = useMsal()
   const isAuthenticated = useIsAuthenticated()
   const [errorMessage, setErrorMessage] = React.useState("")
   const account = accounts[0]
   const returnTo = getSafeReturnPath(searchParams.get("returnTo"))
+  const isAuthBusy = inProgress !== InteractionStatus.None
 
   React.useEffect(() => {
     if (account && !instance.getActiveAccount()) {
@@ -35,20 +59,23 @@ function LoginContent() {
     }
   }, [account, instance])
 
+  React.useEffect(() => {
+    if (!isAuthBusy && isAuthenticated) {
+      router.replace(returnTo)
+    }
+  }, [isAuthBusy, isAuthenticated, returnTo, router])
+
   const handleLogin = async () => {
     setErrorMessage("")
 
     try {
-      const result = await instance.loginPopup(loginRequest)
-
-      if (result.account) {
-        instance.setActiveAccount(result.account)
-      }
-
-      router.replace(returnTo)
+      await instance.loginRedirect({
+        ...loginRequest,
+        redirectStartPage: window.location.href,
+      })
     } catch (error) {
       console.error(error)
-      setErrorMessage("Sign-in failed. Please try again.")
+      setErrorMessage(getAuthErrorMessage(error))
     }
   }
 
@@ -56,7 +83,7 @@ function LoginContent() {
     setErrorMessage("")
 
     try {
-      await instance.logoutPopup({ account })
+      await signOutCurrentAccount(instance, account)
     } catch (error) {
       console.error(error)
       setErrorMessage("Sign-out failed. Please refresh the page.")
@@ -90,8 +117,8 @@ function LoginContent() {
             </p>
 
             <ul className="mt-5 space-y-2 text-sm text-foreground/80">
-              <li>Popup sign-in with Microsoft Entra ID</li>
-              <li>Requested scope: User.Read</li>
+              <li>Redirect sign-in with Microsoft Entra ID</li>
+              <li>Requested scopes come from the app auth configuration</li>
               <li>Session cached in browser session storage</li>
             </ul>
           </div>
@@ -137,7 +164,9 @@ function LoginContent() {
                   Authenticate to enter the HRM dashboard and access protected
                   functionality.
                 </p>
-                <Button onClick={handleLogin}>Sign in with Microsoft</Button>
+                <Button disabled={isAuthBusy} onClick={handleLogin}>
+                  {isAuthBusy ? "Preparing sign-in..." : "Sign in with Microsoft"}
+                </Button>
 
                 {errorMessage ? (
                   <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">

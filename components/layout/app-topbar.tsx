@@ -10,7 +10,6 @@ import {
   Settings,
   User,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -32,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import { signOutCurrentAccount } from "@/lib/msalLogout"
 
 function getInitials(name: string) {
   return name
@@ -44,7 +44,6 @@ function getInitials(name: string) {
 
 export function AppTopbar() {
   const [open, setOpen] = React.useState(false)
-  const router = useRouter()
   const { accounts, instance } = useMsal()
   const account = accounts[0]
   const displayName = account?.name ?? account?.username ?? "User"
@@ -64,8 +63,7 @@ export function AppTopbar() {
   }, [])
 
   const handleLogout = async () => {
-    await instance.logoutPopup({ account })
-    router.replace("/login")
+    await signOutCurrentAccount(instance, account)
   }
 
   return (

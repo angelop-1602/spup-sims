@@ -1,19 +1,46 @@
-import type { Configuration, PopupRequest } from "@azure/msal-browser"
+import type {
+  Configuration,
+  RedirectRequest,
+} from "@azure/msal-browser"
 
-const getRedirectUri = () => {
-  if (process.env.NEXT_PUBLIC_AZURE_REDIRECT_URI) {
-    return process.env.NEXT_PUBLIC_AZURE_REDIRECT_URI
-  }
-
-  if (process.env.NEXT_PUBLIC_MSAL_REDIRECT_URI) {
-    return process.env.NEXT_PUBLIC_MSAL_REDIRECT_URI
-  }
-
+function getBrowserOrigin() {
   if (typeof window !== "undefined") {
     return window.location.origin
   }
 
   return "http://localhost:3000"
+}
+
+const getRedirectUri = () => {
+  const configuredRedirectUri =
+    process.env.NEXT_PUBLIC_AZURE_REDIRECT_URI ??
+    process.env.NEXT_PUBLIC_MSAL_REDIRECT_URI
+
+  if (configuredRedirectUri) {
+    if (configuredRedirectUri.startsWith("/")) {
+      return `${getBrowserOrigin()}${configuredRedirectUri}`
+    }
+
+    return configuredRedirectUri
+  }
+
+  return getBrowserOrigin()
+}
+
+const getModulePortalUri = () => {
+  try {
+    return new URL("/", getRedirectUri()).origin
+  } catch {
+    return getBrowserOrigin()
+  }
+}
+
+function getLoginScopes() {
+  const configuredScopes = process.env.NEXT_PUBLIC_API_SCOPES?.split(/[,\s]+/)
+    .map((scope) => scope.trim())
+    .filter(Boolean)
+
+  return configuredScopes?.length ? configuredScopes : ["User.Read"]
 }
 
 export const msalConfig: Configuration = {
@@ -27,6 +54,7 @@ export const msalConfig: Configuration = {
       process.env.NEXT_PUBLIC_TENANT_ID ??
       "common"
     }`,
+    postLogoutRedirectUri: getModulePortalUri(),
     redirectUri: getRedirectUri(),
   },
   cache: {
@@ -34,6 +62,10 @@ export const msalConfig: Configuration = {
   },
 }
 
-export const loginRequest: PopupRequest = {
-  scopes: ["User.Read"],
+export const loginRequest: RedirectRequest = {
+  prompt: "select_account",
+  redirectUri: getRedirectUri(),
+  scopes: getLoginScopes(),
 }
+
+export const modulePortalUri = getModulePortalUri()
