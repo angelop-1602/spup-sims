@@ -7,6 +7,9 @@ import {
   UserRoundPlus,
   IdCard,
   Settings,
+  FilePen,
+  Building,
+  Pin,
 } from "lucide-react"
 
 import {
@@ -15,6 +18,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -29,6 +33,14 @@ const menuItems = [
     url: "/hrm/dashboard",
   },
   {
+    title: "My Portfolio",
+    icon: IdCard,
+    url: "/hrm/employees/portfolio",
+  },
+]
+
+const hrMenuItems = [
+  {
     title: "Applicants",
     icon: UserRoundPlus,
     url: "/hrm/applicants",
@@ -39,9 +51,19 @@ const menuItems = [
     url: "/hrm/employees",
   },
   {
-    title: "Portfolio",
-    icon: IdCard,
-    url: "/hrm/employees/portfolio",
+    title: "Leave Applications",
+    icon: FilePen,
+    url: "#",
+  },
+  {
+    title: "Departments",
+    icon: Building,
+    url: "#",
+  },
+  {
+    title: "Designations",
+    icon: Pin,
+    url: "#",
   },
 ]
 
@@ -63,9 +85,27 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
+          <SidebarGroupLabel>Main</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild tooltip={item.title}>
+                    <Link href={item.url}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Human Resource Management</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {hrMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <Link href={item.url}>
