@@ -1,4 +1,9 @@
+"use client"
+
+import * as React from "react"
 import Link from "next/link"
+import { useMsal } from "@azure/msal-react"
+import { loginRequest } from "@/lib/authConfig"
 import {
   ArrowUpRight,
   CalendarClock,
@@ -27,98 +32,99 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-const summaryCards = [
-  {
-    label: "Active Employees",
-    value: "248",
-    detail: "12 departments covered",
-    icon: Users,
-  },
-  {
-    label: "Open Applicants",
-    value: "36",
-    detail: "8 scheduled for interview",
-    icon: UserRoundPlus,
-  },
-  {
-    label: "For Review",
-    value: "14",
-    detail: "Contracts and personnel files",
-    icon: FileCheck2,
-  },
-  {
-    label: "Due This Week",
-    value: "9",
-    detail: "Onboarding and evaluations",
-    icon: CalendarClock,
-  },
-] as const
-
 const pipeline = [
-  {
-    stage: "Application Screening",
-    count: 18,
-    status: "In progress",
-  },
-  {
-    stage: "Initial Interview",
-    count: 8,
-    status: "Scheduled",
-  },
-  {
-    stage: "Final Interview",
-    count: 6,
-    status: "For panel",
-  },
-  {
-    stage: "Job Offer",
-    count: 4,
-    status: "Pending",
-  },
+  { stage: "Application Screening", count: 18, status: "In progress" },
+  { stage: "Initial Interview", count: 8, status: "Scheduled" },
+  { stage: "Final Interview", count: 6, status: "For panel" },
+  { stage: "Job Offer", count: 4, status: "Pending" },
 ] as const
 
 const departments = [
-  {
-    name: "Academic Affairs",
-    headcount: 96,
-    capacity: 82,
-  },
-  {
-    name: "Student Services",
-    headcount: 42,
-    capacity: 76,
-  },
-  {
-    name: "Finance and Administration",
-    headcount: 38,
-    capacity: 68,
-  },
-  {
-    name: "Facilities",
-    headcount: 31,
-    capacity: 71,
-  },
+  { name: "Academic Affairs", headcount: 96, capacity: 82 },
+  { name: "Student Services", headcount: 42, capacity: 76 },
+  { name: "Finance and Administration", headcount: 38, capacity: 68 },
+  { name: "Facilities", headcount: 31, capacity: 71 },
 ] as const
 
 const actions = [
-  {
-    item: "Review faculty appointment papers",
-    owner: "HR Officer",
-    due: "Today",
-  },
-  {
-    item: "Prepare onboarding checklist",
-    owner: "Recruitment",
-    due: "Tomorrow",
-  },
-  {
-    item: "Validate employee portfolio updates",
-    owner: "Records",
-    due: "Friday",
-  },
+  { item: "Review faculty appointment papers", owner: "HR Officer", due: "Today" },
+  { item: "Prepare onboarding checklist", owner: "Recruitment", due: "Tomorrow" },
+  { item: "Validate employee portfolio updates", owner: "Records", due: "Friday" },
 ] as const
 
 export default function HrmDashboardPage() {
+  const { instance, accounts } = useMsal()
+  const [employeeCount, setEmployeeCount] = React.useState<number | string>("...")
+  const [loading, setLoading] = React.useState<boolean>(true)
+
+  React.useEffect(() => {
+    async function fetchEmployeeCount() {
+      if (accounts.length === 0) return
+
+      try {
+        const tokenResponse = await instance.acquireTokenSilent({
+          ...loginRequest,
+          account: accounts[0],
+        })
+
+        const res = await fetch("/api/v1/hrms/dashboard/cards/employees-total", {
+          headers: {
+            Authorization: `Bearer ${tokenResponse.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (!res.ok) {
+          console.error(`API Fetch failed with status: ${res.status}`)
+          setEmployeeCount(0)
+          return
+        }
+
+        const payload = await res.json()
+
+        if (payload && payload.success && payload.data) {
+          setEmployeeCount(payload.data.value ?? 0)
+        } else {
+          setEmployeeCount(0)
+        }
+      } catch (error) {
+        console.error("Failed to acquire token or fetch data:", error)
+        setEmployeeCount(0)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEmployeeCount()
+  }, [instance, accounts])
+
+  const summaryCards = [
+    {
+      label: "Active Employees",
+      value: employeeCount.toString(),
+      detail: "12 departments covered",
+      icon: Users,
+    },
+    {
+      label: "Open Applicants",
+      value: "36",
+      detail: "8 scheduled for interview",
+      icon: UserRoundPlus,
+    },
+    {
+      label: "For Review",
+      value: "14",
+      detail: "Contracts and personnel files",
+      icon: FileCheck2,
+    },
+    {
+      label: "Due This Week",
+      value: "9",
+      detail: "Onboarding and evaluations",
+      icon: CalendarClock,
+    },
+  ] as const
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -143,6 +149,7 @@ export default function HrmDashboardPage() {
         </Button>
       </div>
 
+      {/* Summary Cards Grid Section */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {summaryCards.map((card) => {
           const Icon = card.icon
@@ -168,6 +175,7 @@ export default function HrmDashboardPage() {
         })}
       </div>
 
+      {/* Visual Component Split Block */}
       <div className="grid gap-4 xl:grid-cols-[1fr_0.9fr]">
         <Card className="rounded-lg">
           <CardHeader>
@@ -233,6 +241,7 @@ export default function HrmDashboardPage() {
         </Card>
       </div>
 
+      {/* Footer Actions Panel */}
       <Card className="rounded-lg">
         <CardHeader>
           <CardTitle>Pending HR Actions</CardTitle>
