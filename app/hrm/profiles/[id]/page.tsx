@@ -8,13 +8,10 @@ import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+
+// ─── Interfaces ────────────────────────────────────────────────
 
 interface ProfileValues {
   Id: number
@@ -43,11 +40,7 @@ interface ProfileValues {
 interface ProfileResponse {
   success: boolean
   message: string
-  data: {
-    entity: string
-    id: number
-    values: ProfileValues
-  }
+  data: { entity: string; id: number; values: ProfileValues }
 }
 
 interface DocumentValues {
@@ -69,9 +62,7 @@ interface ApplicantDocument {
 interface DocumentsResponse {
   success: boolean
   message: string
-  data: {
-    data: ApplicantDocument[]
-  }
+  data: { data: ApplicantDocument[] }
 }
 
 interface StatusHistoryValues {
@@ -132,21 +123,25 @@ interface InterviewSchedulesResponse {
   }
 }
 
+// ─── Constants ─────────────────────────────────────────────────
+
 const STATUS_STYLES: Record<string, string> = {
   Interview: "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400",
-  Hired: "bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400",
-  Rejected: "bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400",
-  Pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20 dark:text-yellow-400",
+  Hired:     "bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400",
+  Rejected:  "bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400",
+  Pending:   "bg-yellow-500/10 text-yellow-600 border-yellow-500/20 dark:text-yellow-400",
   Submitted: "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
 }
 
 const STATUS_DOT: Record<string, string> = {
   Interview: "bg-blue-500",
-  Hired: "bg-green-500",
-  Rejected: "bg-red-500",
-  Pending: "bg-yellow-500",
+  Hired:     "bg-green-500",
+  Rejected:  "bg-red-500",
+  Pending:   "bg-yellow-500",
   Submitted: "bg-purple-500",
 }
+
+// ─── Helpers ───────────────────────────────────────────────────
 
 function formatDate(dateString: string | null) {
   if (!dateString) return "—"
@@ -169,20 +164,7 @@ function formatDateTime(dateString: string | null) {
   })
 }
 
-function Row({
-  label,
-  value,
-}: {
-  label: string
-  value: string | null | undefined
-}) {
-  return (
-    <div className="grid grid-cols-[1fr_1.5fr] border-b px-5 py-3 text-sm last:border-0 sm:grid-cols-[180px_1fr]">
-      <span className="text-muted-foreground">{label}</span>
-      <span className="break-words font-medium">{value || "—"}</span>
-    </div>
-  )
-}
+// ─── Sub-components ────────────────────────────────────────────
 
 function InfoPanel({ children }: { children: React.ReactNode }) {
   return (
@@ -191,6 +173,35 @@ function InfoPanel({ children }: { children: React.ReactNode }) {
     </div>
   )
 }
+
+function PanelHeader({ label }: { label: string }) {
+  return (
+    <div className="border-b px-5 py-3">
+      <p className="text-sm font-medium">{label}</p>
+    </div>
+  )
+}
+
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="border-y bg-muted/40 px-5 py-2">
+      <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+    </div>
+  )
+}
+
+function Row({ label, value }: { label: string; value: string | null | undefined }) {
+  return (
+    <div className="grid grid-cols-[1fr_1.5fr] border-b px-5 py-3 text-sm last:border-0 sm:grid-cols-[160px_1fr]">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="break-words font-medium">{value || "—"}</span>
+    </div>
+  )
+}
+
+// ─── Page ──────────────────────────────────────────────────────
 
 export default function ProfileDetailPage() {
   const { instance, accounts } = useMsal()
@@ -212,193 +223,91 @@ export default function ProfileDetailPage() {
   React.useEffect(() => {
     async function fetchProfile() {
       if (accounts.length === 0 || !id) return
-
       setIsLoading(true)
-
       try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
+        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
         const res = await fetch(`/api/v1/core/profiles/${id}`, {
-          headers: {
-            Authorization: `Bearer ${tokenResponse.accessToken}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" },
         })
-
-        if (!res.ok) {
-          console.error(`Profile fetch failed with status: ${res.status}`)
-          setProfile(null)
-          return
-        }
-
+        if (!res.ok) { setProfile(null); return }
         const payload: ProfileResponse = await res.json()
-
-        if (payload?.success && payload.data) {
-          setProfile(payload.data.values)
-        } else {
-          setProfile(null)
-        }
-      } catch (error) {
-        console.error("Failed to acquire token or fetch data:", error)
-        setProfile(null)
-      } finally {
-        setIsLoading(false)
-      }
+        setProfile(payload?.success && payload.data ? payload.data.values : null)
+      } catch { setProfile(null) } finally { setIsLoading(false) }
     }
-
     fetchProfile()
   }, [instance, accounts, id])
 
   React.useEffect(() => {
     async function fetchDocuments() {
       if (accounts.length === 0 || !applicantId) return
-
       setIsLoadingDocs(true)
-
       try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
+        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
         const res = await fetch(
           `/api/v1/recruitment/employee-applicant-documents?EmployeeApplicantId=${applicantId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenResponse.accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
+          { headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" } }
         )
-
-        if (!res.ok) {
-          console.error(`Documents fetch failed with status: ${res.status}`)
-          setDocuments([])
-          return
-        }
-
+        if (!res.ok) { setDocuments([]); return }
         const payload: DocumentsResponse = await res.json()
-
-        if (payload?.success && payload.data?.data) {
-          setDocuments(payload.data.data)
-        } else {
-          setDocuments([])
-        }
-      } catch (error) {
-        console.error("Failed to fetch documents:", error)
-        setDocuments([])
-      } finally {
-        setIsLoadingDocs(false)
-      }
+        setDocuments(payload?.success && payload.data?.data ? payload.data.data : [])
+      } catch { setDocuments([]) } finally { setIsLoadingDocs(false) }
     }
-
     fetchDocuments()
   }, [instance, accounts, applicantId])
 
   React.useEffect(() => {
     async function fetchStatusHistory() {
       if (accounts.length === 0 || !applicantId) return
-
       setIsLoadingHistory(true)
-
       try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
+        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
         const res = await fetch(
           `/api/v1/recruitment/employee-applicant-status-history?EmployeeApplicantId=${applicantId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenResponse.accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
+          { headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" } }
         )
-
-        if (!res.ok) {
-          console.error(`Status history fetch failed with status: ${res.status}`)
-          setStatusHistory([])
-          return
-        }
-
+        if (!res.ok) { setStatusHistory([]); return }
         const payload: StatusHistoryResponse = await res.json()
-
-        if (payload?.success && payload.data?.data) {
-          setStatusHistory(payload.data.data)
-        } else {
-          setStatusHistory([])
-        }
-      } catch (error) {
-        console.error("Failed to fetch status history:", error)
-        setStatusHistory([])
-      } finally {
-        setIsLoadingHistory(false)
-      }
+        setStatusHistory(payload?.success && payload.data?.data ? payload.data.data : [])
+      } catch { setStatusHistory([]) } finally { setIsLoadingHistory(false) }
     }
-
     fetchStatusHistory()
   }, [instance, accounts, applicantId])
 
   React.useEffect(() => {
     async function fetchInterviews() {
       if (accounts.length === 0 || !applicantId) return
-
       setIsLoadingInterviews(true)
-
       try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
+        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
         const res = await fetch(
           `/api/v1/recruitment/interview-schedules?EmployeeApplicantId=${applicantId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenResponse.accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
+          { headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" } }
         )
-
-        if (!res.ok) {
-          console.error(`Interview schedules fetch failed with status: ${res.status}`)
-          setInterviews([])
-          return
-        }
-
+        if (!res.ok) { setInterviews([]); return }
         const payload: InterviewSchedulesResponse = await res.json()
-
-        if (payload?.success && payload.data?.data) {
-          setInterviews(payload.data.data)
-        } else {
-          setInterviews([])
-        }
-      } catch (error) {
-        console.error("Failed to fetch interview schedules:", error)
-        setInterviews([])
-      } finally {
-        setIsLoadingInterviews(false)
-      }
+        setInterviews(payload?.success && payload.data?.data ? payload.data.data : [])
+      } catch { setInterviews([]) } finally { setIsLoadingInterviews(false) }
     }
-
     fetchInterviews()
   }, [instance, accounts, applicantId])
 
   const fullName = profile
-    ? [profile.FirstName, profile.MiddleName, profile.LastName, profile.Suffix]
-        .filter(Boolean)
-        .join(" ")
+    ? [profile.FirstName, profile.MiddleName, profile.LastName, profile.Suffix].filter(Boolean).join(" ")
     : ""
 
   const initials = profile
     ? `${profile.FirstName?.[0] ?? ""}${profile.LastName?.[0] ?? ""}`.toUpperCase()
     : ""
+
+  const resumeDoc = documents.find((d) => d.values.FileUrl)
+
+  const sortedHistory = [...statusHistory].sort(
+    (a, b) => new Date(b.values.CreatedAt).getTime() - new Date(a.values.CreatedAt).getTime()
+  )
+
+  const sortedInterviews = [...interviews].sort(
+    (a, b) => new Date(a.values.ScheduledAt).getTime() - new Date(b.values.ScheduledAt).getTime()
+  )
 
   return (
     <div className="space-y-5">
@@ -424,275 +333,175 @@ export default function ProfileDetailPage() {
         </div>
       ) : (
         <div className="space-y-5">
-          {/* ── Profile card ── */}
+          {/* ── Hero ── */}
           <Card>
-            <CardContent className="py-3">
-              <div className="flex items-center gap-5">
-                <Avatar className="size-30 shrink-0">
+            <CardContent className="py-5">
+              <div className="flex items-start gap-5">
+                <Avatar className="size-20 shrink-0">
                   {profile.ProfilePicture && (
                     <AvatarImage src={profile.ProfilePicture} alt={fullName} />
                   )}
-                  <AvatarFallback className="bg-gray-700 text-2xl font-semibold text-white">
+                  <AvatarFallback className="bg-zinc-700 text-2xl font-semibold text-white">
                     {initials}
                   </AvatarFallback>
                 </Avatar>
 
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-xl font-semibold leading-tight">
-                    {fullName}
-                  </h1>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {profile.PersonalEmail}
-                  </p>
-                  <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                  <h1 className="text-xl font-semibold leading-tight">{fullName}</h1>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{profile.PersonalEmail}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     {applicantStatus && (
-                      <Badge
-                        variant="outline"
-                        className={STATUS_STYLES[applicantStatus] ?? ""}
-                      >
+                      <Badge variant="outline" className={STATUS_STYLES[applicantStatus] ?? ""}>
                         {applicantStatus}
                       </Badge>
                     )}
+                    {profile.Gender && <Badge variant="outline">{profile.Gender}</Badge>}
+                    {profile.CivilStatus && <Badge variant="outline">{profile.CivilStatus}</Badge>}
                   </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Profile #{profile.Id}
+                    {" · "}
+                    Created {formatDate(profile.CreatedAt)}
+                    {profile.Qualifier && ` · ${profile.Qualifier}`}
+                  </p>
                 </div>
 
-                <div className="shrink-0 text-right">
-                  <p className="text-xs text-muted-foreground">Profile ID</p>
-                  <p className="font-mono text-sm font-semibold">
-                    #{profile.Id}
-                  </p>
+                {/* Resume button */}
+                <div className="shrink-0">
+                  {isLoadingDocs ? (
+                    <Button variant="outline" size="sm" disabled>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      Resume
+                    </Button>
+                  ) : resumeDoc ? (
+                    <Button variant="outline" size="sm" asChild>
+                      <a
+                        href={resumeDoc.values.FileUrl!}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <FileText className="h-3.5 w-3.5" />
+                        Resume
+                      </a>
+                    </Button>
+                  ) : (
+                    <Button variant="outline" size="sm" disabled>
+                      <FileText className="h-3.5 w-3.5" />
+                      No resume
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* ── Tabs ── */}
-          <Tabs defaultValue="personal">
-            <TabsList className="w-full">
-              <TabsTrigger value="personal" className="flex-1">
-                Personal
-              </TabsTrigger>
-              <TabsTrigger value="contact" className="flex-1">
-                Contact
-              </TabsTrigger>
-              <TabsTrigger value="record" className="flex-1">
-                Record
-              </TabsTrigger>
-              <TabsTrigger value="interviews" className="flex-1">
-                Interviews
-              </TabsTrigger>
-              <TabsTrigger value="resume" className="flex-1">
-                Resume
-              </TabsTrigger>
-            </TabsList>
+          {/* ── Main grid ── */}
+          <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
 
-            <TabsContent value="personal" className="mt-4">
-              <InfoPanel>
-                <Row label="First Name" value={profile.FirstName} />
-                <Row label="Middle Name" value={profile.MiddleName} />
-                <Row label="Last Name" value={profile.LastName} />
-                {profile.Suffix && (
-                  <Row label="Suffix" value={profile.Suffix} />
-                )}
-                <Row label="Gender" value={profile.Gender} />
-                <Row
-                  label="Date of Birth"
-                  value={formatDate(profile.BirthDate)}
-                />
-                <Row
-                  label="Age"
-                  value={
-                    profile.Age != null ? `${profile.Age} years old` : null
-                  }
-                />
-                <Row label="Civil Status" value={profile.CivilStatus} />
-                <Row label="Religion" value={profile.Religion} />
-              </InfoPanel>
-            </TabsContent>
+            {/* Left — Personal + Contact merged */}
+            <InfoPanel>
+              <SectionDivider label="Personal" />
+              <Row label="First Name" value={profile.FirstName} />
+              <Row label="Middle Name" value={profile.MiddleName} />
+              <Row label="Last Name" value={profile.LastName} />
+              {profile.Suffix && <Row label="Suffix" value={profile.Suffix} />}
+              <Row label="Date of Birth" value={formatDate(profile.BirthDate)} />
+              <Row
+                label="Age"
+                value={profile.Age != null ? `${profile.Age} years old` : null}
+              />
+              <Row label="Religion" value={profile.Religion} />
 
-            <TabsContent value="contact" className="mt-4">
-              <InfoPanel>
-                <Row label="Personal Email" value={profile.PersonalEmail} />
-                <Row label="Phone Number" value={profile.PhoneNumber} />
-                <Row label="Mobile Number" value={profile.MobileNumber} />
-                <Row label="Address" value={profile.Address} />
-              </InfoPanel>
-            </TabsContent>
+              <SectionDivider label="Contact" />
+              <Row label="Email" value={profile.PersonalEmail} />
+              <Row label="Phone" value={profile.PhoneNumber} />
+              <Row label="Mobile" value={profile.MobileNumber} />
+              <Row label="Address" value={profile.Address} />
+            </InfoPanel>
 
-            <TabsContent value="record" className="mt-4 space-y-4">
+            {/* Right — Status history + Interviews */}
+            <div className="space-y-5">
               <InfoPanel>
-                <Row label="Profile ID" value={String(profile.Id)} />
-                <Row label="Date Created" value={formatDate(profile.CreatedAt)} />
-                <Row label="Last Updated" value={formatDate(profile.UpdatedAt)} />
-                <Row label="Qualifier" value={profile.Qualifier} />
-              </InfoPanel>
-
-              <InfoPanel>
-                <div className="border-b px-5 py-3">
-                  <p className="text-sm font-medium">Status History</p>
-                </div>
+                <PanelHeader label="Status History" />
                 {isLoadingHistory ? (
                   <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading history…
+                    Loading…
                   </div>
-                ) : statusHistory.length === 0 ? (
-                  <div className="px-5 py-10 text-center text-sm text-muted-foreground">
+                ) : sortedHistory.length === 0 ? (
+                  <p className="px-5 py-10 text-center text-sm text-muted-foreground">
                     No status history recorded.
-                  </div>
+                  </p>
                 ) : (
                   <div className="px-5 py-4">
-                    {[...statusHistory]
-                      .sort(
-                        (a, b) =>
-                          new Date(b.values.CreatedAt).getTime() -
-                          new Date(a.values.CreatedAt).getTime()
-                      )
-                      .map((entry, index, sorted) => {
-                        const v = entry.values
-                        const isLast = index === sorted.length - 1
-                        return (
-                          <div key={entry.id} className="flex gap-3">
-                            {/* Track */}
-                            <div className="flex flex-col items-center">
-                              <div
-                                className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_DOT[v.Status] ?? "bg-muted-foreground"}`}
-                              />
-                              {!isLast && (
-                                <div className="mt-1.5 w-px flex-1 bg-border" />
-                              )}
-                            </div>
-
-                            {/* Content */}
-                            <div className={!isLast ? "pb-5" : ""}>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <Badge
-                                  variant="outline"
-                                  className={STATUS_STYLES[v.Status] ?? ""}
-                                >
-                                  {v.Status}
-                                </Badge>
-                                <span className="text-xs text-muted-foreground">
-                                  {formatDate(v.CreatedAt)}
-                                </span>
-                              </div>
-                              {v.Remarks && (
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                  {v.Remarks}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                        )
-                      })}
-                  </div>
-                )}
-              </InfoPanel>
-            </TabsContent>
-
-            <TabsContent value="interviews" className="mt-4">
-              <InfoPanel>
-                {isLoadingInterviews ? (
-                  <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading interviews…
-                  </div>
-                ) : interviews.length === 0 ? (
-                  <div className="px-5 py-16 text-center text-sm text-muted-foreground">
-                    No interview schedules on record.
-                  </div>
-                ) : (
-                  [...interviews]
-                    .sort(
-                      (a, b) =>
-                        new Date(a.values.ScheduledAt).getTime() -
-                        new Date(b.values.ScheduledAt).getTime()
-                    )
-                    .map((interview) => {
-                      const v = interview.values
+                    {sortedHistory.map((entry, index) => {
+                      const v = entry.values
+                      const isLast = index === sortedHistory.length - 1
                       return (
-                        <div
-                          key={interview.id}
-                          className="border-b px-5 py-4 last:border-0"
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div>
-                              <p className="text-sm font-medium">
-                                {formatDateTime(v.ScheduledAt)}
-                              </p>
-                              {v.Venue && (
-                                <p className="mt-0.5 text-sm text-muted-foreground">
-                                  {v.Venue}
-                                </p>
-                              )}
-                            </div>
-                            <span className="shrink-0 text-xs text-muted-foreground">
-                              Added {formatDate(v.CreatedAt)}
-                            </span>
+                        <div key={entry.id} className="flex gap-3">
+                          <div className="flex flex-col items-center">
+                            <div
+                              className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_DOT[v.Status] ?? "bg-muted-foreground"}`}
+                            />
+                            {!isLast && <div className="mt-1.5 w-px flex-1 bg-border" />}
                           </div>
-                          {v.Notes && (
-                            <p className="mt-2 text-sm text-muted-foreground">
-                              {v.Notes}
-                            </p>
-                          )}
+                          <div className={!isLast ? "pb-5" : ""}>
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Badge variant="outline" className={STATUS_STYLES[v.Status] ?? ""}>
+                                {v.Status}
+                              </Badge>
+                              <span className="text-xs text-muted-foreground">
+                                {formatDate(v.CreatedAt)}
+                              </span>
+                            </div>
+                            {v.Remarks && (
+                              <p className="mt-1 text-sm text-muted-foreground">{v.Remarks}</p>
+                            )}
+                          </div>
                         </div>
                       )
-                    })
+                    })}
+                  </div>
                 )}
               </InfoPanel>
-            </TabsContent>
 
-            <TabsContent value="resume" className="mt-4">
               <InfoPanel>
-                {isLoadingDocs ? (
-                  <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+                <PanelHeader label="Interview Schedules" />
+                {isLoadingInterviews ? (
+                  <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading documents…
+                    Loading…
                   </div>
-                ) : documents.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-                    <FileText className="h-8 w-8 text-muted-foreground" />
-                    <p className="text-sm font-medium">No documents on file</p>
-                    <p className="text-sm text-muted-foreground">
-                      Uploaded documents will appear here.
-                    </p>
-                  </div>
+                ) : sortedInterviews.length === 0 ? (
+                  <p className="px-5 py-10 text-center text-sm text-muted-foreground">
+                    No interview schedules on record.
+                  </p>
                 ) : (
-                  documents.map((doc) => {
-                    const v = doc.values
+                  sortedInterviews.map((interview) => {
+                    const v = interview.values
                     return (
-                      <div
-                        key={doc.id}
-                        className="flex items-center gap-3 border-b px-5 py-3 text-sm last:border-0"
-                      >
-                        <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate font-medium">
-                            {v.FileName ?? "Untitled document"}
-                          </p>
-                          {v.DocumentType && (
-                            <p className="text-xs text-muted-foreground">
-                              {v.DocumentType}
-                            </p>
-                          )}
+                      <div key={interview.id} className="border-b px-5 py-4 last:border-0">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-sm font-medium">{formatDateTime(v.ScheduledAt)}</p>
+                            {v.Venue && (
+                              <p className="mt-0.5 text-sm text-muted-foreground">{v.Venue}</p>
+                            )}
+                          </div>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            Added {formatDate(v.CreatedAt)}
+                          </span>
                         </div>
-                        {v.FileUrl && (
-                          <a
-                            href={v.FileUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="shrink-0 text-xs font-medium text-primary hover:underline"
-                          >
-                            View
-                          </a>
+                        {v.Notes && (
+                          <p className="mt-2 text-sm text-muted-foreground">{v.Notes}</p>
                         )}
                       </div>
                     )
                   })
                 )}
               </InfoPanel>
-            </TabsContent>
-          </Tabs>
+            </div>
+          </div>
         </div>
       )}
     </div>
