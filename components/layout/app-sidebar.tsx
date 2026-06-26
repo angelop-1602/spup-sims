@@ -36,7 +36,7 @@ const menuItems = [
   {
     title: "My Portfolio",
     icon: IdCard,
-    url: "/hrm/employees/portfolio",
+    url: "/hrm/portfolio",
   },
 ]
 
