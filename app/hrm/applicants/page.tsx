@@ -89,6 +89,8 @@ export default function ApplicantsPage() {
   const [profiles, setProfiles] = React.useState<Profile[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [search, setSearch] = React.useState("")
+  const [dateFrom, setDateFrom] = React.useState("")
+  const [dateTo, setDateTo] = React.useState("")
   const [page, setPage] = React.useState(1)
   const [pageSize] = React.useState(20)
   const [totalPages, setTotalPages] = React.useState(1)
@@ -165,17 +167,28 @@ export default function ApplicantsPage() {
 
   const filtered = applicants.filter((applicant) => {
     const term = search.trim().toLowerCase()
-    if (!term) return true
-    const { ApplicationNumber, Status, ProfileId } = applicant.values
-    const matchingProfile = profiles.find((p) => p.id === ProfileId)
-    const fullName = matchingProfile
-      ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
-      : ""
-    return (
-      ApplicationNumber.toLowerCase().includes(term) ||
-      Status.toLowerCase().includes(term) ||
-      fullName.includes(term)
-    )
+    const { ApplicationNumber, Status, ProfileId, CreatedAt } = applicant.values
+
+    if (term) {
+      const matchingProfile = profiles.find((p) => p.id === ProfileId)
+      const fullName = matchingProfile
+        ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
+        : ""
+      const matchesSearch =
+        ApplicationNumber.toLowerCase().includes(term) ||
+        Status.toLowerCase().includes(term) ||
+        fullName.includes(term)
+      if (!matchesSearch) return false
+    }
+
+    if (dateFrom || dateTo) {
+      const applied = new Date(CreatedAt)
+      applied.setHours(0, 0, 0, 0)
+      if (dateFrom && applied < new Date(dateFrom)) return false
+      if (dateTo && applied > new Date(dateTo)) return false
+    }
+
+    return true
   })
 
   return (
@@ -188,15 +201,41 @@ export default function ApplicantsPage() {
           </p>
         </div>
 
-        <div className="relative w-full sm:w-64">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <div className="flex items-center gap-2">
           <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search application no. or status"
-            className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
+          <span className="text-sm text-muted-foreground">to</span>
+          <input
+            type="date"
+            value={dateTo}
+            min={dateFrom || undefined}
+            onChange={(e) => setDateTo(e.target.value)}
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+          {(dateFrom || dateTo) && (
+            <button
+              type="button"
+              onClick={() => { setDateFrom(""); setDateTo("") }}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              Clear
+            </button>
+          )}
+
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search application no. or status"
+              className="w-64 rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            />
+          </div>
         </div>
       </div>
 
@@ -210,11 +249,11 @@ export default function ApplicantsPage() {
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <UserSearch className="h-8 w-8 text-muted-foreground" />
             <p className="text-sm font-medium">
-              {search ? "No applicants match your search" : "No applicants yet"}
+              {search || dateFrom || dateTo ? "No applicants match your filters" : "No applicants yet"}
             </p>
             <p className="text-sm text-muted-foreground">
-              {search
-                ? "Try a different application number or status."
+              {search || dateFrom || dateTo
+                ? "Try adjusting your search or date range."
                 : "Applicants you add will show up here."}
             </p>
           </div>
