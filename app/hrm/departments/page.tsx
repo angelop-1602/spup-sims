@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useMsal } from "@azure/msal-react"
+import { PermissionGuard } from "@/components/auth/permission-guard"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,21 +33,25 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Edit3, Loader2, Plus, Trash2 } from "lucide-react"
-import type { components } from "@/src/lib/api/schema"
-
-type DepartmentRecord = components["schemas"]["EntityRecord"]
-type PagedDepartmentResponse =
-  components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"]
-
-type DepartmentValues = {
-  Code?: string
-  Name?: string
-  Description?: string
+type Department = {
+  id: number | string
+  code?: string | null
+  Code?: string | null
+  name?: string | null
+  Name?: string | null
 }
 
 type DepartmentForm = {
   name: string
-  description: string
+  Code: string
+}
+
+function getDepartmentCode(department: Department) {
+  return department.code ?? department.Code ?? "-"
+}
+
+function getDepartmentName(department: Department) {
+  return department.name ?? department.Name ?? ""
 }
 
 const API_SCOPES =
@@ -54,26 +59,22 @@ const API_SCOPES =
     "User.Read",
   ]
 
-function getValues(department: DepartmentRecord): DepartmentValues {
-  return (department.values ?? {}) as DepartmentValues
-}
-
 export default function DepartmentsPage() {
   const { accounts, instance } = useMsal()
   const account = accounts[0]
 
-  const [departments, setDepartments] = React.useState<DepartmentRecord[]>([])
+  const [departments, setDepartments] = React.useState<Department[]>([])
   const [formState, setFormState] = React.useState<DepartmentForm>({
     name: "",
-    description: "",
+    Code: "",
   })
 
   const [selectedDepartment, setSelectedDepartment] =
-    React.useState<DepartmentRecord | null>(null)
+    React.useState<Department | null>(null)
 
   const [loading, setLoading] = React.useState(false)
   const [saving, setSaving] = React.useState(false)
-  const [deletingId, setDeletingId] = React.useState<number | null>(null)
+  const [deletingId, setDeletingId] = React.useState<number | string | null>(null)
   const [error, setError] = React.useState<string | null>(null)
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
 
@@ -113,8 +114,10 @@ export default function DepartmentsPage() {
         throw new Error(`Failed to load departments (${response.status})`)
       }
 
-      const payload = (await response.json()) as PagedDepartmentResponse
-      setDepartments(payload.data?.data ?? [])
+      const payload = await response.json()
+      const pagedData =
+        payload?.data?.data ?? payload?.data ?? payload
+      setDepartments(Array.isArray(pagedData) ? pagedData : [])
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to load departments")
     } finally {
@@ -132,7 +135,8 @@ export default function DepartmentsPage() {
     setSelectedDepartment(null)
     setFormState({
       name: "",
-      description: "",
+      Code: "",
+    
     })
   }, [])
 
@@ -141,13 +145,11 @@ export default function DepartmentsPage() {
     setIsDialogOpen(true)
   }
 
-  const openEditDialog = (department: DepartmentRecord) => {
-    const values = getValues(department)
-
+  const openEditDialog = (department: Department) => {
     setSelectedDepartment(department)
     setFormState({
-      name: values.Name ?? "",
-      description: values.Description ?? "",
+      name: getDepartmentName(department),
+      Code: getDepartmentCode(department),
     })
     setIsDialogOpen(true)
   }
@@ -170,11 +172,8 @@ export default function DepartmentsPage() {
           headers,
           cache: "no-store",
           body: JSON.stringify({
-            entity: DEPARTMENT_ENTITY,
-            values: {
-              Name: formState.name,
-              Description: formState.description,
-            },
+            name: formState.name,
+            code: formState.Code,
           }),
         },
       )
@@ -193,7 +192,7 @@ export default function DepartmentsPage() {
     }
   }
 
-  const deleteDepartment = async (department: DepartmentRecord) => {
+  const deleteDepartment = async (department: Department) => {
     setDeletingId(department.id)
     setError(null)
 
@@ -222,12 +221,13 @@ export default function DepartmentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PermissionGuard requiredPermissions={["organization.departments.view"]}>
+      <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Departments</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Create, edit, and delete department entity records.
+            Create, edit, and delete department records.
           </p>
         </div>
 
@@ -271,20 +271,17 @@ export default function DepartmentsPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              departments.map((department) => {
-                const values = getValues(department)
-
-                return (
-                  <TableRow key={`${department.entity}-${department.id}`}>
-                    <TableCell>{department.id}</TableCell>
-                    <TableCell>{values.Code ?? "-"}</TableCell>
-                    <TableCell>{values.Name ?? "-"}</TableCell>
-                    <TableCell className="space-x-2 text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditDialog(department)}
-                      >
+              departments.map((department) => (
+                <TableRow key={String(department.id)}>
+                  <TableCell>{department.id}</TableCell>
+                  <TableCell>{getDepartmentCode(department)}</TableCell>
+                  <TableCell>{getDepartmentName(department) || "-"}</TableCell>
+                  <TableCell className="space-x-2 text-right">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openEditDialog(department)}
+                    >
                         <Edit3 className="mr-2 h-4 w-4" />
                         Edit
                       </Button>
@@ -317,9 +314,8 @@ export default function DepartmentsPage() {
                         </AlertDialogContent>
                       </AlertDialog>
                     </TableCell>
-                  </TableRow>
-                )
-              })
+                </TableRow>
+              ))
             )}
           </TableBody>
         </Table>
@@ -360,17 +356,17 @@ export default function DepartmentsPage() {
 
             <div>
               <label className="mb-2 block text-sm font-medium">
-                Description
+                Code
               </label>
               <Input
-                value={formState.description}
+                value={formState.Code}
                 onChange={(event) =>
                   setFormState((current) => ({
                     ...current,
-                    description: event.target.value,
+                    code: event.target.value,
                   }))
                 }
-                placeholder="Optional description"
+                placeholder="Optional code"
               />
             </div>
 
@@ -394,5 +390,6 @@ export default function DepartmentsPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </PermissionGuard>
   )
 }
