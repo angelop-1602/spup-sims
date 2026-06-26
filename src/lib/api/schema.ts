@@ -4933,169 +4933,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/organization/campuses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organization/campuses/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/organization/colleges": {
         parameters: {
             query?: never;
@@ -5126,9 +4963,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCollegeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCollegeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCollegeResponse"];
                     };
                 };
             };
@@ -5143,9 +4980,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateCollegeRequest"];
+                    "text/json": components["schemas"]["CreateCollegeRequest"];
+                    "application/*+json": components["schemas"]["CreateCollegeRequest"];
                 };
             };
             responses: {
@@ -5155,9 +4992,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCollegeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCollegeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCollegeResponse"];
                     };
                 };
             };
@@ -5192,9 +5029,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCollegeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCollegeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCollegeResponse"];
                     };
                 };
             };
@@ -5210,9 +5047,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateCollegeRequest"];
+                    "text/json": components["schemas"]["UpdateCollegeRequest"];
+                    "application/*+json": components["schemas"]["UpdateCollegeRequest"];
                 };
             };
             responses: {
@@ -5222,9 +5059,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCollegeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCollegeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCollegeResponse"];
                     };
                 };
             };
@@ -5241,16 +5078,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -5289,9 +5122,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDepartmentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDepartmentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDepartmentResponse"];
                     };
                 };
             };
@@ -5306,9 +5139,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateDepartmentRequest"];
+                    "text/json": components["schemas"]["CreateDepartmentRequest"];
+                    "application/*+json": components["schemas"]["CreateDepartmentRequest"];
                 };
             };
             responses: {
@@ -5318,9 +5151,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDepartmentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfDepartmentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfDepartmentResponse"];
                     };
                 };
             };
@@ -5355,9 +5188,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDepartmentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfDepartmentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfDepartmentResponse"];
                     };
                 };
             };
@@ -5373,9 +5206,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateDepartmentRequest"];
+                    "text/json": components["schemas"]["UpdateDepartmentRequest"];
+                    "application/*+json": components["schemas"]["UpdateDepartmentRequest"];
                 };
             };
             responses: {
@@ -5385,9 +5218,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDepartmentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfDepartmentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfDepartmentResponse"];
                     };
                 };
             };
@@ -5404,16 +5237,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -5452,9 +5281,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDesignationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDesignationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDesignationResponse"];
                     };
                 };
             };
@@ -5469,9 +5298,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateDesignationRequest"];
+                    "text/json": components["schemas"]["CreateDesignationRequest"];
+                    "application/*+json": components["schemas"]["CreateDesignationRequest"];
                 };
             };
             responses: {
@@ -5481,9 +5310,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfDesignationResponse"];
                     };
                 };
             };
@@ -5518,9 +5347,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfDesignationResponse"];
                     };
                 };
             };
@@ -5536,9 +5365,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateDesignationRequest"];
+                    "text/json": components["schemas"]["UpdateDesignationRequest"];
+                    "application/*+json": components["schemas"]["UpdateDesignationRequest"];
                 };
             };
             responses: {
@@ -5548,9 +5377,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfDesignationResponse"];
                     };
                 };
             };
@@ -5567,16 +5396,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -11175,6 +11000,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfCollegeResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["CollegeResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfCommunityInvolvementResponse: {
             success: boolean;
             message: string;
@@ -11212,6 +11048,28 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["DashboardMetricResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfDepartmentResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["DepartmentResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfDesignationResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["DesignationResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11417,10 +11275,43 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPagedResponseOfCollegeResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfCollegeResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfPagedResponseOfCommunityInvolvementResponse: {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfCommunityInvolvementResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfDepartmentResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfDepartmentResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfDesignationResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfDesignationResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11707,6 +11598,13 @@ export interface components {
             checkOut: string;
         };
         CivilStatus: number;
+        CollegeResponse: {
+            /** Format: int64 */
+            id: number | string;
+            name: string;
+            code: string;
+            isActive: boolean;
+        };
         CommunityInvolvementRequest: {
             involvement: string;
             natureInvolvement: string;
@@ -11737,6 +11635,21 @@ export interface components {
             isHoliday: boolean;
             isRestDay: boolean;
             status: null | string;
+        };
+        CreateCollegeRequest: {
+            name: string;
+            code: string;
+            isActive?: boolean;
+        };
+        CreateDepartmentRequest: {
+            name: string;
+            code: string;
+            isActive?: boolean;
+        };
+        CreateDesignationRequest: {
+            name: string;
+            code: string;
+            isActive?: boolean;
         };
         CreateEmployeeDocumentRequest: {
             /** Format: int64 */
@@ -11863,6 +11776,20 @@ export interface components {
             value: number | string;
             unit: null | string;
             description: null | string;
+        };
+        DepartmentResponse: {
+            /** Format: int64 */
+            id: number | string;
+            name: string;
+            code: string;
+            isActive: boolean;
+        };
+        DesignationResponse: {
+            /** Format: int64 */
+            id: number | string;
+            name: string;
+            code: string;
+            isActive: boolean;
         };
         DocumentReportResponse: {
             /** Format: int32 */
@@ -12122,8 +12049,47 @@ export interface components {
             success?: boolean;
             message?: string;
         };
+        PagedResponseOfCollegeResponse: {
+            data: components["schemas"]["CollegeResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
         PagedResponseOfCommunityInvolvementResponse: {
             data: components["schemas"]["CommunityInvolvementResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfDepartmentResponse: {
+            data: components["schemas"]["DepartmentResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfDesignationResponse: {
+            data: components["schemas"]["DesignationResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -12392,6 +12358,21 @@ export interface components {
             isHoliday: boolean;
             isRestDay: boolean;
             status: null | string;
+        };
+        UpdateCollegeRequest: {
+            name: string;
+            code: string;
+            isActive?: boolean;
+        };
+        UpdateDepartmentRequest: {
+            name: string;
+            code: string;
+            isActive?: boolean;
+        };
+        UpdateDesignationRequest: {
+            name: string;
+            code: string;
+            isActive?: boolean;
         };
         UpdateEmployeeDocumentRequest: {
             documentType: string;
