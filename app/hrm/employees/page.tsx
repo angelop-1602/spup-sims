@@ -5,6 +5,8 @@ import { useMsal } from "@azure/msal-react"
 import { loginRequest } from "@/lib/authConfig"
 import { Loader2, Search, Users } from "lucide-react"
 
+const PAGE_SIZE = 10
+
 interface Employee {
   id: number
   employeeNumber: string
@@ -47,7 +49,7 @@ function getInitials(name: string) {
 function formatDate(dateString: string) {
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
-    month: "short",
+    month: "numeric",
     day: "numeric",
   })
 }
@@ -57,11 +59,35 @@ export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  // Search + filters
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  const [departmentFilter, setDepartmentFilter] = useState("")
+  const [designationFilter, setDesignationFilter] = useState("")
+
+  // Options for the filter dropdowns, accumulated across pages as we see them
+  const [departmentOptions, setDepartmentOptions] = useState<string[]>([])
+  const [designationOptions, setDesignationOptions] = useState<string[]>([])
+
+  // Pagination
   const [page, setPage] = useState(1)
-  const [pageSize] = useState(10)
+  const [pageSize] = useState(PAGE_SIZE)
   const [totalPages, setTotalPages] = useState(1)
   const [totalRecords, setTotalRecords] = useState(0)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search.trim())
+      setPage(1)
+    }, 200) // 200ms debounce
+    return () => clearTimeout(timeout)
+  }, [search])
+
+  // Reset to page 1 whenever a dropdown filter changes
+  useEffect(() => {
+    setPage(1)
+  }, [departmentFilter, designationFilter])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -77,16 +103,21 @@ export default function EmployeesPage() {
           account: accounts[0],
         })
 
-        const res = await fetch(
-          `/api/v1/hrms/employees?page=${page}&pageSize=${pageSize}`,
-          {
-            signal: controller.signal,
-            headers: {
-              Authorization: `Bearer ${tokenResponse.accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        )
+        const params = new URLSearchParams({
+          page: String(page),
+          pageSize: String(PAGE_SIZE),
+        })
+        if (debouncedSearch) params.set("search", debouncedSearch)
+        if (departmentFilter) params.set("department", departmentFilter)
+        if (designationFilter) params.set("designation", designationFilter)
+
+        const res = await fetch(`/api/v1/hrms/employees?${params.toString()}`, {
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${tokenResponse.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        })
         if (!res.ok) {
           throw new Error(`Request failed (${res.status})`)
         }
@@ -94,9 +125,21 @@ export default function EmployeesPage() {
         if (!json.success) {
           throw new Error(json.message || "Couldn't load employees.")
         }
+
         setEmployees(json.data.data)
         setTotalPages(json.data.totalPages)
         setTotalRecords(json.data.totalRecords)
+
+        setDepartmentOptions((prev) => {
+          const next = new Set(prev)
+          json.data.data.forEach((e) => e.department && next.add(e.department))
+          return Array.from(next).sort()
+        })
+        setDesignationOptions((prev) => {
+          const next = new Set(prev)
+          json.data.data.forEach((e) => e.designation && next.add(e.designation))
+          return Array.from(next).sort()
+        })
       } catch (err) {
         if (err instanceof Error && err.name !== "AbortError") {
           setError(err.message)
@@ -108,18 +151,17 @@ export default function EmployeesPage() {
 
     fetchEmployees()
     return () => controller.abort()
-  }, [instance, accounts, page, pageSize])
+  }, [
+    instance,
+    accounts,
+    page,
+    pageSize,
+    debouncedSearch,
+    departmentFilter,
+    designationFilter,
+  ])
 
-  const filtered = employees.filter((employee) => {
-    const term = search.trim().toLowerCase()
-    if (!term) return true
-    return (
-      employee.fullName.toLowerCase().includes(term) ||
-      employee.employeeNumber.toLowerCase().includes(term) ||
-      employee.email.toLowerCase().includes(term) ||
-      (employee.department ?? "").toLowerCase().includes(term)
-    )
-  })
+  const hasActiveFilters = Boolean(search || departmentFilter || designationFilter)
 
   return (
     <div>
@@ -130,20 +172,63 @@ export default function EmployeesPage() {
             Employee records will appear here.
           </p>
         </div>
+      </div>
 
+      {/* Search + filters row */}
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative w-full sm:w-64">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, ID, email, department"
+            placeholder="Search name, department, designation"
             className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
+
+        <select
+          value={departmentFilter}
+          onChange={(e) => setDepartmentFilter(e.target.value)}
+          className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-48"
+        >
+          <option value="">All departments</option>
+          {departmentOptions.map((dept) => (
+            <option key={dept} value={dept}>
+              {dept}
+            </option>
+          ))}
+        </select>
+
+        <select
+          value={designationFilter}
+          onChange={(e) => setDesignationFilter(e.target.value)}
+          className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-48"
+        >
+          <option value="">All designations</option>
+          {designationOptions.map((role) => (
+            <option key={role} value={role}>
+              {role}
+            </option>
+          ))}
+        </select>
+
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearch("")
+              setDepartmentFilter("")
+              setDesignationFilter("")
+            }}
+            className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
 
-      <div className="mt-6 overflow-hidden rounded-lg border">
+      <div className="mt-4 overflow-hidden rounded-lg border">
         {isLoading ? (
           <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -154,15 +239,15 @@ export default function EmployeesPage() {
             <p className="text-sm font-medium">Couldn&apos;t load employees</p>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>
-        ) : filtered.length === 0 ? (
+        ) : employees.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <Users className="h-8 w-8 text-muted-foreground" />
             <p className="text-sm font-medium">
-              {search ? "No employees match your search" : "No employees yet"}
+              {hasActiveFilters ? "No employees match your filters" : "No employees yet"}
             </p>
             <p className="text-sm text-muted-foreground">
-              {search
-                ? "Try a different name, ID, email, or department."
+              {hasActiveFilters
+                ? "Try a different name, department, or designation."
                 : "Employees you add will show up here."}
             </p>
           </div>
@@ -180,7 +265,7 @@ export default function EmployeesPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((employee) => (
+                {employees.map((employee) => (
                   <tr key={employee.id} className="border-b last:border-0 hover:bg-muted/30">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
