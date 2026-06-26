@@ -58,7 +58,7 @@ const hrMenuItems = [
   {
     title: "Departments",
     icon: Building,
-    url: "#",
+    url: "/hrm/departments",
   },
   {
     title: "Designations",
