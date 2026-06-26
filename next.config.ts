@@ -6,6 +6,10 @@ const nextConfig = {
         source: "/api/v1/recruitment/:path*",
         destination: "https://sims.spup.space/api/v1/recruitment/:path*",
       },
+      {
+        source: "/api/v1/core/:path*",
+        destination: "https://sims.spup.space/api/v1/core/:path*",
+      },
     ]
   },
 }
