@@ -103,6 +103,35 @@ interface StatusHistoryResponse {
   }
 }
 
+interface InterviewScheduleValues {
+  Id: number
+  EmployeeApplicantId: number
+  ScheduledAt: string
+  Venue: string | null
+  Notes: string | null
+  CreatedAt: string
+  UpdatedAt: string | null
+  IsDeleted: boolean
+}
+
+interface InterviewSchedule {
+  entity: string
+  id: number
+  values: InterviewScheduleValues
+}
+
+interface InterviewSchedulesResponse {
+  success: boolean
+  message: string
+  data: {
+    data: InterviewSchedule[]
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
+}
+
 const STATUS_STYLES: Record<string, string> = {
   Interview: "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400",
   Hired: "bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400",
@@ -125,6 +154,18 @@ function formatDate(dateString: string | null) {
     year: "numeric",
     month: "short",
     day: "numeric",
+  })
+}
+
+function formatDateTime(dateString: string | null) {
+  if (!dateString) return "—"
+  return new Date(dateString).toLocaleString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
   })
 }
 
@@ -165,6 +206,8 @@ export default function ProfileDetailPage() {
   const [isLoadingDocs, setIsLoadingDocs] = React.useState(false)
   const [statusHistory, setStatusHistory] = React.useState<StatusHistoryEntry[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = React.useState(false)
+  const [interviews, setInterviews] = React.useState<InterviewSchedule[]>([])
+  const [isLoadingInterviews, setIsLoadingInterviews] = React.useState(false)
 
   React.useEffect(() => {
     async function fetchProfile() {
@@ -301,6 +344,52 @@ export default function ProfileDetailPage() {
     fetchStatusHistory()
   }, [instance, accounts, applicantId])
 
+  React.useEffect(() => {
+    async function fetchInterviews() {
+      if (accounts.length === 0 || !applicantId) return
+
+      setIsLoadingInterviews(true)
+
+      try {
+        const tokenResponse = await instance.acquireTokenSilent({
+          ...loginRequest,
+          account: accounts[0],
+        })
+
+        const res = await fetch(
+          `/api/v1/recruitment/interview-schedules?EmployeeApplicantId=${applicantId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResponse.accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+
+        if (!res.ok) {
+          console.error(`Interview schedules fetch failed with status: ${res.status}`)
+          setInterviews([])
+          return
+        }
+
+        const payload: InterviewSchedulesResponse = await res.json()
+
+        if (payload?.success && payload.data?.data) {
+          setInterviews(payload.data.data)
+        } else {
+          setInterviews([])
+        }
+      } catch (error) {
+        console.error("Failed to fetch interview schedules:", error)
+        setInterviews([])
+      } finally {
+        setIsLoadingInterviews(false)
+      }
+    }
+
+    fetchInterviews()
+  }, [instance, accounts, applicantId])
+
   const fullName = profile
     ? [profile.FirstName, profile.MiddleName, profile.LastName, profile.Suffix]
         .filter(Boolean)
@@ -388,6 +477,9 @@ export default function ProfileDetailPage() {
               </TabsTrigger>
               <TabsTrigger value="record" className="flex-1">
                 Record
+              </TabsTrigger>
+              <TabsTrigger value="interviews" className="flex-1">
+                Interviews
               </TabsTrigger>
               <TabsTrigger value="resume" className="flex-1">
                 Resume
@@ -494,6 +586,58 @@ export default function ProfileDetailPage() {
                         )
                       })}
                   </div>
+                )}
+              </InfoPanel>
+            </TabsContent>
+
+            <TabsContent value="interviews" className="mt-4">
+              <InfoPanel>
+                {isLoadingInterviews ? (
+                  <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading interviews…
+                  </div>
+                ) : interviews.length === 0 ? (
+                  <div className="px-5 py-16 text-center text-sm text-muted-foreground">
+                    No interview schedules on record.
+                  </div>
+                ) : (
+                  [...interviews]
+                    .sort(
+                      (a, b) =>
+                        new Date(a.values.ScheduledAt).getTime() -
+                        new Date(b.values.ScheduledAt).getTime()
+                    )
+                    .map((interview) => {
+                      const v = interview.values
+                      return (
+                        <div
+                          key={interview.id}
+                          className="border-b px-5 py-4 last:border-0"
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <p className="text-sm font-medium">
+                                {formatDateTime(v.ScheduledAt)}
+                              </p>
+                              {v.Venue && (
+                                <p className="mt-0.5 text-sm text-muted-foreground">
+                                  {v.Venue}
+                                </p>
+                              )}
+                            </div>
+                            <span className="shrink-0 text-xs text-muted-foreground">
+                              Added {formatDate(v.CreatedAt)}
+                            </span>
+                          </div>
+                          {v.Notes && (
+                            <p className="mt-2 text-sm text-muted-foreground">
+                              {v.Notes}
+                            </p>
+                          )}
+                        </div>
+                      )
+                    })
                 )}
               </InfoPanel>
             </TabsContent>
