@@ -69,7 +69,7 @@ const STATUS_STYLES: Record<string, string> = {
 }
 
 function getStatusStyle(status: string) {
-  return STATUS_STYLES[status] ?? "bg-zinc-100 text-zinc-600"
+  return STATUS_STYLES[status] ?? "bg-muted text-muted-foreground border border-border"
 }
 
 function formatDate(dateString: string | null) {
