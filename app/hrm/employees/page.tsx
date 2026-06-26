@@ -3,66 +3,11 @@
 import { useEffect, useState } from "react"
 import { useMsal } from "@azure/msal-react"
 import { loginRequest } from "@/lib/authConfig"
-import { Loader2, Search, Users } from "lucide-react"
+import { Loader2, Search, Users, Eye } from "lucide-react"
+import { Employee, EmployeesResponse, Department, DepartmentsResponse, Designation, DesignationsResponse } from "./types"
+import { EmployeeDetailsModal } from "./modal"
 
 const PAGE_SIZE = 10
-
-interface Employee {
-  id: number
-  employeeNumber: string
-  firstName: string
-  middleName: string | null
-  lastName: string
-  suffix: string | null
-  fullName: string
-  email: string
-  mobileNumber: string | null
-  phoneNumber: string | null
-  departmentId: number
-  department: string | null
-  designationId: number | null
-  designation: string | null
-  employeeTypeId: number
-  employeeType: string | null
-  dateHired: string
-  isActive: boolean
-}
-
-interface EmployeesResponse {
-  success: boolean
-  message: string
-  data: {
-    data: Employee[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
-}
-
-interface Department {
-  id: number
-  name: string
-}
-
-interface DepartmentsResponse {
-  success: boolean
-  data: {
-    data: Department[]
-  }
-}
-
-interface Designation {
-  id: number
-  name: string
-}
-
-interface DesignationsResponse {
-  success: boolean
-  data: {
-    data: Designation[]
-  }
-}
 
 function getInitials(name: string) {
   return name
@@ -71,14 +16,6 @@ function getInitials(name: string) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
     .join("")
-}
-
-function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "numeric",
-    day: "numeric",
-  })
 }
 
 export default function EmployeesPage() {
@@ -102,6 +39,12 @@ export default function EmployeesPage() {
   const [totalPages, setTotalPages] = useState(1)
   const [totalRecords, setTotalRecords] = useState(0)
 
+  // Employee modal
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [detailedEmployee, setDetailedEmployee] = useState<any | null>(null)
+  const [isModalLoading, setIsModalLoading] = useState(false)
+
   // Search input
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -114,6 +57,38 @@ export default function EmployeesPage() {
   useEffect(() => {
     setDesignationFilter("")
   }, [departmentFilter])
+
+  async function handleViewDetails(id: number) {
+    setSelectedEmployeeId(id)
+    setIsModalOpen(true)
+    setIsModalLoading(true)
+    setDetailedEmployee(null) 
+
+    try {
+      const tokenResponse = await instance.acquireTokenSilent({
+        ...loginRequest,
+        account: accounts[0],
+      })
+
+      const res = await fetch(`/api/v1/hrms/employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${tokenResponse.accessToken}`,
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!res.ok) throw new Error("Could not load employee details profile.")
+      const json = await res.json()
+      
+      if (json.success) {
+        setDetailedEmployee(json.data)
+      }
+    } catch (err) {
+      console.error("Error fetching detailed employee data:", err)
+    } finally {
+      setIsModalLoading(false)
+    }
+  }
 
   // Reset pagination when filters are adjusted
   useEffect(() => {
@@ -146,12 +121,14 @@ export default function EmployeesPage() {
         
         if (json.success && json.data?.data) {
           const depts = json.data.data
-            .map((item) => ({
-              id: String(item.id),
-              name: item.name || ""
-            }))
-            .filter((item) => item.name)
-            .sort((a, b) => a.name.localeCompare(b.name))
+          .map((item: Department) => ({
+            id: String(item.id),
+            name: item.name || ""
+          }))
+          .filter((item: { id: string; name: string }) => item.name)
+          .sort((a: { id: string; name: string }, b: { id: string; name: string }) => 
+            a.name.localeCompare(b.name)
+          )
             
           setDepartmentOptions(depts)
         }
@@ -197,12 +174,12 @@ export default function EmployeesPage() {
         
         if (json.success && json.data?.data) {
           const structuralRoles = json.data.data
-            .map((item) => ({
+            .map((item: Designation) => ({
               id: String(item.id),            
               name: item.name || ""
             }))
-            .filter((item) => item.name)
-            .sort((a, b) => a.name.localeCompare(b.name))
+            .filter((item: { id: string; name: string }) => item.name)
+            .sort((a: { id: string; name: string }, b: { id: string; name: string }) => a.name.localeCompare(b.name))
             
           setDesignationOptions(structuralRoles)
         }
@@ -368,7 +345,7 @@ export default function EmployeesPage() {
             </p>
             <p className="text-sm text-muted-foreground">
               {hasActiveFilters
-                ? "Try a different name, department, or designation."
+                ? "Try a different name."
                 : "Employees you add will show up here."}
             </p>
           </div>
@@ -381,8 +358,8 @@ export default function EmployeesPage() {
                   <th className="px-4 py-3 font-medium">Employee ID</th>
                   <th className="px-4 py-3 font-medium">Department</th>
                   <th className="px-4 py-3 font-medium">Designation</th>
-                  <th className="px-4 py-3 font-medium">Date hired</th>
                   <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -406,9 +383,6 @@ export default function EmployeesPage() {
                     </td>
                     <td className="px-4 py-3">{employee.department ?? "—"}</td>
                     <td className="px-4 py-3">{employee.designation ?? "—"}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {formatDate(employee.dateHired)}
-                    </td>
                     <td className="px-4 py-3">
                       <span
                         className={
@@ -421,6 +395,16 @@ export default function EmployeesPage() {
                         {employee.isActive ? "Active" : "Inactive"}
                       </span>
                     </td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={() => handleViewDetails(employee.id)}
+                        title="View Details"
+                        className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                      >
+                        <Eye className="h-4 w-4" /> 
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -428,6 +412,14 @@ export default function EmployeesPage() {
           </div>
         )}
       </div>
+
+      <EmployeeDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        isLoading={isModalLoading}
+        employee={detailedEmployee}
+        getInitials={getInitials}
+      />
 
       {!isLoading && !error && employees.length > 0 && (
         <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
