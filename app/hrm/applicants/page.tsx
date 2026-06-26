@@ -85,6 +85,7 @@ function formatDate(dateString: string | null) {
 export default function ApplicantsPage() {
   const { instance, accounts } = useMsal()
   const [applicants, setApplicants] = React.useState<Applicant[]>([])
+  const [profiles, setProfiles] = React.useState<Profile[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
   const [search, setSearch] = React.useState("")
   const [page, setPage] = React.useState(1)
@@ -104,34 +105,55 @@ export default function ApplicantsPage() {
           account: accounts[0],
         })
 
-        const res = await fetch(
-          `/api/v1/recruitment/employee-applicants?page=${page}&pageSize=${pageSize}`,
-          {
-            headers: {
-              Authorization: `Bearer ${tokenResponse.accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        )
+        const headers = {
+          Authorization: `Bearer ${tokenResponse.accessToken}`,
+          "Content-Type": "application/json",
+        }
 
-        if (!res.ok) {
-          console.error(`API fetch failed with status: ${res.status}`)
+        const params = new URLSearchParams({
+          Page: String(page),
+          PageSize: String(pageSize),
+          Search: "",
+          SortBy: "",
+          Descending: "true",
+          SchoolYearId: "1",
+          Status: "",
+        })
+
+        const [applicantsRes, profilesRes] = await Promise.all([
+          fetch(`/api/v1/recruitment/employee-applicants?${params.toString()}`, { headers }),
+          fetch(`/api/v1/core/profiles?page=1&pageSize=100`, { headers }),
+        ])
+
+        if (!applicantsRes.ok) {
+          console.error(`Applicants fetch failed with status: ${applicantsRes.status}`)
           setApplicants([])
           return
         }
+ 
+        if (!profilesRes.ok) {
+          console.error(`Profiles fetch failed with status: ${profilesRes.status}`)
+        }
 
-        const payload: ApplicantsResponse = await res.json()
+        const applicantsPayload: ApplicantsResponse = await applicantsRes.json()
 
-        if (payload && payload.success && payload.data) {
-          setApplicants(payload.data.data ?? [])
-          setTotalPages(payload.data.totalPages ?? 1)
-          setTotalRecords(payload.data.totalRecords ?? 0)
+        const profilesPayload: ProfilesResponse = profilesRes.ok
+          ? await profilesRes.json()
+          : { success: false, data: { data: [] } }
+
+        if (applicantsPayload && applicantsPayload.success && applicantsPayload.data) {
+          setApplicants(applicantsPayload.data.data ?? [])
+          setTotalPages(applicantsPayload.data.totalPages ?? 1)
+          setTotalRecords(applicantsPayload.data.totalRecords ?? 0)
         } else {
           setApplicants([])
         }
+
+        setProfiles(profilesPayload.data?.data ?? [])
       } catch (error) {
         console.error("Failed to acquire token or fetch data:", error)
         setApplicants([])
+        setProfiles([])
       } finally {
         setIsLoading(false)
       }
@@ -144,10 +166,14 @@ export default function ApplicantsPage() {
     const term = search.trim().toLowerCase()
     if (!term) return true
     const { ApplicationNumber, Status, ProfileId } = applicant.values
+    const matchingProfile = profiles.find((p) => p.id === ProfileId)
+    const fullName = matchingProfile
+      ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
+      : ""
     return (
       ApplicationNumber.toLowerCase().includes(term) ||
       Status.toLowerCase().includes(term) ||
-      String(ProfileId).includes(term)
+      fullName.includes(term)
     )
   })
 
@@ -197,7 +223,7 @@ export default function ApplicantsPage() {
               <thead>
                 <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-4 py-3 font-medium">Application No.</th>
-                  <th className="px-4 py-3 font-medium">Profile ID</th>
+                  <th className="px-4 py-3 font-medium">Applicant Name</th>
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Date Applied</th>
                   <th className="px-4 py-3 font-medium">Last Updated</th>
@@ -206,6 +232,11 @@ export default function ApplicantsPage() {
               <tbody>
                 {filtered.map((applicant) => {
                   const v = applicant.values
+                  const matchingProfile = profiles.find((p) => p.id === v.ProfileId)
+                  const fullName = matchingProfile
+                    ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`
+                    : "No linked profile"
+
                   return (
                     <tr
                       key={applicant.id}
@@ -214,8 +245,12 @@ export default function ApplicantsPage() {
                       <td className="px-4 py-3 font-medium">
                         {v.ApplicationNumber}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {v.ProfileId}
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/hrm/profiles/${v.ProfileId}`}
+                        >
+                          {fullName}
+                        </Link>
                       </td>
                       <td className="px-4 py-3">
                         <span
