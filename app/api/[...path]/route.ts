@@ -20,7 +20,11 @@ type ApiRouteContext = {
 function getTargetUrl(path: string[], request: NextRequest) {
   const baseUrl = new URL(API_BASE)
   const basePath = baseUrl.pathname.replace(/\/$/, "")
-  const targetPath = path.map((segment) => encodeURIComponent(segment)).join("/")
+
+  const cleanPath = path.filter(
+    (segment) => segment.toLowerCase() !== "v1" && segment.toLowerCase() !== "api"
+  )
+  const targetPath = cleanPath.map((segment) => encodeURIComponent(segment)).join("/")
 
   baseUrl.pathname = `${basePath}/${targetPath}`
   baseUrl.search = request.nextUrl.search
