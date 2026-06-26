@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react"
-import Link from "next/link"
+import { useRouter } from "next/navigation";
 import { useMsal } from "@azure/msal-react"
 import { loginRequest } from "@/lib/authConfig"
-import { Loader2, Search, UserSearch } from "lucide-react"
+import { Loader2, Search, UserSearch, Eye } from "lucide-react"
 
 interface ApplicantValues {
   Id: number
@@ -84,6 +84,7 @@ function formatDate(dateString: string | null) {
 
 export default function ApplicantsPage() {
   const { instance, accounts } = useMsal()
+  const router = useRouter()
   const [applicants, setApplicants] = React.useState<Applicant[]>([])
   const [profiles, setProfiles] = React.useState<Profile[]>([])
   const [isLoading, setIsLoading] = React.useState(true)
@@ -227,6 +228,7 @@ export default function ApplicantsPage() {
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Date Applied</th>
                   <th className="px-4 py-3 font-medium">Last Updated</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th> 
                 </tr>
               </thead>
               <tbody>
@@ -246,11 +248,7 @@ export default function ApplicantsPage() {
                         {v.ApplicationNumber}
                       </td>
                       <td className="px-4 py-3">
-                        <Link
-                          href={`/hrm/profiles/${v.ProfileId}`}
-                        >
                           {fullName}
-                        </Link>
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -267,6 +265,15 @@ export default function ApplicantsPage() {
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
                         {formatDate(v.UpdatedAt)}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <button
+                          type="button"
+                          onClick={() => router.push(`/hrm/profiles/${v.ProfileId}`)}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-secondary/50 px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-all hover:bg-secondary focus-visible:outline-none"
+                        >
+                          <Eye className="h-3.5 w-3.5 opacity-70" />
+                        </button>
                       </td>
                     </tr>
                   )
