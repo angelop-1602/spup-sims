@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useMsal } from "@azure/msal-react"
+import { PermissionGuard } from "@/components/auth/permission-guard"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,13 +39,11 @@ type Department = {
   Code?: string | null
   name?: string | null
   Name?: string | null
-  description?: string | null
-  Description?: string | null
 }
 
 type DepartmentForm = {
   name: string
-  description: string
+  Code: string
 }
 
 function getDepartmentCode(department: Department) {
@@ -67,7 +66,7 @@ export default function DepartmentsPage() {
   const [departments, setDepartments] = React.useState<Department[]>([])
   const [formState, setFormState] = React.useState<DepartmentForm>({
     name: "",
-    code: "",
+    Code: "",
   })
 
   const [selectedDepartment, setSelectedDepartment] =
@@ -136,7 +135,7 @@ export default function DepartmentsPage() {
     setSelectedDepartment(null)
     setFormState({
       name: "",
-      code: "",
+      Code: "",
     
     })
   }, [])
@@ -150,7 +149,7 @@ export default function DepartmentsPage() {
     setSelectedDepartment(department)
     setFormState({
       name: getDepartmentName(department),
-      code: getDepartmentCode(department),
+      Code: getDepartmentCode(department),
     })
     setIsDialogOpen(true)
   }
@@ -174,7 +173,7 @@ export default function DepartmentsPage() {
           cache: "no-store",
           body: JSON.stringify({
             name: formState.name,
-            code: formState.code,
+            code: formState.Code,
           }),
         },
       )
@@ -222,7 +221,8 @@ export default function DepartmentsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PermissionGuard requiredPermissions={["organization.departments.view"]}>
+      <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">Departments</h1>
@@ -390,5 +390,6 @@ export default function DepartmentsPage() {
         </DialogContent>
       </Dialog>
     </div>
+    </PermissionGuard>
   )
 }

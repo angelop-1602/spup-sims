@@ -4281,6 +4281,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfCurrentUserResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCurrentUserResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCurrentUserResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/core/profiles": {
         parameters: {
             query?: never;
@@ -4474,9 +4522,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfUserResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfUserResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfUserResponse"];
                     };
                 };
             };
@@ -4491,9 +4539,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateUserRequest"];
+                    "text/json": components["schemas"]["CreateUserRequest"];
+                    "application/*+json": components["schemas"]["CreateUserRequest"];
                 };
             };
             responses: {
@@ -4503,9 +4551,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfUserResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfUserResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfUserResponse"];
                     };
                 };
             };
@@ -4540,9 +4588,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfUserResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfUserResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfUserResponse"];
                     };
                 };
             };
@@ -4558,9 +4606,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateUserRequest"];
+                    "text/json": components["schemas"]["UpdateUserRequest"];
+                    "application/*+json": components["schemas"]["UpdateUserRequest"];
                 };
             };
             responses: {
@@ -4570,9 +4618,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfUserResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfUserResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfUserResponse"];
                     };
                 };
             };
@@ -4589,16 +4637,111 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/users/{userId}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
                 /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
+                        "text/plain": components["schemas"]["ApiResponseOfUserRolesResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfUserRolesResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfUserRolesResponse"];
                     };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/users/{userId}/roles/{roleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: number;
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfUserRolesResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfUserRolesResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfUserRolesResponse"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: number;
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
                 };
             };
         };
@@ -4637,9 +4780,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfRoleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfRoleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfRoleResponse"];
                     };
                 };
             };
@@ -4654,9 +4797,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateRoleRequest"];
+                    "text/json": components["schemas"]["CreateRoleRequest"];
+                    "application/*+json": components["schemas"]["CreateRoleRequest"];
                 };
             };
             responses: {
@@ -4666,9 +4809,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRoleResponse"];
                     };
                 };
             };
@@ -4703,9 +4846,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRoleResponse"];
                     };
                 };
             };
@@ -4721,9 +4864,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateRoleRequest"];
+                    "text/json": components["schemas"]["UpdateRoleRequest"];
+                    "application/*+json": components["schemas"]["UpdateRoleRequest"];
                 };
             };
             responses: {
@@ -4733,9 +4876,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRoleResponse"];
                     };
                 };
             };
@@ -4752,16 +4895,111 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/roles/{roleId}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
                 /** @description OK */
                 200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
+                        "text/plain": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
                     };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/roles/{roleId}/permissions/{permissionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    roleId: number;
+                    permissionId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    roleId: number;
+                    permissionId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
                 };
             };
         };
@@ -4800,9 +5038,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfPermissionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfPermissionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfPermissionResponse"];
                     };
                 };
             };
@@ -4817,9 +5055,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreatePermissionRequest"];
+                    "text/json": components["schemas"]["CreatePermissionRequest"];
+                    "application/*+json": components["schemas"]["CreatePermissionRequest"];
                 };
             };
             responses: {
@@ -4829,9 +5067,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPermissionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPermissionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPermissionResponse"];
                     };
                 };
             };
@@ -4866,9 +5104,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPermissionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPermissionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPermissionResponse"];
                     };
                 };
             };
@@ -4884,9 +5122,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdatePermissionRequest"];
+                    "text/json": components["schemas"]["UpdatePermissionRequest"];
+                    "application/*+json": components["schemas"]["UpdatePermissionRequest"];
                 };
             };
             responses: {
@@ -4896,9 +5134,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPermissionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPermissionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPermissionResponse"];
                     };
                 };
             };
@@ -4915,16 +5153,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -11022,6 +11256,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfCurrentUserResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["CurrentUserResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfDashboardBreakdownResponse: {
             success: boolean;
             message: string;
@@ -11418,6 +11663,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPagedResponseOfPermissionResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfPermissionResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfPagedResponseOfProfessionalEngagementResponse: {
             success: boolean;
             message: string;
@@ -11451,10 +11707,43 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPagedResponseOfRoleResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfRoleResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfUserResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfUserResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfPagedResponseOfWorkExperienceResponse: {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfWorkExperienceResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPermissionResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PermissionResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11488,6 +11777,50 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["ResearchEngagementResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfRolePermissionsResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["RolePermissionsResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfRoleResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["RoleResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfUserResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["UserResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfUserRolesResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["UserRolesResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11741,6 +12074,37 @@ export interface components {
         CreateEmployeeTypeRequest: {
             name: string;
             description: null | string;
+        };
+        CreatePermissionRequest: {
+            name: string;
+            description?: null | string;
+            module: string;
+            action: string;
+        };
+        CreateRoleRequest: {
+            name: string;
+            description?: null | string;
+            isActive?: boolean;
+        };
+        CreateUserRequest: {
+            username: string;
+            email: string;
+            /** Format: int64 */
+            roleId: number | string;
+            /** Format: int64 */
+            profileId: number | string;
+            isActive?: boolean;
+        };
+        CurrentUserResponse: {
+            /** Format: int64 */
+            userId: null | number | string;
+            /** Format: int64 */
+            profileId: null | number | string;
+            email: null | string;
+            azureId: null | string;
+            roles: string[];
+            permissions: string[];
+            isSuperAdmin: boolean;
         };
         DashboardBreakdownItemResponse: {
             key: string;
@@ -12218,6 +12582,19 @@ export interface components {
             success?: boolean;
             message?: string;
         };
+        PagedResponseOfPermissionResponse: {
+            data: components["schemas"]["PermissionResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
         PagedResponseOfProfessionalEngagementResponse: {
             data: components["schemas"]["ProfessionalEngagementResponse"][];
             /** Format: int32 */
@@ -12257,6 +12634,32 @@ export interface components {
             success?: boolean;
             message?: string;
         };
+        PagedResponseOfRoleResponse: {
+            data: components["schemas"]["RoleResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfUserResponse: {
+            data: components["schemas"]["UserResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
         PagedResponseOfWorkExperienceResponse: {
             data: components["schemas"]["WorkExperienceResponse"][];
             /** Format: int32 */
@@ -12269,6 +12672,14 @@ export interface components {
             totalPages: number | string;
             success?: boolean;
             message?: string;
+        };
+        PermissionResponse: {
+            /** Format: int64 */
+            id: number | string;
+            name: string;
+            description: null | string;
+            module: string;
+            action: string;
         };
         ProblemDetails: {
             type?: null | string;
@@ -12336,6 +12747,19 @@ export interface components {
             /** Format: date */
             datePublished: null | string;
             attachment: null | string;
+        };
+        RolePermissionsResponse: {
+            /** Format: int64 */
+            roleId: number | string;
+            role: components["schemas"]["RoleResponse"];
+            permissions: components["schemas"]["PermissionResponse"][];
+        };
+        RoleResponse: {
+            /** Format: int64 */
+            id: number | string;
+            name: string;
+            description: null | string;
+            isActive: boolean;
         };
         SelfAttendancePunchRequest: {
             /** Format: date */
@@ -12455,6 +12879,44 @@ export interface components {
         UpdateEmployeeTypeRequest: {
             name: string;
             description: null | string;
+        };
+        UpdatePermissionRequest: {
+            name: string;
+            description?: null | string;
+            module: string;
+            action: string;
+        };
+        UpdateRoleRequest: {
+            name: string;
+            description?: null | string;
+            isActive?: boolean;
+        };
+        UpdateUserRequest: {
+            username: string;
+            email: string;
+            /** Format: int64 */
+            roleId: number | string;
+            /** Format: int64 */
+            profileId: number | string;
+            isActive?: boolean;
+        };
+        UserResponse: {
+            /** Format: int64 */
+            id: number | string;
+            username: string;
+            email: string;
+            roles: components["schemas"]["RoleResponse"][];
+            /** Format: int64 */
+            profileId: number | string;
+            profile: string;
+            isActive: boolean;
+        };
+        UserRolesResponse: {
+            /** Format: int64 */
+            userId: number | string;
+            username: string;
+            email: string;
+            roles: components["schemas"]["RoleResponse"][];
         };
         VerifyDocumentRequest: {
             remarks: null | string;
