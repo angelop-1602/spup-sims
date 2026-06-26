@@ -66,6 +66,7 @@ const STATUS_STYLES: Record<string, string> = {
   Hired: "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20",
   Rejected: "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20",
   Pending: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20",
+  Submitted: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20",
 }
 
 function getStatusStyle(status: string) {
