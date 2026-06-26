@@ -74,12 +74,49 @@ interface DocumentsResponse {
   }
 }
 
+interface StatusHistoryValues {
+  Id: number
+  EmployeeApplicantId: number
+  Status: string
+  Remarks: string | null
+  CreatedAt: string
+  UpdatedAt: string | null
+  CreatedBy: string | null
+  IsDeleted: boolean
+}
+
+interface StatusHistoryEntry {
+  entity: string
+  id: number
+  values: StatusHistoryValues
+}
+
+interface StatusHistoryResponse {
+  success: boolean
+  message: string
+  data: {
+    data: StatusHistoryEntry[]
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
+}
+
 const STATUS_STYLES: Record<string, string> = {
   Interview: "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400",
   Hired: "bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400",
   Rejected: "bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400",
   Pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20 dark:text-yellow-400",
   Submitted: "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
+}
+
+const STATUS_DOT: Record<string, string> = {
+  Interview: "bg-blue-500",
+  Hired: "bg-green-500",
+  Rejected: "bg-red-500",
+  Pending: "bg-yellow-500",
+  Submitted: "bg-purple-500",
 }
 
 function formatDate(dateString: string | null) {
@@ -126,6 +163,8 @@ export default function ProfileDetailPage() {
   const [isLoading, setIsLoading] = React.useState(true)
   const [documents, setDocuments] = React.useState<ApplicantDocument[]>([])
   const [isLoadingDocs, setIsLoadingDocs] = React.useState(false)
+  const [statusHistory, setStatusHistory] = React.useState<StatusHistoryEntry[]>([])
+  const [isLoadingHistory, setIsLoadingHistory] = React.useState(false)
 
   React.useEffect(() => {
     async function fetchProfile() {
@@ -214,6 +253,52 @@ export default function ProfileDetailPage() {
     }
 
     fetchDocuments()
+  }, [instance, accounts, applicantId])
+
+  React.useEffect(() => {
+    async function fetchStatusHistory() {
+      if (accounts.length === 0 || !applicantId) return
+
+      setIsLoadingHistory(true)
+
+      try {
+        const tokenResponse = await instance.acquireTokenSilent({
+          ...loginRequest,
+          account: accounts[0],
+        })
+
+        const res = await fetch(
+          `/api/v1/recruitment/employee-applicant-status-history?EmployeeApplicantId=${applicantId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResponse.accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+
+        if (!res.ok) {
+          console.error(`Status history fetch failed with status: ${res.status}`)
+          setStatusHistory([])
+          return
+        }
+
+        const payload: StatusHistoryResponse = await res.json()
+
+        if (payload?.success && payload.data?.data) {
+          setStatusHistory(payload.data.data)
+        } else {
+          setStatusHistory([])
+        }
+      } catch (error) {
+        console.error("Failed to fetch status history:", error)
+        setStatusHistory([])
+      } finally {
+        setIsLoadingHistory(false)
+      }
+    }
+
+    fetchStatusHistory()
   }, [instance, accounts, applicantId])
 
   const fullName = profile
@@ -342,12 +427,74 @@ export default function ProfileDetailPage() {
               </InfoPanel>
             </TabsContent>
 
-            <TabsContent value="record" className="mt-4">
+            <TabsContent value="record" className="mt-4 space-y-4">
               <InfoPanel>
                 <Row label="Profile ID" value={String(profile.Id)} />
                 <Row label="Date Created" value={formatDate(profile.CreatedAt)} />
                 <Row label="Last Updated" value={formatDate(profile.UpdatedAt)} />
                 <Row label="Qualifier" value={profile.Qualifier} />
+              </InfoPanel>
+
+              <InfoPanel>
+                <div className="border-b px-5 py-3">
+                  <p className="text-sm font-medium">Status History</p>
+                </div>
+                {isLoadingHistory ? (
+                  <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading history…
+                  </div>
+                ) : statusHistory.length === 0 ? (
+                  <div className="px-5 py-10 text-center text-sm text-muted-foreground">
+                    No status history recorded.
+                  </div>
+                ) : (
+                  <div className="px-5 py-4">
+                    {[...statusHistory]
+                      .sort(
+                        (a, b) =>
+                          new Date(b.values.CreatedAt).getTime() -
+                          new Date(a.values.CreatedAt).getTime()
+                      )
+                      .map((entry, index, sorted) => {
+                        const v = entry.values
+                        const isLast = index === sorted.length - 1
+                        return (
+                          <div key={entry.id} className="flex gap-3">
+                            {/* Track */}
+                            <div className="flex flex-col items-center">
+                              <div
+                                className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_DOT[v.Status] ?? "bg-muted-foreground"}`}
+                              />
+                              {!isLast && (
+                                <div className="mt-1.5 w-px flex-1 bg-border" />
+                              )}
+                            </div>
+
+                            {/* Content */}
+                            <div className={!isLast ? "pb-5" : ""}>
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className={STATUS_STYLES[v.Status] ?? ""}
+                                >
+                                  {v.Status}
+                                </Badge>
+                                <span className="text-xs text-muted-foreground">
+                                  {formatDate(v.CreatedAt)}
+                                </span>
+                              </div>
+                              {v.Remarks && (
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                  {v.Remarks}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })}
+                  </div>
+                )}
               </InfoPanel>
             </TabsContent>
 
