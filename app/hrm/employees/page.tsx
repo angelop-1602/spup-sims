@@ -18,8 +18,11 @@ interface Employee {
   email: string
   mobileNumber: string | null
   phoneNumber: string | null
+  departmentId: number
   department: string | null
+  designationId: number | null
   designation: string | null
+  employeeTypeId: number
   employeeType: string | null
   dateHired: string
   isActive: boolean
@@ -34,6 +37,22 @@ interface EmployeesResponse {
     pageSize: number
     totalRecords: number
     totalPages: number
+  }
+}
+
+interface Department {
+  id: number
+  values: {
+    Code: string
+    Name: string
+  }
+}
+
+interface DepartmentsResponse {
+  success: boolean
+  message: string
+  data: {
+    data: Department[]
   }
 }
 
@@ -66,8 +85,8 @@ export default function EmployeesPage() {
   const [departmentFilter, setDepartmentFilter] = useState("")
   const [designationFilter, setDesignationFilter] = useState("")
 
-  // Options for the filter dropdowns, accumulated across pages as we see them
-  const [departmentOptions, setDepartmentOptions] = useState<string[]>([])
+  // Structured details for mapping
+  const [departmentOptions, setDepartmentOptions] = useState<{ id: string; name: string }[]>([])
   const [designationOptions, setDesignationOptions] = useState<string[]>([])
 
   // Pagination
@@ -80,21 +99,67 @@ export default function EmployeesPage() {
     const timeout = setTimeout(() => {
       setDebouncedSearch(search.trim())
       setPage(1)
-    }, 200) // 200ms debounce
+    }, 200) // 200ms debounce delay
     return () => clearTimeout(timeout)
   }, [search])
 
-  // Reset to page 1 whenever a dropdown filter changes
+  // Reset pagination on filter change
   useEffect(() => {
     setPage(1)
   }, [departmentFilter, designationFilter])
 
+  // Fetch dropdown options for departments
   useEffect(() => {
+    if (accounts.length === 0) return
+    const controller = new AbortController()
+
+    async function fetchDepartments() {
+      try {
+        const tokenResponse = await instance.acquireTokenSilent({
+          ...loginRequest,
+          account: accounts[0],
+        })
+
+        const res = await fetch("/api/v1/organization/departments", {
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${tokenResponse.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        })
+        
+        if (!res.ok) throw new Error("Failed to fetch departments")
+        
+        const json: DepartmentsResponse = await res.json()
+        
+        if (json.success && json.data?.data) {
+          const depts = json.data.data
+            .map((item) => ({
+              id: String(item.id),
+              name: item.values?.Name || ""
+            }))
+            .filter((item) => item.name)
+            .sort((a, b) => a.name.localeCompare(b.name))
+            
+          setDepartmentOptions(depts)
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name !== "AbortError") {
+          console.error("Departments dropdown query failed:", err.message)
+        }
+      }
+    }
+
+    fetchDepartments()
+    return () => controller.abort()
+  }, [instance, accounts])
+    
+  // Loads employee list 
+  useEffect(() => {
+    if (accounts.length === 0) return
     const controller = new AbortController()
 
     async function fetchEmployees() {
-      if (accounts.length === 0) return
-
       setIsLoading(true)
       setError(null)
       try {
@@ -107,9 +172,13 @@ export default function EmployeesPage() {
           page: String(page),
           pageSize: String(PAGE_SIZE),
         })
+        
         if (debouncedSearch) params.set("search", debouncedSearch)
-        if (departmentFilter) params.set("department", departmentFilter)
         if (designationFilter) params.set("designation", designationFilter)
+        if (departmentFilter) {
+          params.set("departmentId", departmentFilter)
+          params.set("department", departmentFilter) 
+        }
 
         const res = await fetch(`/api/v1/hrms/employees?${params.toString()}`, {
           signal: controller.signal,
@@ -118,9 +187,11 @@ export default function EmployeesPage() {
             "Content-Type": "application/json",
           },
         })
+        
         if (!res.ok) {
           throw new Error(`Request failed (${res.status})`)
         }
+        
         const json: EmployeesResponse = await res.json()
         if (!json.success) {
           throw new Error(json.message || "Couldn't load employees.")
@@ -130,16 +201,14 @@ export default function EmployeesPage() {
         setTotalPages(json.data.totalPages)
         setTotalRecords(json.data.totalRecords)
 
-        setDepartmentOptions((prev) => {
-          const next = new Set(prev)
-          json.data.data.forEach((e) => e.department && next.add(e.department))
-          return Array.from(next).sort()
-        })
-        setDesignationOptions((prev) => {
-          const next = new Set(prev)
-          json.data.data.forEach((e) => e.designation && next.add(e.designation))
-          return Array.from(next).sort()
-        })
+        // To edit: Dynamically compile available classifications
+        if (!search && !departmentFilter && !designationFilter) {
+          setDesignationOptions((prev) => {
+            const next = new Set(prev)
+            json.data.data.forEach((e) => e.designation && next.add(e.designation))
+            return Array.from(next).sort()
+          })
+        }
       } catch (err) {
         if (err instanceof Error && err.name !== "AbortError") {
           setError(err.message)
@@ -174,7 +243,6 @@ export default function EmployeesPage() {
         </div>
       </div>
 
-      {/* Search + filters row */}
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative w-full sm:w-64">
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -194,8 +262,8 @@ export default function EmployeesPage() {
         >
           <option value="">All departments</option>
           {departmentOptions.map((dept) => (
-            <option key={dept} value={dept}>
-              {dept}
+            <option key={dept.id} value={dept.id}>
+              {dept.name}
             </option>
           ))}
         </select>
