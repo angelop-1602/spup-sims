@@ -46,9 +46,9 @@ interface ProfileResponse {
 interface DocumentValues {
   Id: number
   EmployeeApplicantId: number
-  DocumentType: string | null
+  RequirementName: string | null
   FileName: string | null
-  FileUrl: string | null
+  StoragePath: string | null
   CreatedAt: string
   UpdatedAt: string | null
 }
@@ -214,82 +214,63 @@ export default function ProfileDetailPage() {
   const [profile, setProfile] = React.useState<ProfileValues | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [documents, setDocuments] = React.useState<ApplicantDocument[]>([])
-  const [isLoadingDocs, setIsLoadingDocs] = React.useState(false)
   const [statusHistory, setStatusHistory] = React.useState<StatusHistoryEntry[]>([])
-  const [isLoadingHistory, setIsLoadingHistory] = React.useState(false)
   const [interviews, setInterviews] = React.useState<InterviewSchedule[]>([])
-  const [isLoadingInterviews, setIsLoadingInterviews] = React.useState(false)
 
   React.useEffect(() => {
-    async function fetchProfile() {
-      if (accounts.length === 0 || !id) return
+    if (accounts.length === 0 || !id) return
+
+    async function fetchAll() {
       setIsLoading(true)
       try {
         const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
-        const res = await fetch(`/api/v1/core/profiles/${id}`, {
-          headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" },
-        })
-        if (!res.ok) { setProfile(null); return }
-        const payload: ProfileResponse = await res.json()
-        setProfile(payload?.success && payload.data ? payload.data.values : null)
-      } catch { setProfile(null) } finally { setIsLoading(false) }
-    }
-    fetchProfile()
-  }, [instance, accounts, id])
+        const headers = { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" }
 
-  React.useEffect(() => {
-    async function fetchDocuments() {
-      if (accounts.length === 0 || !applicantId) return
-      setIsLoadingDocs(true)
-      try {
-        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
-        const res = await fetch(
-          `/api/v1/recruitment/employee-applicant-documents?EmployeeApplicantId=${applicantId}`,
-          { headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" } }
-        )
-        if (!res.ok) { setDocuments([]); return }
-        const payload: DocumentsResponse = await res.json()
-        setDocuments(payload?.success && payload.data?.data ? payload.data.data : [])
-      } catch { setDocuments([]) } finally { setIsLoadingDocs(false) }
-    }
-    fetchDocuments()
-  }, [instance, accounts, applicantId])
+        const requests: Promise<Response>[] = [
+          fetch(`/api/v1/core/profiles/${id}`, { headers }),
+        ]
 
-  React.useEffect(() => {
-    async function fetchStatusHistory() {
-      if (accounts.length === 0 || !applicantId) return
-      setIsLoadingHistory(true)
-      try {
-        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
-        const res = await fetch(
-          `/api/v1/recruitment/employee-applicant-status-history?EmployeeApplicantId=${applicantId}`,
-          { headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" } }
-        )
-        if (!res.ok) { setStatusHistory([]); return }
-        const payload: StatusHistoryResponse = await res.json()
-        setStatusHistory(payload?.success && payload.data?.data ? payload.data.data : [])
-      } catch { setStatusHistory([]) } finally { setIsLoadingHistory(false) }
-    }
-    fetchStatusHistory()
-  }, [instance, accounts, applicantId])
+        if (applicantId) {
+          requests.push(
+            fetch(`/api/v1/recruitment/employee-applicant-documents?EmployeeApplicantId=${applicantId}`, { headers }),
+            fetch(`/api/v1/recruitment/employee-applicant-status-history?EmployeeApplicantId=${applicantId}`, { headers }),
+            fetch(`/api/v1/recruitment/interview-schedules?EmployeeApplicantId=${applicantId}`, { headers }),
+          )
+        }
 
-  React.useEffect(() => {
-    async function fetchInterviews() {
-      if (accounts.length === 0 || !applicantId) return
-      setIsLoadingInterviews(true)
-      try {
-        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
-        const res = await fetch(
-          `/api/v1/recruitment/interview-schedules?EmployeeApplicantId=${applicantId}`,
-          { headers: { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" } }
+        const results = await Promise.allSettled(requests.map((r) => r.then((res) => res.ok ? res.json() : null)))
+
+        const [profileResult, docsResult, historyResult, interviewsResult] = results
+
+        setProfile(
+          profileResult.status === "fulfilled" && profileResult.value?.success
+            ? profileResult.value.data?.values ?? null
+            : null
         )
-        if (!res.ok) { setInterviews([]); return }
-        const payload: InterviewSchedulesResponse = await res.json()
-        setInterviews(payload?.success && payload.data?.data ? payload.data.data : [])
-      } catch { setInterviews([]) } finally { setIsLoadingInterviews(false) }
+        setDocuments(
+          docsResult?.status === "fulfilled" && docsResult.value?.success
+            ? docsResult.value.data?.data ?? []
+            : []
+        )
+        setStatusHistory(
+          historyResult?.status === "fulfilled" && historyResult.value?.success
+            ? historyResult.value.data?.data ?? []
+            : []
+        )
+        setInterviews(
+          interviewsResult?.status === "fulfilled" && interviewsResult.value?.success
+            ? interviewsResult.value.data?.data ?? []
+            : []
+        )
+      } catch {
+        setProfile(null)
+      } finally {
+        setIsLoading(false)
+      }
     }
-    fetchInterviews()
-  }, [instance, accounts, applicantId])
+
+    fetchAll()
+  }, [instance, accounts, id, applicantId])
 
   const fullName = profile
     ? [profile.FirstName, profile.MiddleName, profile.LastName, profile.Suffix].filter(Boolean).join(" ")
@@ -299,7 +280,7 @@ export default function ProfileDetailPage() {
     ? `${profile.FirstName?.[0] ?? ""}${profile.LastName?.[0] ?? ""}`.toUpperCase()
     : ""
 
-  const resumeDoc = documents.find((d) => d.values.FileUrl)
+  const resumeDoc = documents.find((d) => d.values.RequirementName === "Resume" && d.values.StoragePath)
 
   const sortedHistory = [...statusHistory].sort(
     (a, b) => new Date(b.values.CreatedAt).getTime() - new Date(a.values.CreatedAt).getTime()
@@ -368,18 +349,14 @@ export default function ProfileDetailPage() {
 
                 {/* Resume button */}
                 <div className="shrink-0">
-                  {isLoadingDocs ? (
+                  {isLoading ? (
                     <Button variant="outline" size="sm" disabled>
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
                       Resume
                     </Button>
                   ) : resumeDoc ? (
                     <Button variant="outline" size="sm" asChild>
-                      <a
-                        href={resumeDoc.values.FileUrl!}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a href={resumeDoc.values.StoragePath!} target="_blank" rel="noopener noreferrer">
                         <FileText className="h-3.5 w-3.5" />
                         Resume
                       </a>
@@ -423,12 +400,7 @@ export default function ProfileDetailPage() {
             <div className="space-y-5">
               <InfoPanel>
                 <PanelHeader label="Status History" />
-                {isLoadingHistory ? (
-                  <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading…
-                  </div>
-                ) : sortedHistory.length === 0 ? (
+                {sortedHistory.length === 0 ? (
                   <p className="px-5 py-10 text-center text-sm text-muted-foreground">
                     No status history recorded.
                   </p>
@@ -467,12 +439,7 @@ export default function ProfileDetailPage() {
 
               <InfoPanel>
                 <PanelHeader label="Interview Schedules" />
-                {isLoadingInterviews ? (
-                  <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Loading…
-                  </div>
-                ) : sortedInterviews.length === 0 ? (
+                {sortedInterviews.length === 0 ? (
                   <p className="px-5 py-10 text-center text-sm text-muted-foreground">
                     No interview schedules on record.
                   </p>
