@@ -171,7 +171,7 @@ export default function EmployeesPage() {
     if (accounts.length === 0) return
     const controller = new AbortController()
 
-    async function fetchMasterDesignations() {
+    async function fetchDesignations() {
       try {
         const tokenResponse = await instance.acquireTokenSilent({
           ...loginRequest,
@@ -191,7 +191,7 @@ export default function EmployeesPage() {
           },
         })
 
-        if (!res.ok) throw new Error(`HTTP error status: ${res.status}`)
+        if (!res.ok) throw new Error("Failed to fetch designations")
 
         const json: DesignationsResponse = await res.json()
         
@@ -208,12 +208,12 @@ export default function EmployeesPage() {
         }
       } catch (err) {
         if (err instanceof Error && err.name !== "AbortError") {
-          console.error("Master structural designations sync dropped:", err.message)
+          console.error("Designations dropdown query failed:", err.message)
         }
       }
     }
 
-    fetchMasterDesignations()
+    fetchDesignations()
     return () => controller.abort()
   }, [instance, accounts, departmentFilter])
 
@@ -291,7 +291,7 @@ export default function EmployeesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-normal">Employees</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Employee records will appear below.
+            Employee details will appear below.
           </p>
         </div>
       </div>
@@ -303,7 +303,7 @@ export default function EmployeesPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name, department, designation"
+            placeholder="Search employees by name"
             className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
         </div>
