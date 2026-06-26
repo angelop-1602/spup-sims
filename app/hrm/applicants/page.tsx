@@ -269,7 +269,7 @@ export default function ApplicantsPage() {
                       <td className="px-4 py-3 text-right">
                         <button
                           type="button"
-                          onClick={() => router.push(`/hrm/profiles/${v.ProfileId}`)}
+                          onClick={() => router.push(`/hrm/profiles/${v.ProfileId}?status=${encodeURIComponent(v.Status)}&applicantId=${v.Id}`)}
                           className="inline-flex items-center gap-1.5 rounded-lg bg-secondary/50 px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-all hover:bg-secondary focus-visible:outline-none"
                         >
                           <Eye className="h-3.5 w-3.5 opacity-70" />

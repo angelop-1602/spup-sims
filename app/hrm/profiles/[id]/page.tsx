@@ -3,9 +3,18 @@
 import React from "react"
 import { useMsal } from "@azure/msal-react"
 import { loginRequest } from "@/lib/authConfig"
-import { Loader2, ArrowLeft } from "lucide-react"
+import { Loader2, ArrowLeft, FileText } from "lucide-react"
 import Link from "next/link"
-import { useParams } from "next/navigation"
+import { useParams, useSearchParams } from "next/navigation"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 
 interface ProfileValues {
   Id: number
@@ -41,6 +50,38 @@ interface ProfileResponse {
   }
 }
 
+interface DocumentValues {
+  Id: number
+  EmployeeApplicantId: number
+  DocumentType: string | null
+  FileName: string | null
+  FileUrl: string | null
+  CreatedAt: string
+  UpdatedAt: string | null
+}
+
+interface ApplicantDocument {
+  entity: string
+  id: number
+  values: DocumentValues
+}
+
+interface DocumentsResponse {
+  success: boolean
+  message: string
+  data: {
+    data: ApplicantDocument[]
+  }
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  Interview: "bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400",
+  Hired: "bg-green-500/10 text-green-600 border-green-500/20 dark:text-green-400",
+  Rejected: "bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400",
+  Pending: "bg-yellow-500/10 text-yellow-600 border-yellow-500/20 dark:text-yellow-400",
+  Submitted: "bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400",
+}
+
 function formatDate(dateString: string | null) {
   if (!dateString) return "—"
   return new Date(dateString).toLocaleDateString("en-US", {
@@ -50,11 +91,25 @@ function formatDate(dateString: string | null) {
   })
 }
 
-function DetailRow({ label, value }: { label: string; value: string | null | undefined }) {
+function Row({
+  label,
+  value,
+}: {
+  label: string
+  value: string | null | undefined
+}) {
   return (
-    <div className="grid grid-cols-3 gap-4 py-3 border-b last:border-0">
-      <dt className="text-sm text-muted-foreground">{label}</dt>
-      <dd className="col-span-2 text-sm font-medium">{value || "—"}</dd>
+    <div className="grid grid-cols-[1fr_1.5fr] border-b px-5 py-3 text-sm last:border-0 sm:grid-cols-[180px_1fr]">
+      <span className="text-muted-foreground">{label}</span>
+      <span className="break-words font-medium">{value || "—"}</span>
+    </div>
+  )
+}
+
+function InfoPanel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="overflow-hidden rounded-xl bg-card text-sm shadow-xs ring-1 ring-foreground/10">
+      {children}
     </div>
   )
 }
@@ -62,10 +117,15 @@ function DetailRow({ label, value }: { label: string; value: string | null | und
 export default function ProfileDetailPage() {
   const { instance, accounts } = useMsal()
   const params = useParams()
+  const searchParams = useSearchParams()
   const id = params?.id as string
+  const applicantStatus = searchParams.get("status")
+  const applicantId = searchParams.get("applicantId")
 
   const [profile, setProfile] = React.useState<ProfileValues | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
+  const [documents, setDocuments] = React.useState<ApplicantDocument[]>([])
+  const [isLoadingDocs, setIsLoadingDocs] = React.useState(false)
 
   React.useEffect(() => {
     async function fetchProfile() {
@@ -94,7 +154,7 @@ export default function ProfileDetailPage() {
 
         const payload: ProfileResponse = await res.json()
 
-        if (payload && payload.success && payload.data) {
+        if (payload?.success && payload.data) {
           setProfile(payload.data.values)
         } else {
           setProfile(null)
@@ -110,105 +170,238 @@ export default function ProfileDetailPage() {
     fetchProfile()
   }, [instance, accounts, id])
 
+  React.useEffect(() => {
+    async function fetchDocuments() {
+      if (accounts.length === 0 || !applicantId) return
+
+      setIsLoadingDocs(true)
+
+      try {
+        const tokenResponse = await instance.acquireTokenSilent({
+          ...loginRequest,
+          account: accounts[0],
+        })
+
+        const res = await fetch(
+          `/api/v1/recruitment/employee-applicant-documents?EmployeeApplicantId=${applicantId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${tokenResponse.accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        )
+
+        if (!res.ok) {
+          console.error(`Documents fetch failed with status: ${res.status}`)
+          setDocuments([])
+          return
+        }
+
+        const payload: DocumentsResponse = await res.json()
+
+        if (payload?.success && payload.data?.data) {
+          setDocuments(payload.data.data)
+        } else {
+          setDocuments([])
+        }
+      } catch (error) {
+        console.error("Failed to fetch documents:", error)
+        setDocuments([])
+      } finally {
+        setIsLoadingDocs(false)
+      }
+    }
+
+    fetchDocuments()
+  }, [instance, accounts, applicantId])
+
   const fullName = profile
     ? [profile.FirstName, profile.MiddleName, profile.LastName, profile.Suffix]
         .filter(Boolean)
         .join(" ")
     : ""
 
+  const initials = profile
+    ? `${profile.FirstName?.[0] ?? ""}${profile.LastName?.[0] ?? ""}`.toUpperCase()
+    : ""
+
   return (
-    <div>
-      <div className="mb-6">
-        <Link
-          href="/hrm/applicants"
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Applicants
-        </Link>
-      </div>
+    <div className="space-y-5">
+      <Link
+        href="/hrm/applicants"
+        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Applicants
+      </Link>
 
       {isLoading ? (
-        <div className="flex items-center justify-center gap-2 py-24 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 py-32 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
           Loading profile…
         </div>
       ) : !profile ? (
-        <div className="flex flex-col items-center justify-center gap-2 py-24 text-center">
+        <div className="flex flex-col items-center justify-center gap-2 py-32 text-center">
           <p className="text-sm font-medium">Profile not found</p>
           <p className="text-sm text-muted-foreground">
-            The profile you&apos;re looking for doesn&apos;t exist or could not be loaded.
+            This profile doesn&apos;t exist or could not be loaded.
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {/* Header */}
-          <div className="flex items-center gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-muted text-lg font-semibold">
-              {profile.FirstName?.[0]?.toUpperCase()}
-              {profile.LastName?.[0]?.toUpperCase()}
-            </div>
-            <div>
-              <h1 className="text-2xl font-semibold tracking-normal">{fullName}</h1>
-              <p className="text-sm text-muted-foreground">{profile.PersonalEmail}</p>
-            </div>
-            <div className="ml-auto">
-              <span
-                className={
-                  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium " +
-                  (profile.IsActive
-                    ? "bg-green-50 text-green-700"
-                    : "bg-zinc-100 text-zinc-600")
-                }
-              >
-                {profile.IsActive ? "Active" : "Inactive"}
-              </span>
-            </div>
-          </div>
+        <div className="space-y-5">
+          {/* ── Profile card ── */}
+          <Card>
+            <CardContent className="py-3">
+              <div className="flex items-center gap-5">
+                <Avatar className="size-30 shrink-0">
+                  {profile.ProfilePicture && (
+                    <AvatarImage src={profile.ProfilePicture} alt={fullName} />
+                  )}
+                  <AvatarFallback className="bg-gray-700 text-2xl font-semibold text-white">
+                    {initials}
+                  </AvatarFallback>
+                </Avatar>
 
-          {/* Personal Information */}
-          <div className="rounded-lg border">
-            <div className="border-b px-4 py-3">
-              <h2 className="text-sm font-semibold">Personal Information</h2>
-            </div>
-            <dl className="px-4">
-              <DetailRow label="First Name" value={profile.FirstName} />
-              <DetailRow label="Middle Name" value={profile.MiddleName} />
-              <DetailRow label="Last Name" value={profile.LastName} />
-              <DetailRow label="Suffix" value={profile.Suffix} />
-              <DetailRow label="Gender" value={profile.Gender} />
-              <DetailRow label="Date of Birth" value={formatDate(profile.BirthDate)} />
-              <DetailRow label="Age" value={profile.Age != null ? String(profile.Age) : null} />
-              <DetailRow label="Civil Status" value={profile.CivilStatus} />
-              <DetailRow label="Religion" value={profile.Religion} />
-            </dl>
-          </div>
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-xl font-semibold leading-tight">
+                    {fullName}
+                  </h1>
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    {profile.PersonalEmail}
+                  </p>
+                  <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                    {applicantStatus && (
+                      <Badge
+                        variant="outline"
+                        className={STATUS_STYLES[applicantStatus] ?? ""}
+                      >
+                        {applicantStatus}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
 
-          {/* Contact Information */}
-          <div className="rounded-lg border">
-            <div className="border-b px-4 py-3">
-              <h2 className="text-sm font-semibold">Contact Information</h2>
-            </div>
-            <dl className="px-4">
-              <DetailRow label="Personal Email" value={profile.PersonalEmail} />
-              <DetailRow label="Phone Number" value={profile.PhoneNumber} />
-              <DetailRow label="Mobile Number" value={profile.MobileNumber} />
-              <DetailRow label="Address" value={profile.Address} />
-            </dl>
-          </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-xs text-muted-foreground">Profile ID</p>
+                  <p className="font-mono text-sm font-semibold">
+                    #{profile.Id}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* Record Details */}
-          <div className="rounded-lg border">
-            <div className="border-b px-4 py-3">
-              <h2 className="text-sm font-semibold">Record Details</h2>
-            </div>
-            <dl className="px-4">
-              <DetailRow label="Profile ID" value={String(profile.Id)} />
-              <DetailRow label="Date Created" value={formatDate(profile.CreatedAt)} />
-              <DetailRow label="Last Updated" value={formatDate(profile.UpdatedAt)} />
-              <DetailRow label="Qualifier" value={profile.Qualifier} />
-            </dl>
-          </div>
+          {/* ── Tabs ── */}
+          <Tabs defaultValue="personal">
+            <TabsList className="w-full">
+              <TabsTrigger value="personal" className="flex-1">
+                Personal
+              </TabsTrigger>
+              <TabsTrigger value="contact" className="flex-1">
+                Contact
+              </TabsTrigger>
+              <TabsTrigger value="record" className="flex-1">
+                Record
+              </TabsTrigger>
+              <TabsTrigger value="resume" className="flex-1">
+                Resume
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="personal" className="mt-4">
+              <InfoPanel>
+                <Row label="First Name" value={profile.FirstName} />
+                <Row label="Middle Name" value={profile.MiddleName} />
+                <Row label="Last Name" value={profile.LastName} />
+                {profile.Suffix && (
+                  <Row label="Suffix" value={profile.Suffix} />
+                )}
+                <Row label="Gender" value={profile.Gender} />
+                <Row
+                  label="Date of Birth"
+                  value={formatDate(profile.BirthDate)}
+                />
+                <Row
+                  label="Age"
+                  value={
+                    profile.Age != null ? `${profile.Age} years old` : null
+                  }
+                />
+                <Row label="Civil Status" value={profile.CivilStatus} />
+                <Row label="Religion" value={profile.Religion} />
+              </InfoPanel>
+            </TabsContent>
+
+            <TabsContent value="contact" className="mt-4">
+              <InfoPanel>
+                <Row label="Personal Email" value={profile.PersonalEmail} />
+                <Row label="Phone Number" value={profile.PhoneNumber} />
+                <Row label="Mobile Number" value={profile.MobileNumber} />
+                <Row label="Address" value={profile.Address} />
+              </InfoPanel>
+            </TabsContent>
+
+            <TabsContent value="record" className="mt-4">
+              <InfoPanel>
+                <Row label="Profile ID" value={String(profile.Id)} />
+                <Row label="Date Created" value={formatDate(profile.CreatedAt)} />
+                <Row label="Last Updated" value={formatDate(profile.UpdatedAt)} />
+                <Row label="Qualifier" value={profile.Qualifier} />
+              </InfoPanel>
+            </TabsContent>
+
+            <TabsContent value="resume" className="mt-4">
+              <InfoPanel>
+                {isLoadingDocs ? (
+                  <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Loading documents…
+                  </div>
+                ) : documents.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+                    <FileText className="h-8 w-8 text-muted-foreground" />
+                    <p className="text-sm font-medium">No documents on file</p>
+                    <p className="text-sm text-muted-foreground">
+                      Uploaded documents will appear here.
+                    </p>
+                  </div>
+                ) : (
+                  documents.map((doc) => {
+                    const v = doc.values
+                    return (
+                      <div
+                        key={doc.id}
+                        className="flex items-center gap-3 border-b px-5 py-3 text-sm last:border-0"
+                      >
+                        <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-medium">
+                            {v.FileName ?? "Untitled document"}
+                          </p>
+                          {v.DocumentType && (
+                            <p className="text-xs text-muted-foreground">
+                              {v.DocumentType}
+                            </p>
+                          )}
+                        </div>
+                        {v.FileUrl && (
+                          <a
+                            href={v.FileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="shrink-0 text-xs font-medium text-primary hover:underline"
+                          >
+                            View
+                          </a>
+                        )}
+                      </div>
+                    )
+                  })
+                )}
+              </InfoPanel>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
     </div>
