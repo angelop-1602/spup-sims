@@ -336,8 +336,6 @@ export default function ProfileDetailPage() {
                         {applicantStatus}
                       </Badge>
                     )}
-                    {profile.Gender && <Badge variant="outline">{profile.Gender}</Badge>}
-                    {profile.CivilStatus && <Badge variant="outline">{profile.CivilStatus}</Badge>}
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground">
                     Profile #{profile.Id}
