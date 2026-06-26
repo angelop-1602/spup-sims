@@ -42,17 +42,25 @@ interface EmployeesResponse {
 
 interface Department {
   id: number
-  values: {
-    Code: string
-    Name: string
-  }
+  name: string
 }
 
 interface DepartmentsResponse {
   success: boolean
-  message: string
   data: {
     data: Department[]
+  }
+}
+
+interface Designation {
+  id: number
+  name: string
+}
+
+interface DesignationsResponse {
+  success: boolean
+  data: {
+    data: Designation[]
   }
 }
 
@@ -79,31 +87,35 @@ export default function EmployeesPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  // Search + filters
+  // Search and filters
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("")
   const [designationFilter, setDesignationFilter] = useState("")
 
-  // Structured details for mapping
+  // Structured details for options
   const [departmentOptions, setDepartmentOptions] = useState<{ id: string; name: string }[]>([])
-  const [designationOptions, setDesignationOptions] = useState<string[]>([])
+  const [designationOptions, setDesignationOptions] = useState<{ id: string; name: string }[]>([])
 
   // Pagination
   const [page, setPage] = useState(1)
-  const [pageSize] = useState(PAGE_SIZE)
   const [totalPages, setTotalPages] = useState(1)
   const [totalRecords, setTotalRecords] = useState(0)
 
+  // Search input
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedSearch(search.trim())
       setPage(1)
-    }, 200) // 200ms debounce delay
+    }, 200) // 200ms debounce
     return () => clearTimeout(timeout)
   }, [search])
 
-  // Reset pagination on filter change
+  useEffect(() => {
+    setDesignationFilter("")
+  }, [departmentFilter])
+
+  // Reset pagination when filters are adjusted
   useEffect(() => {
     setPage(1)
   }, [departmentFilter, designationFilter])
@@ -136,7 +148,7 @@ export default function EmployeesPage() {
           const depts = json.data.data
             .map((item) => ({
               id: String(item.id),
-              name: item.values?.Name || ""
+              name: item.name || ""
             }))
             .filter((item) => item.name)
             .sort((a, b) => a.name.localeCompare(b.name))
@@ -153,8 +165,59 @@ export default function EmployeesPage() {
     fetchDepartments()
     return () => controller.abort()
   }, [instance, accounts])
-    
-  // Loads employee list 
+  
+  // Fetch dropdown options for designations dynamically
+  useEffect(() => {
+    if (accounts.length === 0) return
+    const controller = new AbortController()
+
+    async function fetchMasterDesignations() {
+      try {
+        const tokenResponse = await instance.acquireTokenSilent({
+          ...loginRequest,
+          account: accounts[0],
+        })
+
+        const params = new URLSearchParams()
+        if (departmentFilter) {
+          params.set("departmentId", departmentFilter)
+        }
+
+        const res = await fetch(`/api/v1/organization/designations?${params.toString()}`, {
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${tokenResponse.accessToken}`,
+            "Content-Type": "application/json",
+          },
+        })
+
+        if (!res.ok) throw new Error(`HTTP error status: ${res.status}`)
+
+        const json: DesignationsResponse = await res.json()
+        
+        if (json.success && json.data?.data) {
+          const structuralRoles = json.data.data
+            .map((item) => ({
+              id: String(item.id),            
+              name: item.name || ""
+            }))
+            .filter((item) => item.name)
+            .sort((a, b) => a.name.localeCompare(b.name))
+            
+          setDesignationOptions(structuralRoles)
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name !== "AbortError") {
+          console.error("Master structural designations sync dropped:", err.message)
+        }
+      }
+    }
+
+    fetchMasterDesignations()
+    return () => controller.abort()
+  }, [instance, accounts, departmentFilter])
+
+  // Fetch employees based on current filters
   useEffect(() => {
     if (accounts.length === 0) return
     const controller = new AbortController()
@@ -174,10 +237,9 @@ export default function EmployeesPage() {
         })
         
         if (debouncedSearch) params.set("search", debouncedSearch)
-        if (designationFilter) params.set("designation", designationFilter)
+        if (designationFilter) params.set("designationId", designationFilter)
         if (departmentFilter) {
           params.set("departmentId", departmentFilter)
-          params.set("department", departmentFilter) 
         }
 
         const res = await fetch(`/api/v1/hrms/employees?${params.toString()}`, {
@@ -201,14 +263,6 @@ export default function EmployeesPage() {
         setTotalPages(json.data.totalPages)
         setTotalRecords(json.data.totalRecords)
 
-        // To edit: Dynamically compile available classifications
-        if (!search && !departmentFilter && !designationFilter) {
-          setDesignationOptions((prev) => {
-            const next = new Set(prev)
-            json.data.data.forEach((e) => e.designation && next.add(e.designation))
-            return Array.from(next).sort()
-          })
-        }
       } catch (err) {
         if (err instanceof Error && err.name !== "AbortError") {
           setError(err.message)
@@ -224,7 +278,6 @@ export default function EmployeesPage() {
     instance,
     accounts,
     page,
-    pageSize,
     debouncedSearch,
     departmentFilter,
     designationFilter,
@@ -238,7 +291,7 @@ export default function EmployeesPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-normal">Employees</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Employee records will appear here.
+            Employee records will appear below.
           </p>
         </div>
       </div>
@@ -275,8 +328,8 @@ export default function EmployeesPage() {
         >
           <option value="">All designations</option>
           {designationOptions.map((role) => (
-            <option key={role} value={role}>
-              {role}
+            <option key={role.id} value={role.id}>
+              {role.name}
             </option>
           ))}
         </select>
