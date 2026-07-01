@@ -106,7 +106,9 @@ export default function ApplicantsPage() {
         const params = new URLSearchParams({
           Page: String(page),
           PageSize: String(pageSize),
-          Search: "",
+          Search: trimmedSearch,
+          DateFrom: dateFrom,
+          DateTo: dateTo,
           SortBy: "",
           Descending: "true",
           SchoolYearId: "1",

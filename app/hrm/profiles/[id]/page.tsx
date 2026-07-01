@@ -37,9 +37,9 @@ interface ProfileValues {
 }
 
 interface ProfileResponse {
-  success: boolean
-  message: string
-  data: { entity: string; id: number; values: ProfileValues }
+  entity: string
+  id: number
+  values: ProfileValues
 }
 
 interface DocumentValues {
@@ -59,9 +59,7 @@ interface ApplicantDocument {
 }
 
 interface DocumentsResponse {
-  success: boolean
-  message: string
-  data: { data: ApplicantDocument[] }
+  data: ApplicantDocument[]
 }
 
 interface StatusHistoryValues {
@@ -82,15 +80,11 @@ interface StatusHistoryEntry {
 }
 
 interface StatusHistoryResponse {
-  success: boolean
-  message: string
-  data: {
-    data: StatusHistoryEntry[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
+  data: StatusHistoryEntry[]
+  page: number
+  pageSize: number
+  totalRecords: number
+  totalPages: number
 }
 
 interface InterviewScheduleValues {
@@ -111,15 +105,11 @@ interface InterviewSchedule {
 }
 
 interface InterviewSchedulesResponse {
-  success: boolean
-  message: string
-  data: {
-    data: InterviewSchedule[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
+  data: InterviewSchedule[]
+  page: number
+  pageSize: number
+  totalRecords: number
+  totalPages: number
 }
 
 // ─── Constants ─────────────────────────────────────────────────
