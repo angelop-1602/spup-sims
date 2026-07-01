@@ -37,9 +37,9 @@ interface ProfileValues {
 }
 
 interface ProfileResponse {
-  success: boolean
-  message: string
-  data: { entity: string; id: number; values: ProfileValues }
+  entity: string
+  id: number
+  values: ProfileValues
 }
 
 interface DocumentValues {
@@ -59,9 +59,7 @@ interface ApplicantDocument {
 }
 
 interface DocumentsResponse {
-  success: boolean
-  message: string
-  data: { data: ApplicantDocument[] }
+  data: ApplicantDocument[]
 }
 
 interface StatusHistoryValues {
@@ -82,15 +80,11 @@ interface StatusHistoryEntry {
 }
 
 interface StatusHistoryResponse {
-  success: boolean
-  message: string
-  data: {
-    data: StatusHistoryEntry[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
+  data: StatusHistoryEntry[]
+  page: number
+  pageSize: number
+  totalRecords: number
+  totalPages: number
 }
 
 interface InterviewScheduleValues {
@@ -111,15 +105,11 @@ interface InterviewSchedule {
 }
 
 interface InterviewSchedulesResponse {
-  success: boolean
-  message: string
-  data: {
-    data: InterviewSchedule[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
+  data: InterviewSchedule[]
+  page: number
+  pageSize: number
+  totalRecords: number
+  totalPages: number
 }
 
 // ─── Constants ─────────────────────────────────────────────────
@@ -223,8 +213,8 @@ export default function ProfileDetailPage() {
     async function fetchAll() {
       setIsLoading(true)
       try {
-        type ProfilePayload = { success: boolean; data?: { values?: ProfileValues } }
-        type ListPayload = { success: boolean; data?: { data?: unknown[] } }
+        type ProfilePayload = { entity: string; id: number; values: ProfileValues }
+        type ListPayload = { data: unknown[] }
 
         const requests: Promise<ProfilePayload | ListPayload>[] = [
           query<ProfilePayload>(`/api/v1/core/profiles/${id}`),
@@ -250,17 +240,16 @@ export default function ProfileDetailPage() {
         const fulfilled = (
           result: PromiseSettledResult<ProfilePayload | ListPayload>,
         ): ProfilePayload | ListPayload | null =>
-          result.status === "fulfilled" ? (result.value as ProfilePayload | ListPayload) : null
+          result.status === "fulfilled" ? result.value : null
 
         const profilePayload = fulfilled(profileResult) as ProfilePayload | null
-        setProfile(profilePayload?.success ? (profilePayload.data?.values ?? null) : null)
+        setProfile(profilePayload?.values ?? null)
 
         const toArray = (
           result: PromiseSettledResult<ProfilePayload | ListPayload>,
         ): unknown[] => {
-          const payload = fulfilled(result)
-          if (!payload?.success) return []
-          return (payload.data?.data as unknown[]) ?? []
+          const payload = fulfilled(result) as ListPayload | null
+          return (payload?.data as unknown[]) ?? []
         }
 
         setDocuments(toArray(docsResult) as ApplicantDocument[])
