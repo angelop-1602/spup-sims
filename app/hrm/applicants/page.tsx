@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
-import { useApiClient } from "@/lib/api"
+import { useApiQuery, useApiClient } from "@/lib/api"
 
 interface ApplicantValues {
   Id: number
@@ -37,27 +37,11 @@ interface Profile {
 }
 
 interface ApplicantsPayload {
-  success: boolean
-  message: string
-  data: {
-    data: Applicant[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
-}
-
-interface ProfilesPayload {
-  success: boolean
-  message: string
-  data: {
-    data: Profile[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
+  data: Applicant[]
+  page: number
+  pageSize: number
+  totalRecords: number
+  totalPages: number
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -81,93 +65,87 @@ function formatDate(dateString: string | null) {
   })
 }
 
+const PAGE_SIZE = 20
+const EMPTY_APPLICANTS: Applicant[] = []
+
 export default function ApplicantsPage() {
   const router = useRouter()
-  const [applicants, setApplicants] = React.useState<Applicant[]>([])
-  const [profiles, setProfiles] = React.useState<Profile[]>([])
-  const [isLoading, setIsLoading] = React.useState(true)
   const [search, setSearch] = React.useState("")
+  const [debouncedSearch, setDebouncedSearch] = React.useState("")
   const [dateFrom, setDateFrom] = React.useState("")
   const [dateTo, setDateTo] = React.useState("")
   const [page, setPage] = React.useState(1)
-  const [pageSize] = React.useState(20)
-  const [totalPages, setTotalPages] = React.useState(1)
-  const [totalRecords, setTotalRecords] = React.useState(0)
-
-  const { query, account } = useApiClient()
 
   React.useEffect(() => {
-    async function fetchApplicants() {
-      if (!account) return
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search.trim())
+      setPage(1)
+    }, 200) // 200ms debounce
+    return () => clearTimeout(timeout)
+  }, [search])
 
-      setIsLoading(true)
+  React.useEffect(() => {
+    setPage(1)
+  }, [dateFrom, dateTo])
 
-      try {
-        const params = new URLSearchParams({
-          Page: String(page),
-          PageSize: String(pageSize),
-          Search: trimmedSearch,
-          DateFrom: dateFrom,
-          DateTo: dateTo,
-          SortBy: "",
-          Descending: "true",
-          SchoolYearId: "1",
-          Status: "",
-        })
-
-        const [applicantsPayload, profilesPayload] = await Promise.all([
-          query<ApplicantsPayload>(
-            `/api/v1/recruitment/employee-applicants?${params.toString()}`,
-          ),
-          query<ProfilesPayload>("/api/v1/core/profiles?page=1&pageSize=100"),
-        ])
-
-        if (applicantsPayload && applicantsPayload.success && applicantsPayload.data) {
-          setApplicants(applicantsPayload.data.data ?? [])
-          setTotalPages(applicantsPayload.data.totalPages ?? 1)
-          setTotalRecords(applicantsPayload.data.totalRecords ?? 0)
-        } else {
-          setApplicants([])
-        }
-
-        setProfiles(profilesPayload?.data?.data ?? [])
-      } catch (error) {
-        console.error("Failed to fetch data:", error)
-        setApplicants([])
-        setProfiles([])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchApplicants()
-  }, [query, account, page, pageSize])
-
-  const filtered = applicants.filter((applicant) => {
-    const term = search.trim().toLowerCase()
-    const { ApplicationNumber, Status, ProfileId, CreatedAt } = applicant.values
-
-    if (term) {
-      const matchingProfile = profiles.find((p) => p.id === ProfileId)
-      const fullName = matchingProfile
-        ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
-        : ""
-      const matchesSearch =
-        ApplicationNumber.toLowerCase().includes(term) ||
-        Status.toLowerCase().includes(term) ||
-        fullName.includes(term)
-      if (!matchesSearch) return false
-    }
-
-    if (dateFrom || dateTo) {
-      const applied = new Date(CreatedAt)
-      applied.setHours(0, 0, 0, 0)
-      if (dateFrom && applied < new Date(dateFrom)) return false
-      if (dateTo && applied > new Date(dateTo)) return false
-    }
-
-    return true
+  const {
+    data: applicantsPayload,
+    loading: isLoading,
+    error,
+  } = useApiQuery<ApplicantsPayload>("/api/v1/recruitment/employee-applicants", {
+    Page: page,
+    PageSize: PAGE_SIZE,
+    Search: debouncedSearch || undefined,
+    DateFrom: dateFrom || undefined,
+    DateTo: dateTo || undefined,
+    SortBy: "",
+    Descending: true,
+    SchoolYearId: 1,
+    Status: "",
   })
+
+  const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
+
+  const { query } = useApiClient()
+  const [profileNames, setProfileNames] = React.useState<Record<number, string>>({})
+  const attemptedIdsRef = React.useRef<Set<number>>(new Set())
+
+  React.useEffect(() => {
+    const missingIds = Array.from(
+      new Set(applicants.map((a) => a.values.ProfileId)),
+    ).filter((id) => !attemptedIdsRef.current.has(id))
+
+    if (missingIds.length === 0) return
+
+    for (const id of missingIds) attemptedIdsRef.current.add(id)
+
+    let cancelled = false
+
+    Promise.all(
+      missingIds.map((id) =>
+        query<Profile>(`/api/v1/core/profiles/${id}`)
+          .then((profile) => [id, `${profile.values.FirstName} ${profile.values.LastName}`] as const)
+          .catch(() => [id, null] as const),
+      ),
+    ).then((results) => {
+      if (cancelled) return
+      const resolved = results.filter(([, name]) => name) as [number, string][]
+      if (resolved.length === 0) return
+      setProfileNames((prev) => {
+        const next = { ...prev }
+        for (const [id, name] of resolved) next[id] = name
+        return next
+      })
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [applicants, query])
+
+  const totalPages = applicantsPayload?.totalPages ?? 1
+  const totalRecords = applicantsPayload?.totalRecords ?? 0
+  const hasActiveFilters = Boolean(search || dateFrom || dateTo)
 
   return (
     <div>
@@ -178,7 +156,6 @@ export default function ApplicantsPage() {
             Applicant records will appear here.
           </p>
         </div>
-
         <div className="flex items-center gap-2">
           <input
             type="date"
@@ -203,7 +180,6 @@ export default function ApplicantsPage() {
               Clear
             </button>
           )}
-
           <div className="relative">
             <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
@@ -223,14 +199,19 @@ export default function ApplicantsPage() {
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading applicants…
           </div>
-        ) : filtered.length === 0 ? (
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
+            <p className="text-sm font-medium">Couldn&apos;t load applicants</p>
+            <p className="text-sm text-muted-foreground">{error.message}</p>
+          </div>
+        ) : applicants.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <UserSearch className="h-8 w-8 text-muted-foreground" />
             <p className="text-sm font-medium">
-              {search || dateFrom || dateTo ? "No applicants match your filters" : "No applicants yet"}
+              {hasActiveFilters ? "No applicants match your filters" : "No applicants yet"}
             </p>
             <p className="text-sm text-muted-foreground">
-              {search || dateFrom || dateTo
+              {hasActiveFilters
                 ? "Try adjusting your search or date range."
                 : "Applicants you add will show up here."}
             </p>
@@ -249,13 +230,9 @@ export default function ApplicantsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((applicant) => {
+                {applicants.map((applicant) => {
                   const v = applicant.values
-                  const matchingProfile = profiles.find((p) => p.id === v.ProfileId)
-                  const fullName = matchingProfile
-                    ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`
-                    : "No linked profile"
-
+                  const fullName = profileNames[v.ProfileId] ?? "No linked profile"
                   return (
                     <tr
                       key={applicant.id}
@@ -265,7 +242,7 @@ export default function ApplicantsPage() {
                         {v.ApplicationNumber}
                       </td>
                       <td className="px-4 py-3">
-                          {fullName}
+                        {fullName}
                       </td>
                       <td className="px-4 py-3">
                         <span
@@ -301,7 +278,7 @@ export default function ApplicantsPage() {
         )}
       </div>
 
-      {!isLoading && applicants.length > 0 && (
+      {!isLoading && !error && applicants.length > 0 && (
         <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
           <p className="text-sm text-muted-foreground">
             Page {page} of {totalPages} · {totalRecords} applicant
