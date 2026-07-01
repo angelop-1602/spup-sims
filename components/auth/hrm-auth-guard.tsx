@@ -6,28 +6,24 @@ import { useIsAuthenticated, useMsal } from "@azure/msal-react"
 import { ShieldCheck } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 
+import { HrmPageSkeleton } from "@/components/layout/app-shell-skeleton"
 import { Button } from "@/components/ui/button"
-
-const API_SCOPES =
-  process.env.NEXT_PUBLIC_API_SCOPES?.split(/[\s,]+/).filter(Boolean) ?? [
-    "User.Read",
-  ]
-
-type CurrentUser = {
-  userId: number | string | null
-  profileId: number | string | null
-  email: string | null
-  azureId: string | null
-  roles: string[]
-  permissions: string[]
-  isSuperAdmin: boolean
-}
+import {
+  readCachedHrmAccess,
+  type CurrentUser,
+  verifyHrmAccess,
+} from "@/lib/hrmAccess"
 
 type HrmAuthContextValue = {
+  accessError: string | null
   currentUser: CurrentUser | null
+  hasDatabaseAccess: boolean | null
   roles: string[]
   permissions: string[]
   hasPermission: (permission: string) => boolean
+  isAuthenticated: boolean
+  isCheckingAccess: boolean
+  signInPath: string
 }
 
 const HrmAuthContext = React.createContext<HrmAuthContextValue | null>(null)
@@ -50,11 +46,12 @@ export function HrmAuthGuard({ children }: { children: React.ReactNode }) {
   const account = accounts[0]
   const isCheckingSession = inProgress !== InteractionStatus.None
   const signInPath = `/login?returnTo=${encodeURIComponent(pathname)}`
+  const cachedUser = readCachedHrmAccess(account)
 
   const [currentUser, setCurrentUser] =
-    React.useState<CurrentUser | null>(null)
+    React.useState<CurrentUser | null>(cachedUser)
   const [hasDatabaseAccess, setHasDatabaseAccess] =
-    React.useState<boolean | null>(null)
+    React.useState<boolean | null>(cachedUser ? true : null)
   const [accessError, setAccessError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
@@ -74,58 +71,29 @@ export function HrmAuthGuard({ children }: { children: React.ReactNode }) {
     }
 
     const verifyUser = async () => {
+      const cachedAccess = readCachedHrmAccess(account)
+
+      if (cachedAccess) {
+        setAccessError(null)
+        setCurrentUser(cachedAccess)
+        setHasDatabaseAccess(true)
+        return
+      }
+
       setAccessError(null)
       setHasDatabaseAccess(null)
       setCurrentUser(null)
 
-      try {
-        const result = await instance.acquireTokenSilent({
-          scopes: API_SCOPES,
-          account,
-        })
+      const result = await verifyHrmAccess(instance, account)
 
-        const response = await fetch("/api/me", {
-          headers: {
-            Authorization: `Bearer ${result.accessToken}`,
-            Accept: "application/json",
-          },
-          cache: "no-store",
-        })
-
-        if (!response.ok) {
-          setHasDatabaseAccess(false)
-          setAccessError(
-            response.status === 404
-              ? "Your account is not registered in the HRM database."
-              : "You do not have permission to access this application."
-          )
-          return
-        }
-
-        const payload = await response.json()
-        const user =
-          payload?.data?.data ?? payload?.data ?? payload ?? null
-
-        if (
-          !user ||
-          !Array.isArray(user.roles) ||
-          !Array.isArray(user.permissions)
-        ) {
-          setHasDatabaseAccess(false)
-          setAccessError("Unable to verify your HRM access.")
-          return
-        }
-
-        setCurrentUser(user)
+      if (result.ok) {
+        setCurrentUser(result.user)
         setHasDatabaseAccess(true)
-      } catch (error) {
-        setHasDatabaseAccess(false)
-        setAccessError(
-          error instanceof Error
-            ? error.message
-            : "Unable to verify your HRM access."
-        )
+        return
       }
+
+      setHasDatabaseAccess(false)
+      setAccessError(result.message)
     }
 
     void verifyUser()
@@ -139,51 +107,52 @@ export function HrmAuthGuard({ children }: { children: React.ReactNode }) {
 
   const contextValue = React.useMemo(
     () => ({
+      accessError,
       currentUser,
+      hasDatabaseAccess,
       roles: currentUser?.roles ?? [],
       permissions: currentUser?.permissions ?? [],
       hasPermission,
+      isAuthenticated,
+      isCheckingAccess:
+        isCheckingSession || (isAuthenticated && hasDatabaseAccess === null),
+      signInPath,
     }),
-    [currentUser, hasPermission]
+    [
+      accessError,
+      currentUser,
+      hasDatabaseAccess,
+      hasPermission,
+      isAuthenticated,
+      isCheckingSession,
+      signInPath,
+    ]
   )
 
-  if (isCheckingSession || (isAuthenticated && hasDatabaseAccess === null)) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
-        <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <p className="text-sm text-muted-foreground">Checking access…</p>
-        </div>
-      </main>
-    )
-  }
+  return (
+    <HrmAuthContext.Provider value={contextValue}>
+      {children}
+    </HrmAuthContext.Provider>
+  )
+}
 
-  if (!isAuthenticated) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
-        <div className="w-full max-w-md rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-700/10 text-emerald-700">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold">Authentication required</h1>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Sign in with Microsoft to access the HRM workspace.
-              </p>
-            </div>
-          </div>
+export function HrmAuthGate({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
+  const {
+    accessError,
+    hasDatabaseAccess,
+    isAuthenticated,
+    isCheckingAccess,
+    signInPath,
+  } = useHrmAuth()
 
-          <Button className="mt-6 w-full" onClick={() => router.push(signInPath)}>
-            Go to sign in
-          </Button>
-        </div>
-      </main>
-    )
+  if (isCheckingAccess || !isAuthenticated) {
+    return <HrmPageSkeleton />
   }
 
   if (!hasDatabaseAccess) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
+      <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center px-2 text-foreground">
         <div className="w-full max-w-md rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
@@ -206,13 +175,9 @@ export function HrmAuthGuard({ children }: { children: React.ReactNode }) {
             Return to sign in
           </Button>
         </div>
-      </main>
+      </div>
     )
   }
 
-  return (
-    <HrmAuthContext.Provider value={contextValue}>
-      {children}
-    </HrmAuthContext.Provider>
-  )
+  return <>{children}</>
 }
