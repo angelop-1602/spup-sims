@@ -35,7 +35,7 @@ function MicrosoftMark() {
 function AuthBackground({ children }: { children: React.ReactNode }) {
   return (
     <main className="relative min-h-svh overflow-hidden bg-[#f7f7f5] text-zinc-950">
-      <Image
+      {/* <Image
         src="/img/bg-auth.png"
         alt=""
         aria-hidden="true"
@@ -43,7 +43,7 @@ function AuthBackground({ children }: { children: React.ReactNode }) {
         priority
         sizes="100vw"
         className="object-cover object-[center_bottom]"
-      />
+      /> */}
       <div className="absolute inset-0 bg-white/15" />
 
       <div className="relative z-10 flex min-h-svh flex-col px-5 py-5 sm:px-8 lg:px-10">

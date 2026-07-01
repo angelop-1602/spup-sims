@@ -3,11 +3,11 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
-import { useApiQuery, useApiClient } from "@/lib/api"
+import { useApiClient, type components } from "@/lib/api"
 
 interface ApplicantValues {
-  Id: number
-  ProfileId: number
+  Id: number | string
+  ProfileId: number | string
   ApplicationNumber: string
   Status: string
   CreatedAt: string
@@ -21,7 +21,7 @@ interface ApplicantValues {
 
 interface Applicant {
   entity: string
-  id: number
+  id: number | string
   values: ApplicantValues
 }
 
@@ -32,16 +32,17 @@ interface ProfileValues {
 }
 
 interface Profile {
-  id: number
+  id: number | string
   values: ProfileValues
 }
 
-interface ApplicantsPayload {
-  data: Applicant[]
-  page: number
-  pageSize: number
-  totalRecords: number
-  totalPages: number
+type PagedEntityRecords<TValues> = Omit<
+  components["schemas"]["PagedResponseOfEntityRecord"],
+  "data"
+> & {
+  data: Array<Omit<components["schemas"]["EntityRecord"], "values"> & {
+    values: TValues
+  }>
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -104,39 +105,61 @@ export default function ApplicantsPage() {
     Status: "",
   })
 
-  const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
+      try {
+        const trimmedSearch = search.trim()
+        const params = {
+          Page: page,
+          PageSize: pageSize,
+          Search: trimmedSearch || undefined,
+          DateFrom: dateFrom || undefined,
+          DateTo: dateTo || undefined,
+          SortBy: "",
+          Descending: true,
+          SchoolYearId: 1,
+          Status: "",
+        }
 
-  const { query } = useApiClient()
-  const [profileNames, setProfileNames] = React.useState<Record<number, string>>({})
-  const attemptedIdsRef = React.useRef<Set<number>>(new Set())
+        const [applicantsPayload, profilesPayload] = await Promise.all([
+          query<PagedEntityRecords<ApplicantValues>>(
+            "/api/v1/recruitment/employee-applicants",
+            params,
+          ),
+          query<PagedEntityRecords<ProfileValues>>("/api/v1/core/profiles", {
+            Page: 1,
+            PageSize: 100,
+          }),
+        ])
 
-  React.useEffect(() => {
-    const missingIds = Array.from(
-      new Set(applicants.map((a) => a.values.ProfileId)),
-    ).filter((id) => !attemptedIdsRef.current.has(id))
+        setApplicants(applicantsPayload?.data ?? [])
+        setTotalPages(Number(applicantsPayload?.totalPages ?? 1))
+        setTotalRecords(Number(applicantsPayload?.totalRecords ?? 0))
 
-    if (missingIds.length === 0) return
+        setProfiles(profilesPayload?.data ?? [])
+      } catch (error) {
+        console.error("Failed to fetch data:", error)
+        setApplicants([])
+        setProfiles([])
+      } finally {
+        setIsLoading(false)
+      }
+    }
 
-    for (const id of missingIds) attemptedIdsRef.current.add(id)
+    fetchApplicants()
+  }, [query, account, page, pageSize, search, dateFrom, dateTo])
 
     let cancelled = false
 
-    Promise.all(
-      missingIds.map((id) =>
-        query<Profile>(`/api/v1/core/profiles/${id}`)
-          .then((profile) => [id, `${profile.values.FirstName} ${profile.values.LastName}`] as const)
-          .catch(() => [id, null] as const),
-      ),
-    ).then((results) => {
-      if (cancelled) return
-      const resolved = results.filter(([, name]) => name) as [number, string][]
-      if (resolved.length === 0) return
-      setProfileNames((prev) => {
-        const next = { ...prev }
-        for (const [id, name] of resolved) next[id] = name
-        return next
-      })
-    })
+    if (term) {
+      const matchingProfile = profiles.find((p) => String(p.id) === String(ProfileId))
+      const fullName = matchingProfile
+        ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
+        : ""
+      const matchesSearch =
+        ApplicationNumber.toLowerCase().includes(term) ||
+        Status.toLowerCase().includes(term) ||
+        fullName.includes(term)
+      if (!matchesSearch) return false
+    }
 
     return () => {
       cancelled = true
@@ -160,7 +183,10 @@ export default function ApplicantsPage() {
           <input
             type="date"
             value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
+            onChange={(e) => {
+              setDateFrom(e.target.value)
+              setPage(1)
+            }}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
           <span className="text-sm text-muted-foreground">to</span>
@@ -168,13 +194,20 @@ export default function ApplicantsPage() {
             type="date"
             value={dateTo}
             min={dateFrom || undefined}
-            onChange={(e) => setDateTo(e.target.value)}
+            onChange={(e) => {
+              setDateTo(e.target.value)
+              setPage(1)
+            }}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
           {(dateFrom || dateTo) && (
             <button
               type="button"
-              onClick={() => { setDateFrom(""); setDateTo("") }}
+              onClick={() => {
+                setDateFrom("")
+                setDateTo("")
+                setPage(1)
+              }}
               className="text-xs text-muted-foreground hover:text-foreground"
             >
               Clear
@@ -185,7 +218,10 @@ export default function ApplicantsPage() {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
               placeholder="Search application no. or status"
               className="w-64 rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
@@ -232,7 +268,11 @@ export default function ApplicantsPage() {
               <tbody>
                 {applicants.map((applicant) => {
                   const v = applicant.values
-                  const fullName = profileNames[v.ProfileId] ?? "No linked profile"
+                  const matchingProfile = profiles.find((p) => String(p.id) === String(v.ProfileId))
+                  const fullName = matchingProfile
+                    ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`
+                    : "No linked profile"
+
                   return (
                     <tr
                       key={applicant.id}
