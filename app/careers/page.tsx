@@ -378,6 +378,8 @@ export default function HrmPage() {
             </div>
 
             <div className="relative w-full">
+              <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-neutral-200 z-0" />
+              
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
                 {/* Step 1 */}
                 <div className="flex flex-col items-center text-center">
