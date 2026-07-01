@@ -41,7 +41,6 @@ export default function JobDetailsModal({
     if (!userProfile) return;
     setIsApplying(true);
 
-    // Simulate database lookup & locking process
     setTimeout(() => {
       setIsApplying(false);
       setIsSuccess(true);
@@ -68,7 +67,6 @@ export default function JobDetailsModal({
     setIsApplying(true);
     setFormError('');
 
-    // Simulate submission
     setTimeout(() => {
       setIsApplying(false);
       setIsSuccess(true);
@@ -125,66 +123,58 @@ export default function JobDetailsModal({
             </button>
           </div>
 
-          {/* Modal Scroll Body */}
-          <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-8 bg-neutral-50/10">
-            
-            {/* Split layout: Details and Apply panel */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              
-              {/* Left Column: Job Spec (Responsibilities, Requirements, etc) */}
-              <div className="lg:col-span-7 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 bg-neutral-50/10">        
+            <div className="w-full space-y-8">
                 <div>
-                  <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-2.5">About this Role</h3>
-                  <p className="text-sm text-neutral-600 leading-relaxed font-normal text-justify">
+                    <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-2.5">About this Role</h3>
+                    <p className="text-sm text-neutral-600 leading-relaxed font-normal text-justify">
                     {job.description}
-                  </p>
+                    </p>
                 </div>
 
                 <div className="border-t border-neutral-100 pt-5">
-                  <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                     Key Responsibilities
-                  </h3>
-                  <ul className="space-y-2">
+                    </h3>
+                    <ul className="space-y-2">
                     {job.responsibilities.map((resp, idx) => (
-                      <li key={idx} className="flex gap-2 text-sm text-neutral-600 leading-relaxed text-justify">
+                        <li key={idx} className="flex gap-2 text-sm text-neutral-600 leading-relaxed text-justify">
                         <ChevronRight className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-0.5" />
                         <span>{resp}</span>
-                      </li>
+                        </li>
                     ))}
-                  </ul>
+                    </ul>
                 </div>
 
                 <div className="border-t border-neutral-100 pt-5">
-                  <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                     Candidate Qualifications
-                  </h3>
-                  <ul className="space-y-2">
+                    </h3>
+                    <ul className="space-y-2">
                     {job.requirements.map((req, idx) => (
-                      <li key={idx} className="flex gap-2 text-sm text-neutral-600 leading-relaxed text-justify">
+                        <li key={idx} className="flex gap-2 text-sm text-neutral-600 leading-relaxed text-justify">
                         <ChevronRight className="w-4 h-4 text-neutral-400 flex-shrink-0 mt-0.5" />
                         <span>{req}</span>
-                      </li>
+                        </li>
                     ))}
-                  </ul>
+                    </ul>
                 </div>
 
                 <div className="border-t border-neutral-100 pt-5">
-                  <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <h3 className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-3 flex items-center gap-2">
                     Compensation & Perks
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {job.benefits.map((benefit, idx) => (
-                      <div key={idx} className="flex gap-2 items-start p-2.5 bg-neutral-50 border border-neutral-100 rounded-lg text-xs text-neutral-600 font-medium text-justify">
+                        <div key={idx} className="flex gap-2 items-start p-2.5 bg-white border border-neutral-100 rounded-lg text-xs text-neutral-600 font-medium text-justify shadow-2xs">
                         <Star className="w-3.5 h-3.5 text-neutral-400 flex-shrink-0 mt-0.5" />
                         <span>{benefit}</span>
-                      </div>
+                        </div>
                     ))}
-                  </div>
+                    </div>
                 </div>
-              </div>
             </div>
-
-          </div>
+        </div>
 
           {/* Footer */}
           <div className="p-4 bg-neutral-50 border-t border-neutral-100 flex justify-end">
