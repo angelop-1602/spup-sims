@@ -28,7 +28,7 @@ export default function EmployeePortfolioPage() {
         </div>
       ) : error ? (
         <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-6 text-sm text-destructive">
-          {error}
+          {error.message}
         </div>
       ) : profile ? (
         <EmployeePortfolioDetails profile={profile} />

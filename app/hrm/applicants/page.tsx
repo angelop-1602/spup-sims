@@ -3,11 +3,11 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
-import { useApiClient } from "@/lib/api"
+import { useApiClient, type components } from "@/lib/api"
 
 interface ApplicantValues {
-  Id: number
-  ProfileId: number
+  Id: number | string
+  ProfileId: number | string
   ApplicationNumber: string
   Status: string
   CreatedAt: string
@@ -21,7 +21,7 @@ interface ApplicantValues {
 
 interface Applicant {
   entity: string
-  id: number
+  id: number | string
   values: ApplicantValues
 }
 
@@ -32,32 +32,17 @@ interface ProfileValues {
 }
 
 interface Profile {
-  id: number
+  id: number | string
   values: ProfileValues
 }
 
-interface ApplicantsPayload {
-  success: boolean
-  message: string
-  data: {
-    data: Applicant[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
-}
-
-interface ProfilesPayload {
-  success: boolean
-  message: string
-  data: {
-    data: Profile[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
+type PagedEntityRecords<TValues> = Omit<
+  components["schemas"]["PagedResponseOfEntityRecord"],
+  "data"
+> & {
+  data: Array<Omit<components["schemas"]["EntityRecord"], "values"> & {
+    values: TValues
+  }>
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -103,32 +88,35 @@ export default function ApplicantsPage() {
       setIsLoading(true)
 
       try {
-        const params = new URLSearchParams({
-          Page: String(page),
-          PageSize: String(pageSize),
-          Search: "",
+        const trimmedSearch = search.trim()
+        const params = {
+          Page: page,
+          PageSize: pageSize,
+          Search: trimmedSearch || undefined,
+          DateFrom: dateFrom || undefined,
+          DateTo: dateTo || undefined,
           SortBy: "",
-          Descending: "true",
-          SchoolYearId: "1",
+          Descending: true,
+          SchoolYearId: 1,
           Status: "",
-        })
-
-        const [applicantsPayload, profilesPayload] = await Promise.all([
-          query<ApplicantsPayload>(
-            `/api/v1/recruitment/employee-applicants?${params.toString()}`,
-          ),
-          query<ProfilesPayload>("/api/v1/core/profiles?page=1&pageSize=100"),
-        ])
-
-        if (applicantsPayload && applicantsPayload.success && applicantsPayload.data) {
-          setApplicants(applicantsPayload.data.data ?? [])
-          setTotalPages(applicantsPayload.data.totalPages ?? 1)
-          setTotalRecords(applicantsPayload.data.totalRecords ?? 0)
-        } else {
-          setApplicants([])
         }
 
-        setProfiles(profilesPayload?.data?.data ?? [])
+        const [applicantsPayload, profilesPayload] = await Promise.all([
+          query<PagedEntityRecords<ApplicantValues>>(
+            "/api/v1/recruitment/employee-applicants",
+            params,
+          ),
+          query<PagedEntityRecords<ProfileValues>>("/api/v1/core/profiles", {
+            Page: 1,
+            PageSize: 100,
+          }),
+        ])
+
+        setApplicants(applicantsPayload?.data ?? [])
+        setTotalPages(Number(applicantsPayload?.totalPages ?? 1))
+        setTotalRecords(Number(applicantsPayload?.totalRecords ?? 0))
+
+        setProfiles(profilesPayload?.data ?? [])
       } catch (error) {
         console.error("Failed to fetch data:", error)
         setApplicants([])
@@ -139,14 +127,14 @@ export default function ApplicantsPage() {
     }
 
     fetchApplicants()
-  }, [query, account, page, pageSize])
+  }, [query, account, page, pageSize, search, dateFrom, dateTo])
 
   const filtered = applicants.filter((applicant) => {
     const term = search.trim().toLowerCase()
     const { ApplicationNumber, Status, ProfileId, CreatedAt } = applicant.values
 
     if (term) {
-      const matchingProfile = profiles.find((p) => p.id === ProfileId)
+      const matchingProfile = profiles.find((p) => String(p.id) === String(ProfileId))
       const fullName = matchingProfile
         ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
         : ""
@@ -181,7 +169,10 @@ export default function ApplicantsPage() {
           <input
             type="date"
             value={dateFrom}
-            onChange={(e) => setDateFrom(e.target.value)}
+            onChange={(e) => {
+              setDateFrom(e.target.value)
+              setPage(1)
+            }}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
           <span className="text-sm text-muted-foreground">to</span>
@@ -189,13 +180,20 @@ export default function ApplicantsPage() {
             type="date"
             value={dateTo}
             min={dateFrom || undefined}
-            onChange={(e) => setDateTo(e.target.value)}
+            onChange={(e) => {
+              setDateTo(e.target.value)
+              setPage(1)
+            }}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           />
           {(dateFrom || dateTo) && (
             <button
               type="button"
-              onClick={() => { setDateFrom(""); setDateTo("") }}
+              onClick={() => {
+                setDateFrom("")
+                setDateTo("")
+                setPage(1)
+              }}
               className="text-xs text-muted-foreground hover:text-foreground"
             >
               Clear
@@ -207,7 +205,10 @@ export default function ApplicantsPage() {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
               placeholder="Search application no. or status"
               className="w-64 rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
@@ -249,7 +250,7 @@ export default function ApplicantsPage() {
               <tbody>
                 {filtered.map((applicant) => {
                   const v = applicant.values
-                  const matchingProfile = profiles.find((p) => p.id === v.ProfileId)
+                  const matchingProfile = profiles.find((p) => String(p.id) === String(v.ProfileId))
                   const fullName = matchingProfile
                     ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`
                     : "No linked profile"

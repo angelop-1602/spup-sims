@@ -12,9 +12,7 @@ import { EmployeeDetailsModal } from "./modal"
 
 type Employee = components["schemas"]["EmployeeResponse"]
 type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
-type Department = components["schemas"]["DepartmentResponse"]
 type PagedDepartments = components["schemas"]["PagedResponseOfDepartmentResponse"]
-type Designation = components["schemas"]["DesignationResponse"]
 type PagedDesignations = components["schemas"]["PagedResponseOfDesignationResponse"]
 
 const PAGE_SIZE = 10
@@ -39,7 +37,6 @@ export default function EmployeesPage() {
   const [page, setPage] = useState(1)
 
   // Employee modal
-  const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [detailedEmployee, setDetailedEmployee] = useState<unknown | null>(null)
   const [isModalLoading, setIsModalLoading] = useState(false)
@@ -54,15 +51,6 @@ export default function EmployeesPage() {
     }, 200) // 200ms debounce
     return () => clearTimeout(timeout)
   }, [search])
-
-  useEffect(() => {
-    setDesignationFilter("")
-  }, [departmentFilter])
-
-  // Reset pagination when filters are adjusted
-  useEffect(() => {
-    setPage(1)
-  }, [departmentFilter, designationFilter])
 
   const {
     data: employeesPaged,
@@ -100,7 +88,6 @@ export default function EmployeesPage() {
     .sort((a, b) => a.name.localeCompare(b.name))
 
   async function handleViewDetails(id: number) {
-    setSelectedEmployeeId(id)
     setIsModalOpen(true)
     setIsModalLoading(true)
     setDetailedEmployee(null)
@@ -118,7 +105,7 @@ export default function EmployeesPage() {
   }
 
   const employees = employeesPaged?.data ?? []
-  const totalPages = employeesPaged?.totalPages ?? 1
+  const totalPages = Number(employeesPaged?.totalPages ?? 1)
   const totalRecords = employeesPaged?.totalRecords ?? 0
 
   const hasActiveFilters = Boolean(search || departmentFilter || designationFilter)
@@ -149,7 +136,11 @@ export default function EmployeesPage() {
 
         <select
           value={departmentFilter}
-          onChange={(e) => setDepartmentFilter(e.target.value)}
+          onChange={(e) => {
+            setDepartmentFilter(e.target.value)
+            setDesignationFilter("")
+            setPage(1)
+          }}
           className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-48"
         >
           <option value="">All departments</option>
@@ -162,7 +153,10 @@ export default function EmployeesPage() {
 
         <select
           value={designationFilter}
-          onChange={(e) => setDesignationFilter(e.target.value)}
+          onChange={(e) => {
+            setDesignationFilter(e.target.value)
+            setPage(1)
+          }}
           className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-48"
         >
           <option value="">All designations</option>
@@ -180,6 +174,7 @@ export default function EmployeesPage() {
               setSearch("")
               setDepartmentFilter("")
               setDesignationFilter("")
+              setPage(1)
             }}
             className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
           >
