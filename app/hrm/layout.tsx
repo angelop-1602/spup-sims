@@ -1,4 +1,4 @@
-import { HrmAuthGuard } from "@/components/auth/hrm-auth-guard"
+import { HrmAuthGate, HrmAuthGuard } from "@/components/auth/hrm-auth-guard"
 import { AppShell } from "@/components/layout/app-shell"
 
 export default function HrmLayout({
@@ -8,7 +8,9 @@ export default function HrmLayout({
 }) {
   return (
     <HrmAuthGuard>
-      <AppShell>{children}</AppShell>
+      <AppShell>
+        <HrmAuthGate>{children}</HrmAuthGate>
+      </AppShell>
     </HrmAuthGuard>
   )
 }

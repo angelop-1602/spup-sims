@@ -5,9 +5,30 @@ import { InteractionStatus } from "@azure/msal-browser"
 import { useIsAuthenticated, useMsal } from "@azure/msal-react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { SignInPage } from "@/components/auth/sign-in-page"
+import {
+  SignInPage,
+  SignInPageSkeleton,
+} from "@/components/auth/sign-in-page"
 import { loginRequest } from "@/lib/authConfig"
-import { signOutCurrentAccount } from "@/lib/msalLogout"
+import { clearCachedHrmAccess, verifyHrmAccess } from "@/lib/hrmAccess"
+
+const LOGIN_PENDING_KEY = "spup:sims:login-pending"
+
+function readPendingLogin() {
+  if (typeof window === "undefined") {
+    return false
+  }
+
+  return window.sessionStorage.getItem(LOGIN_PENDING_KEY) === "1"
+}
+
+function writePendingLogin() {
+  window.sessionStorage.setItem(LOGIN_PENDING_KEY, "1")
+}
+
+function clearPendingLogin() {
+  window.sessionStorage.removeItem(LOGIN_PENDING_KEY)
+}
 
 function getSafeReturnPath(returnTo: string | null) {
   if (!returnTo || !returnTo.startsWith("/") || returnTo.startsWith("//")) {
@@ -48,6 +69,10 @@ function LoginContent() {
   const { accounts, inProgress, instance } = useMsal()
   const isAuthenticated = useIsAuthenticated()
   const [errorMessage, setErrorMessage] = React.useState("")
+  const [hasPendingLogin, setHasPendingLogin] =
+    React.useState(readPendingLogin)
+  const [isSigningIn, setIsSigningIn] = React.useState(false)
+  const [isVerifying, setIsVerifying] = React.useState(false)
   const account = accounts[0]
   const returnTo = getSafeReturnPath(searchParams.get("returnTo"))
   const isAuthBusy = inProgress !== InteractionStatus.None
@@ -59,13 +84,50 @@ function LoginContent() {
   }, [account, instance])
 
   React.useEffect(() => {
-    if (!isAuthBusy && isAuthenticated) {
-      router.replace(returnTo)
+    if (isAuthBusy || !isAuthenticated || !account) {
+      return
     }
-  }, [isAuthBusy, isAuthenticated, returnTo, router])
+
+    let isCurrent = true
+
+    const verifyAndContinue = async () => {
+      setErrorMessage("")
+      setIsSigningIn(false)
+      setIsVerifying(true)
+
+      const result = await verifyHrmAccess(instance, account)
+
+      if (!isCurrent) {
+        return
+      }
+
+      if (result.ok) {
+        clearPendingLogin()
+        setHasPendingLogin(false)
+        router.replace(returnTo)
+        return
+      }
+
+      clearPendingLogin()
+      clearCachedHrmAccess()
+      setHasPendingLogin(false)
+      setIsVerifying(false)
+      setErrorMessage(result.message)
+    }
+
+    void verifyAndContinue()
+
+    return () => {
+      isCurrent = false
+    }
+  }, [account, instance, isAuthBusy, isAuthenticated, returnTo, router])
 
   const handleLogin = async () => {
     setErrorMessage("")
+    writePendingLogin()
+    setHasPendingLogin(true)
+    setIsSigningIn(true)
+    setIsVerifying(false)
 
     try {
       await instance.loginRedirect({
@@ -74,18 +136,10 @@ function LoginContent() {
       })
     } catch (error) {
       console.error(error)
+      clearPendingLogin()
+      setHasPendingLogin(false)
+      setIsSigningIn(false)
       setErrorMessage(getAuthErrorMessage(error))
-    }
-  }
-
-  const handleLogout = async () => {
-    setErrorMessage("")
-
-    try {
-      await signOutCurrentAccount(instance, account)
-    } catch (error) {
-      console.error(error)
-      setErrorMessage("Sign-out failed. Please refresh the page.")
     }
   }
 
@@ -100,15 +154,19 @@ function LoginContent() {
 
   return (
     <SignInPage
-      accountEmail={account?.username}
-      accountName={account?.name}
+      busyLabel={
+        isVerifying || (hasPendingLogin && isAuthenticated)
+          ? "Verifying access..."
+          : "Preparing sign-in..."
+      }
       errorMessage={errorMessage}
-      isAuthenticated={isAuthenticated}
-      isBusy={isAuthBusy}
+      isBusy={
+        isSigningIn ||
+        isVerifying ||
+        (hasPendingLogin && (isAuthBusy || isAuthenticated))
+      }
       onBack={handleBack}
-      onContinue={() => router.replace(returnTo)}
       onSignIn={handleLogin}
-      onSignOut={handleLogout}
     />
   )
 }
@@ -116,11 +174,7 @@ function LoginContent() {
 export default function Page() {
   return (
     <React.Suspense
-      fallback={
-        <div className="flex min-h-svh items-center justify-center bg-[#f7f7f5] text-sm text-zinc-500">
-          Loading sign-in...
-        </div>
-      }
+      fallback={<SignInPageSkeleton />}
     >
       <LoginContent />
     </React.Suspense>
