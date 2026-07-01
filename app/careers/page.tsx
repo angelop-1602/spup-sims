@@ -364,6 +364,89 @@ export default function HrmPage() {
             </div>
           )}
         </div>
+
+        {/* APPLICATION PROCESS SECTION */}
+        <section className="bg-white border border-neutral-200 rounded-2xl p-6 md:p-10 shadow-xs mt-12 w-full">
+          <div className="max-w-5xl mx-auto">
+            <div className="mb-12 text-left">
+              <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
+                Our Application Process
+              </h2>
+              <p className="text-xs text-neutral-500 mt-1">
+                A simple four-step pathway to joining the SPUP academic and staff community.
+              </p>
+            </div>
+
+            <div className="relative w-full">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
+                {/* Step 1 */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
+                    1
+                  </div>
+                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
+                    <Search className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    Choose a Position
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
+                    Browse available job openings and locate roles that match your expertise.
+                  </p>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
+                    2
+                  </div>
+                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    Submit Application
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
+                    Upload your digital curriculum vitae and complete the application form.
+                  </p>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
+                    3
+                  </div>
+                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
+                    <User className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    HR Screening
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
+                    The Human Resource Management Office conducts an initial credentials verification evaluation.
+                  </p>
+                </div>
+
+                {/* Step 4 */}
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
+                    4
+                  </div>
+                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    Interview & Evaluation
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
+                    Qualified candidates meet with departmental committees for final evaluations.
+                  </p>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       {/* Footer */}
