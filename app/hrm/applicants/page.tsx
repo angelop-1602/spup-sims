@@ -1,10 +1,9 @@
 "use client"
 
-import React from "react"
-import { useRouter } from "next/navigation";
-import { useMsal } from "@azure/msal-react"
-import { loginRequest } from "@/lib/authConfig"
+import * as React from "react"
+import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
+import { useApiClient } from "@/lib/api"
 
 interface ApplicantValues {
   Id: number
@@ -37,7 +36,7 @@ interface Profile {
   values: ProfileValues
 }
 
-interface ApplicantsResponse {
+interface ApplicantsPayload {
   success: boolean
   message: string
   data: {
@@ -49,7 +48,7 @@ interface ApplicantsResponse {
   }
 }
 
-interface ProfilesResponse {
+interface ProfilesPayload {
   success: boolean
   message: string
   data: {
@@ -83,7 +82,6 @@ function formatDate(dateString: string | null) {
 }
 
 export default function ApplicantsPage() {
-  const { instance, accounts } = useMsal()
   const router = useRouter()
   const [applicants, setApplicants] = React.useState<Applicant[]>([])
   const [profiles, setProfiles] = React.useState<Profile[]>([])
@@ -96,23 +94,15 @@ export default function ApplicantsPage() {
   const [totalPages, setTotalPages] = React.useState(1)
   const [totalRecords, setTotalRecords] = React.useState(0)
 
+  const { query, account } = useApiClient()
+
   React.useEffect(() => {
     async function fetchApplicants() {
-      if (accounts.length === 0) return
+      if (!account) return
 
       setIsLoading(true)
 
       try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
-        const headers = {
-          Authorization: `Bearer ${tokenResponse.accessToken}`,
-          "Content-Type": "application/json",
-        }
-
         const params = new URLSearchParams({
           Page: String(page),
           PageSize: String(pageSize),
@@ -123,26 +113,12 @@ export default function ApplicantsPage() {
           Status: "",
         })
 
-        const [applicantsRes, profilesRes] = await Promise.all([
-          fetch(`/api/v1/recruitment/employee-applicants?${params.toString()}`, { headers }),
-          fetch(`/api/v1/core/profiles?page=1&pageSize=100`, { headers }),
+        const [applicantsPayload, profilesPayload] = await Promise.all([
+          query<ApplicantsPayload>(
+            `/api/v1/recruitment/employee-applicants?${params.toString()}`,
+          ),
+          query<ProfilesPayload>("/api/v1/core/profiles?page=1&pageSize=100"),
         ])
-
-        if (!applicantsRes.ok) {
-          console.error(`Applicants fetch failed with status: ${applicantsRes.status}`)
-          setApplicants([])
-          return
-        }
- 
-        if (!profilesRes.ok) {
-          console.error(`Profiles fetch failed with status: ${profilesRes.status}`)
-        }
-
-        const applicantsPayload: ApplicantsResponse = await applicantsRes.json()
-
-        const profilesPayload: ProfilesResponse = profilesRes.ok
-          ? await profilesRes.json()
-          : { success: false, data: { data: [] } }
 
         if (applicantsPayload && applicantsPayload.success && applicantsPayload.data) {
           setApplicants(applicantsPayload.data.data ?? [])
@@ -152,9 +128,9 @@ export default function ApplicantsPage() {
           setApplicants([])
         }
 
-        setProfiles(profilesPayload.data?.data ?? [])
+        setProfiles(profilesPayload?.data?.data ?? [])
       } catch (error) {
-        console.error("Failed to acquire token or fetch data:", error)
+        console.error("Failed to fetch data:", error)
         setApplicants([])
         setProfiles([])
       } finally {
@@ -163,7 +139,7 @@ export default function ApplicantsPage() {
     }
 
     fetchApplicants()
-  }, [instance, accounts, page, pageSize])
+  }, [query, account, page, pageSize])
 
   const filtered = applicants.filter((applicant) => {
     const term = search.trim().toLowerCase()
@@ -267,7 +243,7 @@ export default function ApplicantsPage() {
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Date Applied</th>
                   <th className="px-4 py-3 font-medium">Last Updated</th>
-                  <th className="px-4 py-3 font-medium text-right">Actions</th> 
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody>

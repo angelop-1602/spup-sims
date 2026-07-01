@@ -1,11 +1,21 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useMsal } from "@azure/msal-react"
-import { loginRequest } from "@/lib/authConfig"
 import { Loader2, Search, Users, Eye } from "lucide-react"
-import { Employee, EmployeesResponse, Department, DepartmentsResponse, Designation, DesignationsResponse } from "./types"
+import { PermissionGuard } from "@/components/auth/permission-guard"
+import {
+  useApiQuery,
+  useApiClient,
+  type components,
+} from "@/lib/api"
 import { EmployeeDetailsModal } from "./modal"
+
+type Employee = components["schemas"]["EmployeeResponse"]
+type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
+type Department = components["schemas"]["DepartmentResponse"]
+type PagedDepartments = components["schemas"]["PagedResponseOfDepartmentResponse"]
+type Designation = components["schemas"]["DesignationResponse"]
+type PagedDesignations = components["schemas"]["PagedResponseOfDesignationResponse"]
 
 const PAGE_SIZE = 10
 
@@ -19,31 +29,22 @@ function getInitials(name: string) {
 }
 
 export default function EmployeesPage() {
-  const { instance, accounts } = useMsal()
-  const [employees, setEmployees] = useState<Employee[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
   // Search and filters
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [departmentFilter, setDepartmentFilter] = useState("")
   const [designationFilter, setDesignationFilter] = useState("")
 
-  // Structured details for options
-  const [departmentOptions, setDepartmentOptions] = useState<{ id: string; name: string }[]>([])
-  const [designationOptions, setDesignationOptions] = useState<{ id: string; name: string }[]>([])
-
   // Pagination
   const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [totalRecords, setTotalRecords] = useState(0)
 
   // Employee modal
   const [selectedEmployeeId, setSelectedEmployeeId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [detailedEmployee, setDetailedEmployee] = useState<any | null>(null)
+  const [detailedEmployee, setDetailedEmployee] = useState<unknown | null>(null)
   const [isModalLoading, setIsModalLoading] = useState(false)
+
+  const { query } = useApiClient()
 
   // Search input
   useEffect(() => {
@@ -58,31 +59,57 @@ export default function EmployeesPage() {
     setDesignationFilter("")
   }, [departmentFilter])
 
+  // Reset pagination when filters are adjusted
+  useEffect(() => {
+    setPage(1)
+  }, [departmentFilter, designationFilter])
+
+  const {
+    data: employeesPaged,
+    loading,
+    error,
+  } = useApiQuery<PagedEmployees>("/api/v1/hrms/employees", {
+    page,
+    pageSize: PAGE_SIZE,
+    search: debouncedSearch || undefined,
+    designationId: designationFilter || undefined,
+    departmentId: departmentFilter || undefined,
+  })
+
+  const { data: departmentsPaged } = useApiQuery<PagedDepartments>(
+    "/api/v1/organization/departments",
+    { Page: 1, PageSize: 100, SortBy: "name" },
+  )
+
+  const { data: designationsPaged } = useApiQuery<PagedDesignations>(
+    "/api/v1/organization/designations",
+    {
+      Page: 1,
+      PageSize: 100,
+      SortBy: "name",
+      departmentId: departmentFilter || undefined,
+    },
+  )
+
+  const departmentOptions = (departmentsPaged?.data ?? [])
+    .filter((item) => item.name)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  const designationOptions = (designationsPaged?.data ?? [])
+    .filter((item) => item.name)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
   async function handleViewDetails(id: number) {
     setSelectedEmployeeId(id)
     setIsModalOpen(true)
     setIsModalLoading(true)
-    setDetailedEmployee(null) 
+    setDetailedEmployee(null)
 
     try {
-      const tokenResponse = await instance.acquireTokenSilent({
-        ...loginRequest,
-        account: accounts[0],
-      })
-
-      const res = await fetch(`/api/v1/hrms/employees/${id}`, {
-        headers: {
-          Authorization: `Bearer ${tokenResponse.accessToken}`,
-          "Content-Type": "application/json",
-        },
-      })
-
-      if (!res.ok) throw new Error("Could not load employee details profile.")
-      const json = await res.json()
-      
-      if (json.success) {
-        setDetailedEmployee(json.data)
-      }
+      const employee = await query<Employee>(
+        `/api/v1/hrms/employees/${id}`,
+      )
+      setDetailedEmployee(employee)
     } catch (err) {
       console.error("Error fetching detailed employee data:", err)
     } finally {
@@ -90,179 +117,14 @@ export default function EmployeesPage() {
     }
   }
 
-  // Reset pagination when filters are adjusted
-  useEffect(() => {
-    setPage(1)
-  }, [departmentFilter, designationFilter])
-
-  // Fetch dropdown options for departments
-  useEffect(() => {
-    if (accounts.length === 0) return
-    const controller = new AbortController()
-
-    async function fetchDepartments() {
-      try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
-        const res = await fetch("/api/v1/organization/departments", {
-          signal: controller.signal,
-          headers: {
-            Authorization: `Bearer ${tokenResponse.accessToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-        
-        if (!res.ok) throw new Error("Failed to fetch departments")
-        
-        const json: DepartmentsResponse = await res.json()
-        
-        if (json.success && json.data?.data) {
-          const depts = json.data.data
-          .map((item: Department) => ({
-            id: String(item.id),
-            name: item.name || ""
-          }))
-          .filter((item: { id: string; name: string }) => item.name)
-          .sort((a: { id: string; name: string }, b: { id: string; name: string }) => 
-            a.name.localeCompare(b.name)
-          )
-            
-          setDepartmentOptions(depts)
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name !== "AbortError") {
-          console.error("Departments dropdown query failed:", err.message)
-        }
-      }
-    }
-
-    fetchDepartments()
-    return () => controller.abort()
-  }, [instance, accounts])
-  
-  // Fetch dropdown options for designations dynamically
-  useEffect(() => {
-    if (accounts.length === 0) return
-    const controller = new AbortController()
-
-    async function fetchDesignations() {
-      try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
-        const params = new URLSearchParams()
-        if (departmentFilter) {
-          params.set("departmentId", departmentFilter)
-        }
-
-        const res = await fetch(`/api/v1/organization/designations?${params.toString()}`, {
-          signal: controller.signal,
-          headers: {
-            Authorization: `Bearer ${tokenResponse.accessToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-
-        if (!res.ok) throw new Error("Failed to fetch designations")
-
-        const json: DesignationsResponse = await res.json()
-        
-        if (json.success && json.data?.data) {
-          const structuralRoles = json.data.data
-            .map((item: Designation) => ({
-              id: String(item.id),            
-              name: item.name || ""
-            }))
-            .filter((item: { id: string; name: string }) => item.name)
-            .sort((a: { id: string; name: string }, b: { id: string; name: string }) => a.name.localeCompare(b.name))
-            
-          setDesignationOptions(structuralRoles)
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name !== "AbortError") {
-          console.error("Designations dropdown query failed:", err.message)
-        }
-      }
-    }
-
-    fetchDesignations()
-    return () => controller.abort()
-  }, [instance, accounts, departmentFilter])
-
-  // Fetch employees based on current filters
-  useEffect(() => {
-    if (accounts.length === 0) return
-    const controller = new AbortController()
-
-    async function fetchEmployees() {
-      setIsLoading(true)
-      setError(null)
-      try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
-        const params = new URLSearchParams({
-          page: String(page),
-          pageSize: String(PAGE_SIZE),
-        })
-        
-        if (debouncedSearch) params.set("search", debouncedSearch)
-        if (designationFilter) params.set("designationId", designationFilter)
-        if (departmentFilter) {
-          params.set("departmentId", departmentFilter)
-        }
-
-        const res = await fetch(`/api/v1/hrms/employees?${params.toString()}`, {
-          signal: controller.signal,
-          headers: {
-            Authorization: `Bearer ${tokenResponse.accessToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-        
-        if (!res.ok) {
-          throw new Error(`Request failed (${res.status})`)
-        }
-        
-        const json: EmployeesResponse = await res.json()
-        if (!json.success) {
-          throw new Error(json.message || "Couldn't load employees.")
-        }
-
-        setEmployees(json.data.data)
-        setTotalPages(json.data.totalPages)
-        setTotalRecords(json.data.totalRecords)
-
-      } catch (err) {
-        if (err instanceof Error && err.name !== "AbortError") {
-          setError(err.message)
-        }
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchEmployees()
-    return () => controller.abort()
-  }, [
-    instance,
-    accounts,
-    page,
-    debouncedSearch,
-    departmentFilter,
-    designationFilter,
-  ])
+  const employees = employeesPaged?.data ?? []
+  const totalPages = employeesPaged?.totalPages ?? 1
+  const totalRecords = employeesPaged?.totalRecords ?? 0
 
   const hasActiveFilters = Boolean(search || departmentFilter || designationFilter)
 
   return (
+    <PermissionGuard requiredPermission="hrms.employees.view">
     <div>
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
@@ -292,7 +154,7 @@ export default function EmployeesPage() {
         >
           <option value="">All departments</option>
           {departmentOptions.map((dept) => (
-            <option key={dept.id} value={dept.id}>
+            <option key={String(dept.id)} value={String(dept.id)}>
               {dept.name}
             </option>
           ))}
@@ -305,7 +167,7 @@ export default function EmployeesPage() {
         >
           <option value="">All designations</option>
           {designationOptions.map((role) => (
-            <option key={role.id} value={role.id}>
+            <option key={String(role.id)} value={String(role.id)}>
               {role.name}
             </option>
           ))}
@@ -327,7 +189,7 @@ export default function EmployeesPage() {
       </div>
 
       <div className="mt-4 overflow-hidden rounded-lg border">
-        {isLoading ? (
+        {loading ? (
           <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
             <Loader2 className="h-4 w-4 animate-spin" />
             Loading employees…
@@ -335,7 +197,7 @@ export default function EmployeesPage() {
         ) : error ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
             <p className="text-sm font-medium">Couldn&apos;t load employees</p>
-            <p className="text-sm text-muted-foreground">{error}</p>
+            <p className="text-sm text-muted-foreground">{error.message}</p>
           </div>
         ) : employees.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
@@ -398,11 +260,11 @@ export default function EmployeesPage() {
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       <button
                         type="button"
-                        onClick={() => handleViewDetails(employee.id)}
+                        onClick={() => handleViewDetails(employee.id as number)}
                         title="View Details"
                         className="inline-flex items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
                       >
-                        <Eye className="h-4 w-4" /> 
+                        <Eye className="h-4 w-4" />
                       </button>
                     </td>
                   </tr>
@@ -421,7 +283,7 @@ export default function EmployeesPage() {
         getInitials={getInitials}
       />
 
-      {!isLoading && !error && employees.length > 0 && (
+      {!loading && !error && employees.length > 0 && (
         <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
           <p className="text-sm text-muted-foreground">
             Page {page} of {totalPages} · {totalRecords} employee
@@ -448,5 +310,6 @@ export default function EmployeesPage() {
         </div>
       )}
     </div>
+    </PermissionGuard>
   )
 }

@@ -45,19 +45,19 @@ const hrMenuItems = [
     title: "Applicants",
     icon: UserRoundPlus,
     url: "/hrm/applicants",
-    requiredPermission: "hrms.applicants.view",
+   // requiredPermission: "hrms.applicants.view",
   },
   {
     title: "Employees",
     icon: Users,
     url: "/hrm/employees",
-    requiredPermission: "hrms.employees.view",
+    //requiredPermission: "hrms.employees.view",
   },
   {
     title: "Leave Applications",
     icon: FilePen,
     url: "#",
-    requiredPermission: "hrms.leave.view",
+    //requiredPermission: "hrms.leave.view",
   },
   {
     title: "Departments",
@@ -69,7 +69,7 @@ const hrMenuItems = [
     title: "Designations",
     icon: Pin,
     url: "#",
-    requiredPermission: "hrms.designations.view",
+    //requiredPermission: "hrms.designations.view",
   },
   {
     title: "Roles & Permissions",

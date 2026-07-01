@@ -1,9 +1,8 @@
 "use client"
 
 import React from "react"
-import { useMsal } from "@azure/msal-react"
-import { loginRequest } from "@/lib/authConfig"
 import { Loader2, ArrowLeft, FileText } from "lucide-react"
+import { useApiClient } from "@/lib/api"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -204,7 +203,6 @@ function Row({ label, value }: { label: string; value: string | null | undefined
 // ─── Page ──────────────────────────────────────────────────────
 
 export default function ProfileDetailPage() {
-  const { instance, accounts } = useMsal()
   const params = useParams()
   const searchParams = useSearchParams()
   const id = params?.id as string
@@ -217,51 +215,57 @@ export default function ProfileDetailPage() {
   const [statusHistory, setStatusHistory] = React.useState<StatusHistoryEntry[]>([])
   const [interviews, setInterviews] = React.useState<InterviewSchedule[]>([])
 
+  const { query, account } = useApiClient()
+
   React.useEffect(() => {
-    if (accounts.length === 0 || !id) return
+    if (!account || !id) return
 
     async function fetchAll() {
       setIsLoading(true)
       try {
-        const token = await instance.acquireTokenSilent({ ...loginRequest, account: accounts[0] })
-        const headers = { Authorization: `Bearer ${token.accessToken}`, "Content-Type": "application/json" }
+        type ProfilePayload = { success: boolean; data?: { values?: ProfileValues } }
+        type ListPayload = { success: boolean; data?: { data?: unknown[] } }
 
-        const requests: Promise<Response>[] = [
-          fetch(`/api/v1/core/profiles/${id}`, { headers }),
+        const requests: Promise<ProfilePayload | ListPayload>[] = [
+          query<ProfilePayload>(`/api/v1/core/profiles/${id}`),
         ]
 
         if (applicantId) {
           requests.push(
-            fetch(`/api/v1/recruitment/employee-applicant-documents?EmployeeApplicantId=${applicantId}`, { headers }),
-            fetch(`/api/v1/recruitment/employee-applicant-status-history?EmployeeApplicantId=${applicantId}`, { headers }),
-            fetch(`/api/v1/recruitment/interview-schedules?EmployeeApplicantId=${applicantId}`, { headers }),
+            query<ListPayload>(
+              `/api/v1/recruitment/employee-applicant-documents?EmployeeApplicantId=${applicantId}`,
+            ),
+            query<ListPayload>(
+              `/api/v1/recruitment/employee-applicant-status-history?EmployeeApplicantId=${applicantId}`,
+            ),
+            query<ListPayload>(
+              `/api/v1/recruitment/interview-schedules?EmployeeApplicantId=${applicantId}`,
+            ),
           )
         }
 
-        const results = await Promise.allSettled(requests.map((r) => r.then((res) => res.ok ? res.json() : null)))
-
+        const results = await Promise.allSettled(requests)
         const [profileResult, docsResult, historyResult, interviewsResult] = results
 
-        setProfile(
-          profileResult.status === "fulfilled" && profileResult.value?.success
-            ? profileResult.value.data?.values ?? null
-            : null
-        )
-        setDocuments(
-          docsResult?.status === "fulfilled" && docsResult.value?.success
-            ? docsResult.value.data?.data ?? []
-            : []
-        )
-        setStatusHistory(
-          historyResult?.status === "fulfilled" && historyResult.value?.success
-            ? historyResult.value.data?.data ?? []
-            : []
-        )
-        setInterviews(
-          interviewsResult?.status === "fulfilled" && interviewsResult.value?.success
-            ? interviewsResult.value.data?.data ?? []
-            : []
-        )
+        const fulfilled = (
+          result: PromiseSettledResult<ProfilePayload | ListPayload>,
+        ): ProfilePayload | ListPayload | null =>
+          result.status === "fulfilled" ? (result.value as ProfilePayload | ListPayload) : null
+
+        const profilePayload = fulfilled(profileResult) as ProfilePayload | null
+        setProfile(profilePayload?.success ? (profilePayload.data?.values ?? null) : null)
+
+        const toArray = (
+          result: PromiseSettledResult<ProfilePayload | ListPayload>,
+        ): unknown[] => {
+          const payload = fulfilled(result)
+          if (!payload?.success) return []
+          return (payload.data?.data as unknown[]) ?? []
+        }
+
+        setDocuments(toArray(docsResult) as ApplicantDocument[])
+        setStatusHistory(toArray(historyResult) as StatusHistoryEntry[])
+        setInterviews(toArray(interviewsResult) as InterviewSchedule[])
       } catch {
         setProfile(null)
       } finally {
@@ -270,7 +274,7 @@ export default function ProfileDetailPage() {
     }
 
     fetchAll()
-  }, [instance, accounts, id, applicantId])
+  }, [query, account, id, applicantId])
 
   const fullName = profile
     ? [profile.FirstName, profile.MiddleName, profile.LastName, profile.Suffix].filter(Boolean).join(" ")
