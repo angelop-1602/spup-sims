@@ -37,19 +37,27 @@ interface Profile {
 }
 
 interface ApplicantsPayload {
-  data: Applicant[]
-  page: number
-  pageSize: number
-  totalRecords: number
-  totalPages: number
+  success: boolean
+  message: string
+  data: {
+    data: Applicant[]
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
 }
 
 interface ProfilesPayload {
-  data: Profile[]
-  page: number
-  pageSize: number
-  totalRecords: number
-  totalPages: number
+  success: boolean
+  message: string
+  data: {
+    data: Profile[]
+    page: number
+    pageSize: number
+    totalRecords: number
+    totalPages: number
+  }
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -89,18 +97,12 @@ export default function ApplicantsPage() {
   const { query, account } = useApiClient()
 
   React.useEffect(() => {
-    setPage(1)
-  }, [search, dateFrom, dateTo])
-
-  React.useEffect(() => {
     async function fetchApplicants() {
       if (!account) return
 
       setIsLoading(true)
 
       try {
-        const trimmedSearch = search.trim()
-
         const params = new URLSearchParams({
           Page: String(page),
           PageSize: String(pageSize),
@@ -113,12 +115,6 @@ export default function ApplicantsPage() {
           Status: "",
         })
 
-        const profileParams = new URLSearchParams({
-          page: "1",
-          pageSize: "100",
-          Search: trimmedSearch,
-        })
-
         const [applicantsPayload, profilesPayload] = await Promise.all([
           query<ApplicantsPayload>(
             `/api/v1/recruitment/employee-applicants?${params.toString()}`,
@@ -126,16 +122,15 @@ export default function ApplicantsPage() {
           query<ProfilesPayload>("/api/v1/core/profiles?page=1&pageSize=100"),
         ])
 
-
-        if (applicantsPayload) {
-          setApplicants(applicantsPayload.data ?? [])
-          setTotalPages(applicantsPayload.totalPages ?? 1)
-          setTotalRecords(applicantsPayload.totalRecords ?? 0)
+        if (applicantsPayload && applicantsPayload.success && applicantsPayload.data) {
+          setApplicants(applicantsPayload.data.data ?? [])
+          setTotalPages(applicantsPayload.data.totalPages ?? 1)
+          setTotalRecords(applicantsPayload.data.totalRecords ?? 0)
         } else {
           setApplicants([])
         }
 
-        setProfiles(profilesPayload?.data ?? [])
+        setProfiles(profilesPayload?.data?.data ?? [])
       } catch (error) {
         console.error("Failed to fetch data:", error)
         setApplicants([])
@@ -146,7 +141,7 @@ export default function ApplicantsPage() {
     }
 
     fetchApplicants()
-  }, [query, account, page, pageSize, search, dateFrom, dateTo])
+  }, [query, account, page, pageSize])
 
   const filtered = applicants.filter((applicant) => {
     const term = search.trim().toLowerCase()

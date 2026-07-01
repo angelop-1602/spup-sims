@@ -213,8 +213,8 @@ export default function ProfileDetailPage() {
     async function fetchAll() {
       setIsLoading(true)
       try {
-        type ProfilePayload = { entity: string; id: number; values: ProfileValues }
-        type ListPayload = { data: unknown[] }
+        type ProfilePayload = { success: boolean; data?: { values?: ProfileValues } }
+        type ListPayload = { success: boolean; data?: { data?: unknown[] } }
 
         const requests: Promise<ProfilePayload | ListPayload>[] = [
           query<ProfilePayload>(`/api/v1/core/profiles/${id}`),
@@ -240,16 +240,17 @@ export default function ProfileDetailPage() {
         const fulfilled = (
           result: PromiseSettledResult<ProfilePayload | ListPayload>,
         ): ProfilePayload | ListPayload | null =>
-          result.status === "fulfilled" ? result.value : null
+          result.status === "fulfilled" ? (result.value as ProfilePayload | ListPayload) : null
 
         const profilePayload = fulfilled(profileResult) as ProfilePayload | null
-        setProfile(profilePayload?.values ?? null)
+        setProfile(profilePayload?.success ? (profilePayload.data?.values ?? null) : null)
 
         const toArray = (
           result: PromiseSettledResult<ProfilePayload | ListPayload>,
         ): unknown[] => {
-          const payload = fulfilled(result) as ListPayload | null
-          return (payload?.data as unknown[]) ?? []
+          const payload = fulfilled(result)
+          if (!payload?.success) return []
+          return (payload.data?.data as unknown[]) ?? []
         }
 
         setDocuments(toArray(docsResult) as ApplicantDocument[])
