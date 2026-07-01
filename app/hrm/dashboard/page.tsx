@@ -2,8 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useMsal } from "@azure/msal-react"
-import { loginRequest } from "@/lib/authConfig"
+import { useApiQuery, type components } from "@/lib/api"
 import {
   ArrowUpRight,
   CalendarClock,
@@ -53,50 +52,13 @@ const actions = [
 ] as const
 
 export default function HrmDashboardPage() {
-  const { instance, accounts } = useMsal()
-  const [employeeCount, setEmployeeCount] = React.useState<number | string>("...")
-  const [loading, setLoading] = React.useState<boolean>(true)
+  const { data: employeeMetric, loading } = useApiQuery<
+    components["schemas"]["DashboardMetricResponse"]
+  >("/api/v1/hrms/dashboard/cards/employees-total")
 
-  React.useEffect(() => {
-    async function fetchEmployeeCount() {
-      if (accounts.length === 0) return
-
-      try {
-        const tokenResponse = await instance.acquireTokenSilent({
-          ...loginRequest,
-          account: accounts[0],
-        })
-
-        const res = await fetch("/api/v1/hrms/dashboard/cards/employees-total", {
-          headers: {
-            Authorization: `Bearer ${tokenResponse.accessToken}`,
-            "Content-Type": "application/json",
-          },
-        })
-
-        if (!res.ok) {
-          console.error(`API Fetch failed with status: ${res.status}`)
-          setEmployeeCount(0)
-          return
-        }
-
-        const payload = await res.json()
-
-        if (payload && payload.success && payload.data) {
-          setEmployeeCount(payload.data.value ?? 0)
-        } else {
-          setEmployeeCount(0)
-        }
-      } catch (error) {
-        console.error("Failed to acquire token or fetch data:", error)
-        setEmployeeCount(0)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchEmployeeCount()
-  }, [instance, accounts])
+  const employeeCount = loading
+    ? "..."
+    : (employeeMetric?.value ?? 0)
 
   const summaryCards = [
     {

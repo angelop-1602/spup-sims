@@ -6,13 +6,17 @@ import { ShieldCheck } from "lucide-react"
 import { useHrmAuth } from "./hrm-auth-guard"
 
 interface PermissionGuardProps {
-  requiredPermissions: string[]
+  /** A single required permission (shorthand for `requiredPermissions: [permission]`). */
+  requiredPermission?: string
+  /** One or more required permissions. */
+  requiredPermissions?: string[]
   mode?: "any" | "all"
   fallback?: React.ReactNode
   children: React.ReactNode
 }
 
 export function PermissionGuard({
+  requiredPermission,
   requiredPermissions,
   mode = "all",
   fallback,
@@ -20,10 +24,14 @@ export function PermissionGuard({
 }: PermissionGuardProps) {
   const { hasPermission } = useHrmAuth()
 
+  const permissions = requiredPermissions ?? (
+    requiredPermission ? [requiredPermission] : []
+  )
+
   const isAuthorized =
     mode === "any"
-      ? requiredPermissions.some(hasPermission)
-      : requiredPermissions.every(hasPermission)
+      ? permissions.some(hasPermission)
+      : permissions.every(hasPermission)
 
   if (isAuthorized) {
     return <>{children}</>

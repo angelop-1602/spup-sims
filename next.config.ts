@@ -1,16 +1,23 @@
 /** @type {import('next').NextConfig} */
+const API_BASE_URL =
+  process.env.API_BASE_URL ?? "https://sims.spup.space"
+
 const nextConfig = {
   async rewrites() {
+    const base = API_BASE_URL.replace(/\/+$/, "")
+
     return [
       {
         source: "/api/v1/recruitment/:path*",
-        destination: "https://sims.spup.space/api/v1/recruitment/:path*",
+        destination: `${base}/api/v1/recruitment/:path*`,
       },
       {
         source: "/api/v1/core/:path*",
-        destination: "https://sims.spup.space/api/v1/core/:path*",
-        source: '/api/v1/hrms/:path*',
-        destination: 'https://sims.spup.space/api/v1/hrms/:path*',
+        destination: `${base}/api/v1/core/:path*`,
+      },
+      {
+        source: "/api/v1/hrms/:path*",
+        destination: `${base}/api/v1/hrms/:path*`,
       },
     ]
   },

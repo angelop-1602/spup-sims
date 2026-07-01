@@ -8,7 +8,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
-import type { components } from "@/src/lib/api/schema"
+import type { components } from "@/lib/api"
 
 type ProfileFields = {
   label: string

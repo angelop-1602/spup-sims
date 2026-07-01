@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useMsal } from "@azure/msal-react"
+import { useApiQuery, useApiMutation, type components } from "@/lib/api"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,105 +14,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { Loader2, Plus, Trash2 } from "lucide-react"
 
-type ApiResponse<T> = {
-  success: boolean
-  message: string
-  data: T | null
-  traceId?: string
-  responseTimestamp?: string
-  timestamp?: string
-  errors?: string[]
-}
+type User = components["schemas"]["UserResponse"]
+type PagedUsers = components["schemas"]["PagedResponseOfUserResponse"]
+type Role = components["schemas"]["RoleResponse"]
+type PagedRoles = components["schemas"]["PagedResponseOfRoleResponse"]
+type Permission = components["schemas"]["PermissionResponse"]
+type PagedPermissions = components["schemas"]["PagedResponseOfPermissionResponse"]
+type UserRoles = components["schemas"]["UserRolesResponse"]
+type RolePermissions = components["schemas"]["RolePermissionsResponse"]
+type CreateRoleRequest = components["schemas"]["CreateRoleRequest"]
+type CreatePermissionRequest = components["schemas"]["CreatePermissionRequest"]
 
-type PagedResponse<T> = {
-  pageNumber?: number | string
-  pageSize?: number | string
-  totalPages?: number | string
-  totalCount?: number | string
-  data: T[]
-}
-
-type UserResponse = {
-  id: number | string
-  username: string
-  email: string
-  roles: RoleResponse[]
-  profileId: number | string
-  profile: string
-  isActive: boolean
-}
-
-type RoleResponse = {
-  id: number | string
-  name: string
-  description: null | string
-  isActive: boolean
-}
-
-type PermissionResponse = {
-  id: number | string
-  name: string
-  description: null | string
-  module: string
-  action: string
-}
-
-type UserRolesResponse = {
-  userId: number | string
-  username: string
-  email: string
-  roles: RoleResponse[]
-}
-
-type RolePermissionsResponse = {
-  roleId: number | string
-  role: RoleResponse
-  permissions: PermissionResponse[]
-}
-
-const API_SCOPES =
-  process.env.NEXT_PUBLIC_API_SCOPES?.split(/[\s,]+/).filter(Boolean) ?? [
-    "User.Read",
-  ]
-
-const getUserLabel = (user: UserResponse) => `${user.username} (${user.email})`
-const getRoleLabel = (role: RoleResponse) => role.name
-const getPermissionLabel = (permission: PermissionResponse) =>
+const getUserLabel = (user: User) => `${user.username} (${user.email})`
+const getRoleLabel = (role: Role) => role.name
+const getPermissionLabel = (permission: Permission) =>
   `${permission.module}.${permission.action}`
-const getPermissionCode = (permission: PermissionResponse) =>
+const getPermissionCode = (permission: Permission) =>
   `${permission.module}.${permission.action}`
-
-const parsePaged = <T,>(payload: unknown): T[] => {
-  const page = (payload as any)?.data ?? payload
-  if (!page || typeof page !== "object") {
-    return []
-  }
-
-  const data = (page as any).data
-  if (!Array.isArray(data)) {
-    return []
-  }
-
-  return data as T[]
-}
 
 export default function RolesPage() {
-  const { accounts, instance } = useMsal()
-  const account = accounts[0]
-
   const [section, setSection] = React.useState<"userRoles" | "rolePermissions">(
-    "userRoles"
+    "userRoles",
   )
-  const [users, setUsers] = React.useState<UserResponse[]>([])
-  const [roles, setRoles] = React.useState<RoleResponse[]>([])
-  const [permissions, setPermissions] = React.useState<PermissionResponse[]>([])
   const [selectedUserId, setSelectedUserId] = React.useState<string>("")
   const [selectedRoleId, setSelectedRoleId] = React.useState<string>("")
-  const [assignedRoles, setAssignedRoles] = React.useState<RoleResponse[]>([])
-  const [assignedPermissions, setAssignedPermissions] = React.useState<PermissionResponse[]>([])
+  const [assignedRoles, setAssignedRoles] = React.useState<Role[]>([])
+  const [assignedPermissions, setAssignedPermissions] = React.useState<Permission[]>([])
   const [selectedAssignRoleId, setSelectedAssignRoleId] = React.useState<string>("")
   const [selectedAssignPermissionId, setSelectedAssignPermissionId] = React.useState<string>("")
   const [newRoleName, setNewRoleName] = React.useState("")
@@ -122,309 +59,200 @@ export default function RolesPage() {
   const [newPermissionDescription, setNewPermissionDescription] = React.useState("")
   const [newPermissionModule, setNewPermissionModule] = React.useState("")
   const [newPermissionAction, setNewPermissionAction] = React.useState("")
-  const [loading, setLoading] = React.useState(false)
-  const [saving, setSaving] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
-  const authHeaders = React.useCallback(async () => {
-    if (!account) {
-      throw new Error("No authenticated account available")
-    }
-
-    const tokenResponse = await instance.acquireTokenSilent({
-      scopes: API_SCOPES,
-      account,
-    })
-
-    return {
-      Authorization: `Bearer ${tokenResponse.accessToken}`,
-      "Content-Type": "application/json",
-      Accept: "application/json",
-    }
-  }, [account, instance])
-
-  const fetchJson = React.useCallback(
-    async (url: string, init: RequestInit = {}) => {
-      const headers = {
-        ...(await authHeaders()),
-        ...(init.headers as Record<string, string>),
-      }
-
-      const response = await fetch(url, {
-        ...init,
-        headers,
-        cache: "no-store",
-      })
-
-      if (!response.ok) {
-        throw new Error(`Request failed (${response.status})`)
-      }
-
-      return response.json()
-    },
-    [authHeaders]
+  // Stabilized so the query's `onError` dep doesn't change every render
+  // (a new inline callback each render would otherwise re-fetch in a loop).
+  const handleError = React.useCallback(
+    (err: Error) => setError(err.message),
+    [],
   )
 
-  const loadLists = React.useCallback(async () => {
-    setLoading(true)
+  const { data: usersPaged, refresh: refreshUsers } = useApiQuery<PagedUsers>(
+    "/api/identity/users",
+    { Page: 1, PageSize: 100, SortBy: "id" },
+    { onError: handleError },
+  )
+
+  const { data: rolesPaged, refresh: refreshRoles } = useApiQuery<PagedRoles>(
+    "/api/identity/roles",
+    { Page: 1, PageSize: 100, SortBy: "id" },
+    { onError: handleError },
+  )
+
+  const { data: permissionsPaged, refresh: refreshPermissions } =
+    useApiQuery<PagedPermissions>(
+      "/api/identity/permissions",
+      { Page: 1, PageSize: 100, SortBy: "id" },
+      { onError: handleError },
+    )
+
+  const users = usersPaged?.data ?? []
+  const roles = rolesPaged?.data ?? []
+  const permissions = permissionsPaged?.data ?? []
+
+  const { data: userRoles, refresh: refreshUserRoles } = useApiQuery<UserRoles>(
+    selectedUserId ? `/api/identity/users/${selectedUserId}/roles` : undefined,
+    undefined,
+    {
+      enabled: Boolean(selectedUserId),
+      onError: handleError,
+    },
+  )
+
+  const { data: rolePermissions, refresh: refreshRolePermissions } =
+    useApiQuery<RolePermissions>(
+      selectedRoleId ? `/api/identity/roles/${selectedRoleId}/permissions` : undefined,
+      undefined,
+      {
+        enabled: Boolean(selectedRoleId),
+        onError: handleError,
+      },
+    )
+
+  React.useEffect(() => {
+    setAssignedRoles(userRoles?.roles ?? [])
+  }, [userRoles])
+
+  React.useEffect(() => {
+    setAssignedPermissions(rolePermissions?.permissions ?? [])
+  }, [rolePermissions])
+
+  React.useEffect(() => {
+    if (!selectedUserId) setAssignedRoles([])
+  }, [selectedUserId])
+
+  React.useEffect(() => {
+    if (!selectedRoleId) setAssignedPermissions([])
+  }, [selectedRoleId])
+
+  const { mutate: command, loading: saving } = useApiMutation()
+
+  const run = async (fn: () => Promise<boolean>, message: string) => {
     setError(null)
-
-    try {
-      const [usersPayload, rolesPayload, permissionsPayload] =
-        await Promise.all([
-          fetchJson("/api/identity/users?Page=1&PageSize=100&SortBy=id"),
-          fetchJson("/api/identity/roles?Page=1&PageSize=100&SortBy=id"),
-          fetchJson("/api/identity/permissions?Page=1&PageSize=100&SortBy=id"),
-        ])
-
-      setUsers(parsePaged<UserResponse>(usersPayload))
-      setRoles(parsePaged<RoleResponse>(rolesPayload))
-      setPermissions(parsePaged<PermissionResponse>(permissionsPayload))
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to load lists")
-    } finally {
-      setLoading(false)
-    }
-  }, [fetchJson])
-
-  const loadUserRoles = React.useCallback(
-    async (userId: string) => {
-      if (!userId) {
-        setAssignedRoles([])
-        return
-      }
-
-      setLoading(true)
-      setError(null)
-
-      try {
-        const payload = await fetchJson(`/api/identity/users/${userId}/roles`)
-        const body = (payload as any)?.data
-        setAssignedRoles(Array.isArray(body?.roles) ? body.roles : [])
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unable to load user roles")
-      } finally {
-        setLoading(false)
-      }
-    },
-    [fetchJson]
-  )
-
-  const loadRolePermissions = React.useCallback(
-    async (roleId: string) => {
-      if (!roleId) {
-        setAssignedPermissions([])
-        return
-      }
-
-      setLoading(true)
-      setError(null)
-
-      try {
-        const payload = await fetchJson(`/api/identity/roles/${roleId}/permissions`)
-        const body = (payload as any)?.data
-        setAssignedPermissions(Array.isArray(body?.permissions) ? body.permissions : [])
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Unable to load role permissions"
-        )
-      } finally {
-        setLoading(false)
-      }
-    },
-    [fetchJson]
-  )
-
-  React.useEffect(() => {
-    if (account) {
-      void loadLists()
-    }
-  }, [account, loadLists])
-
-  React.useEffect(() => {
-    if (selectedUserId) {
-      void loadUserRoles(selectedUserId)
-      setSelectedAssignRoleId("")
-    } else {
-      setAssignedRoles([])
-    }
-  }, [selectedUserId, loadUserRoles])
-
-  React.useEffect(() => {
-    if (selectedRoleId) {
-      void loadRolePermissions(selectedRoleId)
-      setSelectedAssignPermissionId("")
-    } else {
-      setAssignedPermissions([])
-    }
-  }, [selectedRoleId, loadRolePermissions])
-
-  const assignRoleToUser = async () => {
-    if (!selectedUserId || !selectedAssignRoleId) {
-      setError("Select a user and a role to assign.")
-      return
-    }
-
-    setSaving(true)
-    setError(null)
-
-    try {
-      await fetchJson(
-        `/api/identity/users/${selectedUserId}/roles/${selectedAssignRoleId}`,
-        { method: "POST" }
-      )
-      void loadUserRoles(selectedUserId)
-      setSelectedAssignRoleId("")
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Unable to assign role to user"
-      )
-    } finally {
-      setSaving(false)
-    }
+    const ok = await fn()
+    if (!ok) setError(message)
   }
 
-  const removeRoleFromUser = async (roleId: number | string) => {
-    if (!selectedUserId) {
-      return
-    }
+  const assignRoleToUser = () =>
+    run(async () => {
+      if (!selectedUserId || !selectedAssignRoleId) {
+        setError("Select a user and a role to assign.")
+        return false
+      }
+      const ok = await command({
+        path: `/api/identity/users/${selectedUserId}/roles/${selectedAssignRoleId}`,
+        method: "POST",
+      })
+      if (ok) {
+        await refreshUserRoles()
+        setSelectedAssignRoleId("")
+      }
+      return ok
+    }, "Unable to assign role to user")
 
-    setSaving(true)
-    setError(null)
-
-    try {
-      await fetchJson(`/api/identity/users/${selectedUserId}/roles/${roleId}`, {
+  const removeRoleFromUser = (roleId: number | string) =>
+    run(async () => {
+      if (!selectedUserId) return false
+      const ok = await command({
+        path: `/api/identity/users/${selectedUserId}/roles/${roleId}`,
         method: "DELETE",
       })
-      void loadUserRoles(selectedUserId)
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Unable to remove role from user"
-      )
-    } finally {
-      setSaving(false)
-    }
-  }
+      if (ok) await refreshUserRoles()
+      return ok
+    }, "Unable to remove role from user")
 
-  const assignPermissionToRole = async () => {
-    if (!selectedRoleId || !selectedAssignPermissionId) {
-      setError("Select a role and a permission to assign.")
-      return
-    }
-
-    setSaving(true)
-    setError(null)
-
-    try {
-      await fetchJson(
-        `/api/identity/roles/${selectedRoleId}/permissions/${selectedAssignPermissionId}`,
-        { method: "POST" }
-      )
-      void loadRolePermissions(selectedRoleId)
-      setSelectedAssignPermissionId("")
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Unable to assign permission to role"
-      )
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const removePermissionFromRole = async (permissionId: number | string) => {
-    if (!selectedRoleId) {
-      return
-    }
-
-    setSaving(true)
-    setError(null)
-
-    try {
-      await fetchJson(
-        `/api/identity/roles/${selectedRoleId}/permissions/${permissionId}`,
-        { method: "DELETE" }
-      )
-      void loadRolePermissions(selectedRoleId)
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Unable to remove permission from role"
-      )
-    } finally {
-      setSaving(false)
-    }
-  }
-
-  const createRole = async () => {
-    if (!newRoleName.trim()) {
-      setError("Role name is required.")
-      return
-    }
-
-    setSaving(true)
-    setError(null)
-
-    try {
-      await fetchJson("/api/identity/roles", {
+  const assignPermissionToRole = () =>
+    run(async () => {
+      if (!selectedRoleId || !selectedAssignPermissionId) {
+        setError("Select a role and a permission to assign.")
+        return false
+      }
+      const ok = await command({
+        path: `/api/identity/roles/${selectedRoleId}/permissions/${selectedAssignPermissionId}`,
         method: "POST",
-        body: JSON.stringify({
-          name: newRoleName.trim(),
-          description: newRoleDescription.trim() || null,
-          isActive: newRoleIsActive,
-        }),
       })
+      if (ok) {
+        await refreshRolePermissions()
+        setSelectedAssignPermissionId("")
+      }
+      return ok
+    }, "Unable to assign permission to role")
 
-      setNewRoleName("")
-      setNewRoleDescription("")
-      setNewRoleIsActive(true)
-      void loadLists()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to create role")
-    } finally {
-      setSaving(false)
-    }
-  }
+  const removePermissionFromRole = (permissionId: number | string) =>
+    run(async () => {
+      if (!selectedRoleId) return false
+      const ok = await command({
+        path: `/api/identity/roles/${selectedRoleId}/permissions/${permissionId}`,
+        method: "DELETE",
+      })
+      if (ok) await refreshRolePermissions()
+      return ok
+    }, "Unable to remove permission from role")
 
-  const createPermission = async () => {
-    if (!newPermissionName.trim() || !newPermissionModule.trim() || !newPermissionAction.trim()) {
-      setError("Permission name, module, and action are required.")
-      return
-    }
-
-    setSaving(true)
-    setError(null)
-
-    try {
-      await fetchJson("/api/identity/permissions", {
+  const createRole = () =>
+    run(async () => {
+      if (!newRoleName.trim()) {
+        setError("Role name is required.")
+        return false
+      }
+      const body: CreateRoleRequest = {
+        name: newRoleName.trim(),
+        description: newRoleDescription.trim() || null,
+        isActive: newRoleIsActive,
+      }
+      const ok = await command({
+        path: "/api/identity/roles",
         method: "POST",
-        body: JSON.stringify({
-          name: newPermissionName.trim(),
-          description: newPermissionDescription.trim() || null,
-          module: newPermissionModule.trim(),
-          action: newPermissionAction.trim(),
-        }),
+        body,
       })
+      if (ok) {
+        setNewRoleName("")
+        setNewRoleDescription("")
+        setNewRoleIsActive(true)
+        await refreshRoles()
+      }
+      return ok
+    }, "Unable to create role")
 
-      setNewPermissionName("")
-      setNewPermissionDescription("")
-      setNewPermissionModule("")
-      setNewPermissionAction("")
-      void loadLists()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to create permission")
-    } finally {
-      setSaving(false)
-    }
-  }
+  const createPermission = () =>
+    run(async () => {
+      if (!newPermissionName.trim() || !newPermissionModule.trim() || !newPermissionAction.trim()) {
+        setError("Permission name, module, and action are required.")
+        return false
+      }
+      const body: CreatePermissionRequest = {
+        name: newPermissionName.trim(),
+        description: newPermissionDescription.trim() || null,
+        module: newPermissionModule.trim(),
+        action: newPermissionAction.trim(),
+      }
+      const ok = await command({
+        path: "/api/identity/permissions",
+        method: "POST",
+        body,
+      })
+      if (ok) {
+        setNewPermissionName("")
+        setNewPermissionDescription("")
+        setNewPermissionModule("")
+        setNewPermissionAction("")
+        await refreshPermissions()
+      }
+      return ok
+    }, "Unable to create permission")
+
+  const listLoading = !usersPaged && !rolesPaged && !permissionsPaged
 
   const availableRoles = roles.filter(
-    (role) => !assignedRoles.some((assigned) => String(assigned.id) === String(role.id))
+    (role) => !assignedRoles.some((assigned) => String(assigned.id) === String(role.id)),
   )
 
   const availablePermissions = permissions.filter(
     (permission) =>
       !assignedPermissions.some(
-        (assigned) => String(assigned.id) === String(permission.id)
-      )
+        (assigned) => String(assigned.id) === String(permission.id),
+      ),
   )
 
   return (
@@ -461,7 +289,7 @@ export default function RolesPage() {
         </div>
       ) : null}
 
-      {loading ? (
+      {listLoading ? (
         <div className="rounded-lg border p-6 text-center text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-2">
             <Loader2 className="h-4 w-4 animate-spin" />
