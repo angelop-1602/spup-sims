@@ -11,7 +11,7 @@ import {
   RefreshCw,
   TrendingUp,
   X,
-  GraduationCap,
+  UserCheck,
   BookmarkCheck,
   User,
   ShieldCheck
@@ -435,7 +435,7 @@ export default function HrmPage() {
                     4
                   </div>
                   <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <GraduationCap className="w-5 h-5" />
+                    <UserCheck className="w-5 h-5" />
                   </div>
                   <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
                     Interview & Evaluation
