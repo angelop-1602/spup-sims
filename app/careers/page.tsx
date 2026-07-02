@@ -499,9 +499,26 @@ export default function HrmPage() {
 
               <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                    <span>Application Letter</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                      <span>Application Letter</span>
+                    </div>
+
+                    <div className="relative group flex items-center">
+                      <button 
+                        type="button" 
+                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
+                        aria-label="Application letter requirement instructions"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
+                      </button>
+                      
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
+                        Insert additional information here.
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
                     Formal cover letter addressed to the Human Resource Management Office detailing your intent.
@@ -516,12 +533,29 @@ export default function HrmPage() {
 
               <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                    <span>Transcript of Records</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                      <span>Transcript of Records (TOR)</span>
+                    </div>
+
+                    <div className="relative group flex items-center">
+                      <button 
+                        type="button" 
+                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
+                        aria-label="Transcript of Records requirement instructions"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
+                      </button>
+                      
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
+                        Insert additional information here.
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
-                    Official scholastic transcript (TOR) from your graduate or undergraduate educational institution.
+                    Official scholastic transcript from your graduate or undergraduate educational institution.
                   </p>
                 </div>
                 <div className="mt-4 flex items-center">
@@ -533,9 +567,26 @@ export default function HrmPage() {
 
               <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                    <span>Diploma</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                      <span>Diploma</span>
+                    </div>
+
+                    <div className="relative group flex items-center">
+                      <button 
+                        type="button" 
+                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
+                        aria-label="Diploma requirement instructions"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
+                      </button>
+                      
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
+                        Insert additional information here.
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
                     A certified true copy or photocopy of your graduation certification degree.
@@ -550,9 +601,26 @@ export default function HrmPage() {
 
               <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    <ShieldCheck className="w-4 h-4 text-neutral-900 shrink-0" />
-                    <span>Valid ID</span>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                      <span>Valid ID</span>
+                    </div>
+
+                    <div className="relative group flex items-center">
+                      <button 
+                        type="button" 
+                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
+                        aria-label="Valid ID requirement instructions"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
+                      </button>
+                      
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
+                        E.g., Insert list here. 
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
                     Government-issued identification card to securely verify candidate profile parameters.
