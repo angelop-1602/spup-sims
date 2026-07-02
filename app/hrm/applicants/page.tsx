@@ -171,7 +171,6 @@ export default function ApplicantsPage() {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
-                setPage(1)
               }}
               placeholder="Search application no. or status"
               className="w-64 rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
