@@ -84,47 +84,49 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
 
   return (
     <div className="flex flex-col gap-4">
-      <Card className="gap-0 py-0 rounded-lg">
-        <CardContent className="flex items-center gap-4 py-6">
-          <Avatar className="size-16">
-            <AvatarFallback className="text-xl font-semibold">
-              {profile.fullName?.charAt(0) ?? "?"}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <CardTitle className="text-lg">{profile.fullName}</CardTitle>
-            {profile.designation && (
-              <Badge
-                variant="outline"
-                className="mt-1 border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400"
-              >
-                {profile.designation}
-              </Badge>
-            )}
-            <CardDescription className="mt-1">{profile.email}</CardDescription>
-          </div>
-        </CardContent>
-
-        <div className="grid border-t p-0 lg:grid-cols-2 lg:divide-x">
-          <div className="p-6">
-            <p className="pb-2 text-sm font-semibold text-foreground">
-              Personal Details
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {personalFields.map((field) => (
-                <DetailRow key={field.label} label={field.label} value={field.value} />
-              ))}
+      <Card className="gap-0 overflow-hidden rounded-lg py-0">
+        <div className="grid lg:grid-cols-[20rem_1fr] lg:divide-x">
+          <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
+            <Avatar className="size-40">
+              <AvatarFallback className="text-6xl font-semibold">
+                {profile.fullName?.charAt(0) ?? "?"}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <CardTitle className="text-lg">{profile.fullName}</CardTitle>
+              {profile.designation && (
+                <Badge
+                  variant="outline"
+                  className="mt-1 border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400"
+                >
+                  {profile.designation}
+                </Badge>
+              )}
+              <CardDescription className="mt-1">{profile.email}</CardDescription>
             </div>
           </div>
 
-          <div className="border-t p-6 lg:border-t-0">
-            <p className="pb-2 text-sm font-semibold text-foreground">
-              Portfolio Details
-            </p>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {portfolioFields.map((field) => (
-                <DetailRow key={field.label} label={field.label} value={field.value} />
-              ))}
+          <div className="divide-y border-t lg:border-t-0">
+            <div className="p-6">
+              <p className="pb-2 text-sm font-semibold text-foreground">
+                Personal Details
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {personalFields.map((field) => (
+                  <DetailRow key={field.label} label={field.label} value={field.value} />
+                ))}
+              </div>
+            </div>
+
+            <div className="p-6">
+              <p className="pb-2 text-sm font-semibold text-foreground">
+                Portfolio Details
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {portfolioFields.map((field) => (
+                  <DetailRow key={field.label} label={field.label} value={field.value} />
+                ))}
+              </div>
             </div>
           </div>
         </div>
