@@ -36,16 +36,7 @@ interface Profile {
   values: ProfileValues
 }
 
-type PagedEntityRecords<TValues> = Omit<
-  components["schemas"]["PagedResponseOfEntityRecord"],
-  "data"
-> & {
-  data: Array<Omit<components["schemas"]["EntityRecord"], "values"> & {
-    values: TValues
-  }>
-}
-
-type ApplicantsPayload = PagedEntityRecords<ApplicantValues>
+type ApplicantsPayload = components["schemas"]["PagedResponseOfEntityRecord"]
 
 const STATUS_STYLES: Record<string, string> = {
   Interview: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
@@ -209,7 +200,7 @@ export default function ApplicantsPage() {
               </thead>
               <tbody>
                 {applicants.map((applicant) => {
-                  const v = applicant.values
+                  const v = applicant.values as unknown as ApplicantValues
                   const fullName = "—"  // Profile names not loaded in this view
 
                   return (
