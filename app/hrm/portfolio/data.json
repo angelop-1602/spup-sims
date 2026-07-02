@@ -1,0 +1,67 @@
+[
+  {
+    "id": "educational-background",
+    "label": "Educational Background",
+    "columns": ["Level / Degree", "Degree", "Institution", "Year"],
+    "rows": [
+      ["Tertiary", "Bachelor of Science in Information Technology", "St. Paul University Philippines", "2015"],
+      ["Graduate", "Master in Information Technology", "St. Paul University Philippines", "2020"]
+    ]
+  },
+  {
+    "id": "work-experience",
+    "label": "Work Experience",
+    "columns": ["Position", "Company", "From", "To"],
+    "rows": [
+      ["IT Support Staff", "St. Paul University Philippines", "2015", "2018"],
+      ["HR Staff", "St. Paul University Philippines", "2018", "Present"]
+    ]
+  },
+  {
+    "id": "national-certification",
+    "label": "National Certification",
+    "columns": ["Certificate", "Issuing Body", "Date Issued"],
+    "rows": [
+      ["NC II Computer Systems Servicing", "TESDA", "2016-03-10"]
+    ]
+  },
+  {
+    "id": "organization-affiliation",
+    "label": "Organization Affiliation",
+    "columns": ["Organization", "Role", "Year"],
+    "rows": [
+      ["Human Resource Management Society", "Member", "2019"],
+      ["SPUP Employees Association", "Officer", "2021"]
+    ]
+  },
+  {
+    "id": "professional-engagement",
+    "label": "Professional Engagement",
+    "columns": ["Title", "Description", "Year"],
+    "rows": [
+      ["HR Systems Training", "Attended HRIS modernization workshop", "2022"]
+    ]
+  },
+  {
+    "id": "research-creative-work",
+    "label": "Research/Creative Work Engagement",
+    "columns": ["Title", "Type", "Year"],
+    "rows": []
+  },
+  {
+    "id": "community-parish-involvement",
+    "label": "Community and Parish Involvement",
+    "columns": ["Activity", "Role", "Year"],
+    "rows": [
+      ["Barangay Feeding Program", "Volunteer", "2023"]
+    ]
+  },
+  {
+    "id": "awards-recognition",
+    "label": "Awards and Recognition",
+    "columns": ["Award", "Issued By", "Year"],
+    "rows": [
+      ["Employee of the Year", "St. Paul University Philippines", "2023"]
+    ]
+  }
+]

@@ -217,15 +217,19 @@ export default function ApplicantsPage() {
               </thead>
               <tbody>
                 {applicants.map((applicant) => {
-                  const v = applicant.values
-                  const matchingProfile = profiles.find((p) => String(p.id) === String(v.ProfileId))
-                  const fullName = matchingProfile
-                    ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`
+                  const v = applicant.values ?? (applicant as unknown as ApplicantValues)
+                  const matchingProfile = profiles.find((p) => {
+                    const pv = p.values ?? (p as unknown as ProfileValues)
+                    return String(pv.Id ?? p.id) === String(v.ProfileId)
+                  })
+                  const profileValues = matchingProfile?.values ?? (matchingProfile as unknown as ProfileValues | undefined)
+                  const fullName = profileValues
+                    ? `${profileValues.FirstName} ${profileValues.LastName}`
                     : "No linked profile"
 
                   return (
                     <tr
-                      key={applicant.id}
+                      key={v.Id}
                       className="border-b last:border-0 hover:bg-muted/30"
                     >
                       <td className="px-4 py-3 font-medium">

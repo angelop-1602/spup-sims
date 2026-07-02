@@ -134,6 +134,15 @@ function formatDate(dateString: string | null) {
   })
 }
 
+function withValuesFallback<TValues extends object, TRecord extends { values?: TValues }>(
+  records: TRecord[],
+): (TRecord & { values: TValues })[] {
+  return records.map((record) => ({
+    ...record,
+    values: record.values ?? (record as unknown as TValues),
+  }))
+}
+
 function formatDateTime(dateString: string | null) {
   if (!dateString) return "—"
   return new Date(dateString).toLocaleString("en-US", {
@@ -240,22 +249,22 @@ export default function ProfileDetailPage() {
 
         setProfile(
           profileResult.status === "fulfilled"
-            ? profileResult.value.values
+            ? profileResult.value.values ?? (profileResult.value as unknown as ProfileValues)
             : null,
         )
         setDocuments(
           documentsResult.status === "fulfilled"
-            ? documentsResult.value?.data ?? []
+            ? withValuesFallback<DocumentValues, ApplicantDocument>(documentsResult.value?.data ?? [])
             : [],
         )
         setStatusHistory(
           historyResult.status === "fulfilled"
-            ? historyResult.value?.data ?? []
+            ? withValuesFallback<StatusHistoryValues, StatusHistoryEntry>(historyResult.value?.data ?? [])
             : [],
         )
         setInterviews(
           interviewsResult.status === "fulfilled"
-            ? interviewsResult.value?.data ?? []
+            ? withValuesFallback<InterviewScheduleValues, InterviewSchedule>(interviewsResult.value?.data ?? [])
             : [],
         )
       } catch {
