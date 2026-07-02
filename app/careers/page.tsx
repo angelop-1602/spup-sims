@@ -461,21 +461,33 @@ export default function HrmPage() {
               </p>
             </div>
 
-            {/* 4. REQUIREMENTS CARDS GRID */}
+            {/* REQUIREMENTS CARDS GRID */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
                       <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                      <span>Resume / CV</span>
+                      <span>Resume</span>
                     </div>
-                    <button type="button" title="Must be a consolidated PDF file under 5MB." className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help">
-                      <HelpCircle className="w-3.5 h-3.5" />
-                    </button>
+
+                    <div className="relative group flex items-center">
+                      <button 
+                        type="button" 
+                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
+                        aria-label="Resume requirement instructions"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
+                      </button>
+                      
+                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
+                        Insert additional information here.
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
+                      </div>
+                    </div>
                   </div>
                   <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
-                    An updated summary of your professional milestones, technical expertise, and employment background.
+                    An updated, one-page summary of your professional milestones, technical expertise, and employment background.
                   </p>
                 </div>
                 <div className="mt-4 flex items-center">
