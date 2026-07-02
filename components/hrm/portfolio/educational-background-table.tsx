@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Loader2 } from "lucide-react"
+import { createPortal } from "react-dom"
+import { Loader2, Plus } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { useApiQuery, type components } from "@/lib/api"
 import { EducationCredentialsCell } from "@/components/hrm/portfolio/education-credentials-cell"
 
@@ -22,8 +24,10 @@ function formatDate(dateString: string | null) {
 
 export function EducationalBackgroundTable({
   profileId,
+  headerActionsEl,
 }: {
   profileId: number | string
+  headerActionsEl: HTMLElement | null
 }) {
   const [page, setPage] = React.useState(1)
 
@@ -54,6 +58,14 @@ export function EducationalBackgroundTable({
 
   return (
     <div>
+      {headerActionsEl &&
+        createPortal(
+          <Button size="sm">
+            <Plus className="h-3.5 w-3.5" />
+            Add
+          </Button>,
+          headerActionsEl,
+        )}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>

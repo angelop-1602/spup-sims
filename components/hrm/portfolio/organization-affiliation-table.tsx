@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, Paperclip } from "lucide-react"
+import { createPortal } from "react-dom"
+import { Loader2, Paperclip, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useApiQuery, type components } from "@/lib/api"
 
@@ -13,8 +14,10 @@ const PAGE_SIZE = 10
 
 export function OrganizationAffiliationTable({
   profileId,
+  headerActionsEl,
 }: {
   profileId: number | string
+  headerActionsEl: HTMLElement | null
 }) {
   const [page, setPage] = React.useState(1)
 
@@ -45,6 +48,14 @@ export function OrganizationAffiliationTable({
 
   return (
     <div>
+      {headerActionsEl &&
+        createPortal(
+          <Button size="sm">
+            <Plus className="h-3.5 w-3.5" />
+            Add
+          </Button>,
+          headerActionsEl,
+        )}
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>

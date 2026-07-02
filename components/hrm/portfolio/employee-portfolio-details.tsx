@@ -24,7 +24,7 @@ import { AwardRecognitionTable } from "@/components/hrm/portfolio/award-recognit
 
 const SECTION_TABLES: Record<
   string,
-  React.ComponentType<{ profileId: number | string }>
+  React.ComponentType<{ profileId: number | string; headerActionsEl: HTMLElement | null }>
 > = {
   "educational-background": EducationalBackgroundTable,
   "work-experience": WorkExperienceTable,
@@ -47,6 +47,7 @@ type EmployeePortfolioDetailsProps = {
 
 export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsProps) {
   const [activeSectionId, setActiveSectionId] = React.useState(portfolioSections[0].id)
+  const [headerActionsEl, setHeaderActionsEl] = React.useState<HTMLDivElement | null>(null)
   const activeSection = portfolioSections.find((section) => section.id === activeSectionId) ?? portfolioSections[0]
   const ActiveSectionTable = SECTION_TABLES[activeSectionId]
 
@@ -140,12 +141,15 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
         />
 
         <Card className="gap-0 overflow-hidden rounded-lg">
-          <CardHeader className="border-b">
+          <CardHeader className="flex flex-row items-center justify-between border-b">
             <CardTitle className="text-base font-medium">{activeSection.label}</CardTitle>
+            <div ref={setHeaderActionsEl} />
           </CardHeader>
 
           <CardContent className="p-0">
-            {ActiveSectionTable && <ActiveSectionTable profileId={profile.id} />}
+            {ActiveSectionTable && (
+              <ActiveSectionTable profileId={profile.id} headerActionsEl={headerActionsEl} />
+            )}
           </CardContent>
         </Card>
       </div>
