@@ -22,11 +22,9 @@ export default function JobDetailsModal({
   hasApplied,
   onSaveProfile
 }: JobDetailsModalProps) {
-  // Application flow state
   const [isApplying, setIsApplying] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
 
-  // For inline manual application if no profile exists
   const [fullName, setFullName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [phone, setPhone] = useState<string>('');
