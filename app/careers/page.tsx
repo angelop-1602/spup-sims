@@ -491,7 +491,7 @@ export default function HrmPage() {
                   </p>
                 </div>
                 <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-900 text-white border border-red-900">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
                     Required
                   </span>
                 </div>
@@ -507,8 +507,10 @@ export default function HrmPage() {
                     Formal cover letter addressed to the Human Resource Management Office detailing your intent.
                   </p>
                 </div>
-                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                  Required
+                <div className="mt-4 flex items-center">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
+                    Required
+                  </span>
                 </div>
               </div>
 
@@ -522,8 +524,10 @@ export default function HrmPage() {
                     Official scholastic transcript (TOR) from your graduate or undergraduate educational institution.
                   </p>
                 </div>
-                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                  Required
+                <div className="mt-4 flex items-center">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
+                    Required
+                  </span>
                 </div>
               </div>
 
@@ -537,8 +541,10 @@ export default function HrmPage() {
                     A certified true copy or photocopy of your graduation certification degree.
                   </p>
                 </div>
-                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                  Required
+                <div className="mt-4 flex items-center">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
+                    Required
+                  </span>
                 </div>
               </div>
 
@@ -552,8 +558,10 @@ export default function HrmPage() {
                     Government-issued identification card to securely verify candidate profile parameters.
                   </p>
                 </div>
-                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                  Required
+                <div className="mt-4 flex items-center">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
+                    Required
+                  </span>
                 </div>
               </div>
 
@@ -567,8 +575,10 @@ export default function HrmPage() {
                     Professional Regulation Commission license credentials verification for regulated professions.
                   </p>
                 </div>
-                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                  If Applicable
+                <div className="mt-4 flex items-center">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-neutral-400 text-white border border-neutral-400">
+                    If Applicable
+                  </span>
                 </div>
               </div>
 
@@ -582,8 +592,10 @@ export default function HrmPage() {
                     Supplemental accreditation, technical training certifications, or continuing educational credits.
                   </p>
                 </div>
-                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
-                  If Applicable
+                <div className="mt-4 flex items-center">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-neutral-400 text-white border border-neutral-400">
+                    If Applicable
+                  </span>
                 </div>
               </div>
 
