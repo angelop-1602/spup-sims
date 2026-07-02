@@ -4,23 +4,19 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowUpRight,
-  Search,
-  Bookmark,
-  FileText,
   Briefcase,
-  RefreshCw,
+  FileText,
   TrendingUp,
   X,
-  UserCheck,
-  BookmarkCheck,
   User,
-  ShieldCheck,
-  HelpCircle
+  ShieldCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { Job, UserProfile, Application, INITIAL_JOBS } from '@/components/hrm/types';
-import JobCard from '@/components/hrm/landing/JobCard';
-import JobDetailsModal from '@/components/hrm/landing/JobDetailsModal';
+import JobCard from '@/components/hrm/careers/JobCard';
+import JobDetailsModal from '@/components/hrm/careers/JobDetailsModal';
+import ProcessTimeline from '@/components/hrm/careers/ApplicationProcess';
+import FaqSection from '@/components/hrm/careers/Faq';
 
 export default function HrmPage() {
   const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile'>('explore');
@@ -215,7 +211,7 @@ export default function HrmPage() {
       </header>
 
       {/* Main Content body */}
-      <main className="flex-1 w-full mx-auto space-y-8">
+      <main className="flex-1 w-full mx-auto pb-12">
         
         {/* HERO BANNER SECTION */}
         <AnimatePresence mode="popLayout">
@@ -225,12 +221,11 @@ export default function HrmPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.35 }}
-              className="relative w-full h-[400px] md:h-[480px] overflow-hidden shadow-xs flex items-center bg-neutral-900 bg-cover bg-center bg-no-repeat"
+              className="relative w-full h-[400px] md:h-[480px] overflow-hidden shadow-xs flex items-center bg-neutral-900 bg-cover bg-center bg-no-repeat mb-8"
               style={{ backgroundImage: "url('/img/bg-auth.png')", backgroundPosition: 'center center' }} 
             >
               <div className="absolute inset-0 bg-neutral-950/40 z-0 pointer-events-none" />
 
-              {/* Added responsive maximum width alignment wrapper */}
               <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="w-full max-w-lg bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-10 border border-white/20 shadow-xl flex flex-col space-y-5">
                   <div className="space-y-3">
@@ -258,7 +253,7 @@ export default function HrmPage() {
           )}
         </AnimatePresence>
 
-        <div id="workspace-layout" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div id="workspace-layout" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
           {activeTab === 'explore' && (
             <div className="space-y-6">
               
@@ -277,7 +272,7 @@ export default function HrmPage() {
                   className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-neutral-900 bg-neutral-950 text-white hover:bg-neutral-800 text-xs font-bold rounded-xl transition-colors shadow-sm cursor-pointer"
                 >
                   View all openings
-                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
@@ -309,7 +304,7 @@ export default function HrmPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-neutral-900 text-sm">Post-Submission Roster Guideline</h3>
-                  <p className="text-xs text-neutral-500 mt-0.5 leading-relaxed">Search committees typically review incoming academic and staff portfolios within 14 calendar days. Ensure your One-Click CV dossier remains accurate. Any updates are automatically reflected for pending reviews.</p>
+                  <p className="text-xs text-neutral-500 mt-0.5 leading-relaxed">Search committees typically review incoming academic and staff portfolios within 14 calendar days. Ensure your One-Click CV dossier remains accurate.</p>
                 </div>
               </div>
             </div>
@@ -317,7 +312,6 @@ export default function HrmPage() {
 
           {activeTab === 'profile' && (
             <div className="space-y-6">
-              {/* Clean fallback template replacing ProfileBuilder */}
               <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center shadow-sm max-w-2xl mx-auto flex flex-col items-center justify-center space-y-4">
                 <div className="w-12 h-12 rounded-full bg-neutral-50 border border-neutral-200 text-neutral-800 flex items-center justify-center shadow-2xs">
                   <User className="w-5 h-5" />
@@ -366,323 +360,19 @@ export default function HrmPage() {
           )}
         </div>
 
-        {/* APPLICATION PROCESS & REQUIREMENTS CONSOLIDATED CONTAINER */}
-        <section className="bg-white border border-neutral-200 rounded-2xl p-6 md:p-10 shadow-xs mt-12 w-full">
-          <div className="max-w-5xl mx-auto">
-            <div className="mb-12 text-left">
-              <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
-                Our Application Process
-              </h2>
-              <p className="text-xs text-neutral-500 mt-1">
-                A simple four-step pathway to joining the SPUP academic and staff community.
-              </p>
-            </div>
+        {/* Modular Feature Sections */}
+        <ProcessTimeline />
+        <FaqSection />
 
-            {/* Application Process Timeline */}
-            <div className="relative w-full">
-              <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-neutral-200 z-0" />
-              
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
-                {/* Step 1 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    1
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <Search className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    Choose a Position
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    Browse available job openings and locate roles that match your expertise.
-                  </p>
-                </div>
-
-                {/* Step 2 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    2
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    Submit Application
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    Upload your digital curriculum vitae and complete the application form.
-                  </p>
-                </div>
-
-                {/* Step 3 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    3
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    HR Screening
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    The Human Resource Management Office conducts an initial credentials verification evaluation.
-                  </p>
-                </div>
-
-                {/* Step 4 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    4
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <UserCheck className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    Interview & Evaluation
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    Qualified candidates meet with departmental committees for final evaluations.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <hr className="my-12 border-neutral-200" />
-
-            {/* REQUIREMENTS LIST */}
-            <div className="mb-8 text-left">
-              <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
-                Application Requirements
-              </h2>
-              <p className="text-xs text-neutral-500 mt-1">
-                Please prepare the following valid credentials and documentation payloads for your dossier submission.
-              </p>
-            </div>
-
-            {/* REQUIREMENTS CARDS GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                      <span>Resume</span>
-                    </div>
-
-                    <div className="relative group flex items-center">
-                      <button 
-                        type="button" 
-                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
-                        aria-label="Resume requirement instructions"
-                      >
-                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
-                      </button>
-                      
-                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
-                        Insert additional information here.
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
-                    An updated, one-page summary of your professional milestones, technical expertise, and employment background.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
-                    Required
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                      <span>Application Letter</span>
-                    </div>
-
-                    <div className="relative group flex items-center">
-                      <button 
-                        type="button" 
-                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
-                        aria-label="Application letter requirement instructions"
-                      >
-                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
-                      </button>
-                      
-                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
-                        Insert additional information here.
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
-                    Formal cover letter addressed to the Human Resource Management Office detailing your intent.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
-                    Required
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                      <span>Transcript of Records (TOR)</span>
-                    </div>
-
-                    <div className="relative group flex items-center">
-                      <button 
-                        type="button" 
-                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
-                        aria-label="Transcript of Records requirement instructions"
-                      >
-                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
-                      </button>
-                      
-                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
-                        Insert additional information here.
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
-                    Official scholastic transcript from your graduate or undergraduate educational institution.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
-                    Required
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                      <span>Diploma</span>
-                    </div>
-
-                    <div className="relative group flex items-center">
-                      <button 
-                        type="button" 
-                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
-                        aria-label="Diploma requirement instructions"
-                      >
-                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
-                      </button>
-                      
-                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
-                        Insert additional information here.
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
-                    A certified true copy or photocopy of your graduation certification degree.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
-                    Required
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                      <span>Valid ID</span>
-                    </div>
-
-                    <div className="relative group flex items-center">
-                      <button 
-                        type="button" 
-                        className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help"
-                        aria-label="Valid ID requirement instructions"
-                      >
-                        <HelpCircle className="w-3.5 h-3.5 pointer-events-none" />
-                      </button>
-                      
-                      <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block w-48 bg-neutral-950 text-neutral-100 text-[10px] p-2.5 rounded-lg shadow-xl border border-neutral-800 z-50 pointer-events-none text-center normal-case tracking-normal font-medium leading-normal animate-in fade-in duration-100">
-                        E.g., Insert list here. 
-                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-950" />
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
-                    Government-issued identification card to securely verify candidate profile parameters.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-800 text-white border border-red-800">
-                    Required
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xl flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-700 uppercase tracking-wider">
-                    <ShieldCheck className="w-4 h-4 text-neutral-400 shrink-0" />
-                    <span>PRC ID</span>
-                  </div>
-                  <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed font-normal">
-                    Professional Regulation Commission license credentials verification for regulated professions.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-neutral-400 text-white border border-neutral-400">
-                    If Applicable
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xl flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-700 uppercase tracking-wider">
-                    <FileText className="w-4 h-4 text-neutral-400 shrink-0" />
-                    <span>Training Certificates</span>
-                  </div>
-                  <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed font-normal">
-                    Supplemental accreditation, technical training certifications, or continuing educational credits.
-                  </p>
-                </div>
-                <div className="mt-4 flex items-center">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-neutral-400 text-white border border-neutral-400">
-                    If Applicable
-                  </span>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-neutral-200 py-8 mt-12">
+      <footer className="bg-white border-t border-neutral-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-400">
           <div className="flex items-center gap-2">
             <span className="text-neutral-900 font-extrabold uppercase">SPUP HRM Careers</span>
             <span>•</span>
             <span>© 2026 St. Paul University Philippines. All rights reserved.</span>
-          </div>
-          <div className="flex items-center gap-6 text-[11px]">
-            <span className="text-neutral-400 hover:text-neutral-900 cursor-pointer">Terms and Conditions</span>
-            <span className="text-neutral-400 hover:text-neutral-900 cursor-pointer">Privacy Policy</span>
           </div>
         </div>
       </footer>
