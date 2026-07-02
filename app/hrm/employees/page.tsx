@@ -118,7 +118,7 @@ export default function EmployeesPage() {
   }
 
   const employees = employeesPaged?.data ?? []
-  const totalPages = employeesPaged?.totalPages ?? 1
+  const totalPages = Number(employeesPaged?.totalPages ?? 1)
   const totalRecords = employeesPaged?.totalRecords ?? 0
 
   const hasActiveFilters = Boolean(search || departmentFilter || designationFilter)
