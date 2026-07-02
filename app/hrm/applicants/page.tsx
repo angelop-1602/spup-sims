@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
-import { useApiClient, type components } from "@/lib/api"
+import { useApiQuery, type components } from "@/lib/api"
 
 interface ApplicantValues {
   Id: number | string
@@ -44,6 +44,9 @@ type PagedEntityRecords<TValues> = Omit<
     values: TValues
   }>
 }
+
+type ApplicantsPayload = PagedEntityRecords<ApplicantValues>
+type ProfilesPayload = PagedEntityRecords<ProfileValues>
 
 const STATUS_STYLES: Record<string, string> = {
   Interview: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
@@ -105,69 +108,17 @@ export default function ApplicantsPage() {
     Status: "",
   })
 
-      try {
-        const trimmedSearch = search.trim()
-        const params = {
-          Page: page,
-          PageSize: pageSize,
-          Search: trimmedSearch || undefined,
-          DateFrom: dateFrom || undefined,
-          DateTo: dateTo || undefined,
-          SortBy: "",
-          Descending: true,
-          SchoolYearId: 1,
-          Status: "",
-        }
+  const { data: profilesPayload } = useApiQuery<ProfilesPayload>("/api/v1/core/profiles", {
+    Page: 1,
+    PageSize: 100,
+  })
 
-        const [applicantsPayload, profilesPayload] = await Promise.all([
-          query<PagedEntityRecords<ApplicantValues>>(
-            "/api/v1/recruitment/employee-applicants",
-            params,
-          ),
-          query<PagedEntityRecords<ProfileValues>>("/api/v1/core/profiles", {
-            Page: 1,
-            PageSize: 100,
-          }),
-        ])
+  const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
+  const profiles = profilesPayload?.data ?? []
 
-        setApplicants(applicantsPayload?.data ?? [])
-        setTotalPages(Number(applicantsPayload?.totalPages ?? 1))
-        setTotalRecords(Number(applicantsPayload?.totalRecords ?? 0))
 
-        setProfiles(profilesPayload?.data ?? [])
-      } catch (error) {
-        console.error("Failed to fetch data:", error)
-        setApplicants([])
-        setProfiles([])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchApplicants()
-  }, [query, account, page, pageSize, search, dateFrom, dateTo])
-
-    let cancelled = false
-
-    if (term) {
-      const matchingProfile = profiles.find((p) => String(p.id) === String(ProfileId))
-      const fullName = matchingProfile
-        ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
-        : ""
-      const matchesSearch =
-        ApplicationNumber.toLowerCase().includes(term) ||
-        Status.toLowerCase().includes(term) ||
-        fullName.includes(term)
-      if (!matchesSearch) return false
-    }
-
-    return () => {
-      cancelled = true
-    }
-  }, [applicants, query])
-
-  const totalPages = applicantsPayload?.totalPages ?? 1
-  const totalRecords = applicantsPayload?.totalRecords ?? 0
+  const totalPages = Number(applicantsPayload?.totalPages ?? 1)
+  const totalRecords = Number(applicantsPayload?.totalRecords ?? 0)
   const hasActiveFilters = Boolean(search || dateFrom || dateTo)
 
   return (
