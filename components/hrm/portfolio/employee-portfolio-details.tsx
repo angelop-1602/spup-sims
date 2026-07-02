@@ -12,7 +12,29 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import type { components } from "@/lib/api"
 import portfolioSections from "@/app/hrm/portfolio/data.json"
-import { PortfolioSectionNav } from "@/components/hrm/portfolio-section-nav"
+import { PortfolioSectionNav } from "@/components/hrm/portfolio/portfolio-section-nav"
+import { EducationalBackgroundTable } from "@/components/hrm/portfolio/educational-background-table"
+import { WorkExperienceTable } from "@/components/hrm/portfolio/work-experience-table"
+import { NationalCertificationTable } from "@/components/hrm/portfolio/national-certification-table"
+import { OrganizationAffiliationTable } from "@/components/hrm/portfolio/organization-affiliation-table"
+import { ProfessionalEngagementTable } from "@/components/hrm/portfolio/professional-engagement-table"
+import { ResearchEngagementTable } from "@/components/hrm/portfolio/research-engagement-table"
+import { CommunityInvolvementTable } from "@/components/hrm/portfolio/community-involvement-table"
+import { AwardRecognitionTable } from "@/components/hrm/portfolio/award-recognition-table"
+
+const SECTION_TABLES: Record<
+  string,
+  React.ComponentType<{ profileId: number | string }>
+> = {
+  "educational-background": EducationalBackgroundTable,
+  "work-experience": WorkExperienceTable,
+  "national-certification": NationalCertificationTable,
+  "organization-affiliation": OrganizationAffiliationTable,
+  "professional-engagement": ProfessionalEngagementTable,
+  "research-creative-work": ResearchEngagementTable,
+  "community-parish-involvement": CommunityInvolvementTable,
+  "awards-recognition": AwardRecognitionTable,
+}
 
 type ProfileFields = {
   label: string
@@ -26,6 +48,21 @@ type EmployeePortfolioDetailsProps = {
 export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsProps) {
   const [activeSectionId, setActiveSectionId] = React.useState(portfolioSections[0].id)
   const activeSection = portfolioSections.find((section) => section.id === activeSectionId) ?? portfolioSections[0]
+  const ActiveSectionTable = SECTION_TABLES[activeSectionId]
+
+  React.useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("section")
+    if (fromUrl && portfolioSections.some((section) => section.id === fromUrl)) {
+      setActiveSectionId(fromUrl)
+    }
+  }, [])
+
+  const handleSelectSection = (id: string) => {
+    setActiveSectionId(id)
+    const url = new URL(window.location.href)
+    url.searchParams.set("section", id)
+    window.history.replaceState(null, "", url)
+  }
   const personalFields: ProfileFields[] = [
     { label: "Age", value: profile.age ?? "—" },
     { label: "Mobile", value: profile.mobileNumber ?? "—" },
@@ -93,11 +130,11 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
         </div>
       </Card>
 
-      <div className="grid gap-4 lg:grid-cols-[20rem_1fr]">
+      <div className="grid items-start gap-4 lg:grid-cols-[20rem_1fr]">
         <PortfolioSectionNav
           sections={portfolioSections}
           activeSectionId={activeSectionId}
-          onSelect={setActiveSectionId}
+          onSelect={handleSelectSection}
         />
 
         <Card className="gap-0 overflow-hidden rounded-lg">
@@ -106,41 +143,7 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
           </CardHeader>
 
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    {activeSection.columns.map((column) => (
-                      <th key={column} className="px-4 py-3 font-medium">
-                        {column}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {activeSection.rows.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan={activeSection.columns.length}
-                        className="px-4 py-6 text-center text-muted-foreground"
-                      >
-                        No results.
-                      </td>
-                    </tr>
-                  ) : (
-                    activeSection.rows.map((row, rowIndex) => (
-                      <tr key={rowIndex} className="border-b last:border-0 hover:bg-muted/30">
-                        {row.map((cell, cellIndex) => (
-                          <td key={cellIndex} className="px-4 py-3">
-                            {cell}
-                          </td>
-                        ))}
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            {ActiveSectionTable && <ActiveSectionTable profileId={profile.id} />}
           </CardContent>
         </Card>
       </div>

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { EmployeePortfolioDetails } from "@/components/hrm/employee-portfolio-details"
+import { EmployeePortfolioDetails } from "@/components/hrm/portfolio/employee-portfolio-details"
 import { useApiQuery, type components } from "@/lib/api"
 
 type EmployeeResponse = components["schemas"]["EmployeeResponse"]
