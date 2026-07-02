@@ -14,7 +14,8 @@ import {
   UserCheck,
   BookmarkCheck,
   User,
-  ShieldCheck
+  ShieldCheck,
+  HelpCircle
 } from 'lucide-react';
 import Link from 'next/link';
 import { Job, UserProfile, Application, INITIAL_JOBS } from '@/components/hrm/types';
@@ -365,7 +366,7 @@ export default function HrmPage() {
           )}
         </div>
 
-        {/* APPLICATION PROCESS SECTION */}
+        {/* APPLICATION PROCESS & REQUIREMENTS CONSOLIDATED CONTAINER */}
         <section className="bg-white border border-neutral-200 rounded-2xl p-6 md:p-10 shadow-xs mt-12 w-full">
           <div className="max-w-5xl mx-auto">
             <div className="mb-12 text-left">
@@ -377,6 +378,7 @@ export default function HrmPage() {
               </p>
             </div>
 
+            {/* Application Process Timeline */}
             <div className="relative w-full">
               <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-neutral-200 z-0" />
               
@@ -444,8 +446,135 @@ export default function HrmPage() {
                     Qualified candidates meet with departmental committees for final evaluations.
                   </p>
                 </div>
-
               </div>
+            </div>
+
+            <hr className="my-12 border-neutral-200" />
+
+            {/* REQUIREMENTS LIST */}
+            <div className="mb-8 text-left">
+              <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
+                Application Requirements
+              </h2>
+              <p className="text-xs text-neutral-500 mt-1">
+                Please prepare the following valid credentials and documentation payloads for your dossier submission.
+              </p>
+            </div>
+
+            {/* 4. REQUIREMENTS CARDS GRID */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                      <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                      <span>Resume / CV</span>
+                    </div>
+                    <button type="button" title="Must be a consolidated PDF file under 5MB." className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help">
+                      <HelpCircle className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
+                    An updated summary of your professional milestones, technical expertise, and employment background.
+                  </p>
+                </div>
+                <div className="mt-4 flex items-center">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-900 text-white border border-red-900">
+                    Required
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                    <span>Application Letter</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
+                    Formal cover letter addressed to the Human Resource Management Office detailing your intent.
+                  </p>
+                </div>
+                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                  Required
+                </div>
+              </div>
+
+              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                    <span>Transcript of Records</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
+                    Official scholastic transcript (TOR) from your graduate or undergraduate educational institution.
+                  </p>
+                </div>
+                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                  Required
+                </div>
+              </div>
+
+              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
+                    <span>Diploma</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
+                    A certified true copy or photocopy of your graduation certification degree.
+                  </p>
+                </div>
+                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                  Required
+                </div>
+              </div>
+
+              <div className="p-4 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                    <ShieldCheck className="w-4 h-4 text-neutral-900 shrink-0" />
+                    <span>Valid ID</span>
+                  </div>
+                  <p className="text-xs text-neutral-500 mt-1.5 leading-relaxed font-normal">
+                    Government-issued identification card to securely verify candidate profile parameters.
+                  </p>
+                </div>
+                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                  Required
+                </div>
+              </div>
+
+              <div className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xl flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                    <ShieldCheck className="w-4 h-4 text-neutral-400 shrink-0" />
+                    <span>PRC ID</span>
+                  </div>
+                  <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed font-normal">
+                    Professional Regulation Commission license credentials verification for regulated professions.
+                  </p>
+                </div>
+                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                  If Applicable
+                </div>
+              </div>
+
+              <div className="p-4 bg-neutral-50/50 border border-neutral-200 rounded-xl flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-700 uppercase tracking-wider">
+                    <FileText className="w-4 h-4 text-neutral-400 shrink-0" />
+                    <span>Training Certificates</span>
+                  </div>
+                  <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed font-normal">
+                    Supplemental accreditation, technical training certifications, or continuing educational credits.
+                  </p>
+                </div>
+                <div className="mt-3 inline-flex items-center text-[10px] font-bold text-neutral-400 uppercase tracking-widest">
+                  If Applicable
+                </div>
+              </div>
+
             </div>
           </div>
         </section>
