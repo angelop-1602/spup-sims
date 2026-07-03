@@ -296,68 +296,6 @@ export default function HrmPage() {
             </div>
           )}
 
-          {activeTab === 'applications' && (
-            <div className="space-y-6">
-              <div className="p-4 bg-white border border-neutral-200 rounded-2xl flex items-start gap-3 shadow-sm">
-                <div className="p-2 bg-neutral-50 rounded-lg border border-neutral-100 text-neutral-950 flex-shrink-0">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-neutral-900 text-sm">Post-Submission Roster Guideline</h3>
-                  <p className="text-xs text-neutral-500 mt-0.5 leading-relaxed">Search committees typically review incoming academic and staff portfolios within 14 calendar days. Ensure your One-Click CV dossier remains accurate.</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'profile' && (
-            <div className="space-y-6">
-              <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center shadow-sm max-w-2xl mx-auto flex flex-col items-center justify-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-neutral-50 border border-neutral-200 text-neutral-800 flex items-center justify-center shadow-2xs">
-                  <User className="w-5 h-5" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-bold text-neutral-900 text-base">Application Profile Manager</h3>
-                  <p className="text-xs text-neutral-500 max-w-sm leading-relaxed">
-                    The interactive profile and curriculum vitae builder interface is temporarily disconnected for system tuning.
-                  </p>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200/60 rounded-full text-[10px] font-medium tracking-wide">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
-                  Your local caching and security frameworks remain active
-                </div>
-              </div>
-
-              <div className="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
-                <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest mb-4">Why Use One-Click Apply?</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono border border-neutral-200">1</span>
-                      Instant Verification
-                    </div>
-                    <p className="text-xs text-neutral-500 leading-relaxed font-normal">Your educational degrees, reference details, and publications list are compiled into a streamlined academic dossier payload.</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono border border-neutral-200">2</span>
-                      Dynamic Synced Updates
-                    </div>
-                    <p className="text-xs text-neutral-500 leading-relaxed font-normal">Search committees query your snapshot directly. Editing your details here keeps your application fresh before the final audit begins.</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono border border-neutral-200">3</span>
-                      Privacy Protected
-                    </div>
-                    <p className="text-xs text-neutral-500 leading-relaxed font-normal">Dossier parameters are kept completely local inside your sandboxed browser environment, respecting strict regulatory requirements.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Modular Feature Sections */}
