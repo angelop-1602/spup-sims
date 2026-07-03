@@ -4,15 +4,11 @@ import * as React from "react"
 import { createPortal } from "react-dom"
 import { Loader2, Paperclip, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useApiQuery, type components } from "@/lib/api"
+import { useApiQuery } from "@/lib/api"
 
-type PagedAwardRecognitions =
-  components["schemas"]["PagedResponseOfAwardRecognitionResponse"]
-
-const COLUMNS = ["Awarding Body", "Nature of Award", "Date Received", "Attachments"]
 const PAGE_SIZE = 10
 
-function formatDate(dateString: string | null) {
+export function formatDate(dateString: string | null | undefined) {
   if (!dateString) return "—"
   return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
@@ -21,19 +17,52 @@ function formatDate(dateString: string | null) {
   })
 }
 
-export function AwardRecognitionTable({
+export function AttachmentCell({ href }: { href?: string | null }) {
+  return href ? (
+    <Button variant="outline" size="sm" asChild>
+      <a href={href} target="_blank" rel="noopener noreferrer">
+        <Paperclip className="h-3.5 w-3.5" />
+        Files
+      </a>
+    </Button>
+  ) : (
+    <Button variant="outline" size="sm" disabled>
+      <Paperclip className="h-3.5 w-3.5" />
+      Files
+    </Button>
+  )
+}
+
+export type PortfolioTableColumn<TRow> = {
+  header: string
+  render: (row: TRow, profileId: number | string) => React.ReactNode
+}
+
+type PagedRows<TRow> = {
+  data?: TRow[] | null
+  totalPages?: number | string | null
+  totalRecords?: number | string | null
+}
+
+export function PortfolioTable<TRow extends { id: number | string }>({
   profileId,
   headerActionsEl,
+  endpoint,
+  loadingLabel,
+  columns,
 }: {
   profileId: number | string
   headerActionsEl: HTMLElement | null
+  endpoint: string
+  loadingLabel: string
+  columns: PortfolioTableColumn<TRow>[]
 }) {
   const [page, setPage] = React.useState(1)
 
-  const { data, loading, error } = useApiQuery<PagedAwardRecognitions>(
-    `/api/v1/hrms/profiles/${profileId}/award-recognitions`,
-    { Page: page, PageSize: PAGE_SIZE },
-  )
+  const { data, loading, error } = useApiQuery<PagedRows<TRow>>(endpoint, {
+    Page: page,
+    PageSize: PAGE_SIZE,
+  })
   const rows = data?.data ?? []
   const totalPages = Number(data?.totalPages ?? 1)
   const totalRecords = Number(data?.totalRecords ?? 0)
@@ -42,7 +71,7 @@ export function AwardRecognitionTable({
     return (
       <div className="flex items-center justify-center gap-2 px-4 py-10 text-sm text-muted-foreground">
         <Loader2 className="h-4 w-4 animate-spin" />
-        Loading awards and recognition…
+        Loading {loadingLabel}…
       </div>
     )
   }
@@ -69,9 +98,9 @@ export function AwardRecognitionTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wide text-muted-foreground">
-              {COLUMNS.map((column) => (
-                <th key={column} className="px-4 py-3 font-medium">
-                  {column}
+              {columns.map((column) => (
+                <th key={column.header} className="px-4 py-3 font-medium">
+                  {column.header}
                 </th>
               ))}
             </tr>
@@ -80,7 +109,7 @@ export function AwardRecognitionTable({
             {rows.length === 0 ? (
               <tr>
                 <td
-                  colSpan={COLUMNS.length}
+                  colSpan={columns.length}
                   className="px-4 py-6 text-center text-muted-foreground"
                 >
                   No results.
@@ -89,24 +118,11 @@ export function AwardRecognitionTable({
             ) : (
               rows.map((row) => (
                 <tr key={row.id} className="border-b last:border-0 hover:bg-muted/30">
-                  <td className="px-4 py-3">{row.awardingBody}</td>
-                  <td className="px-4 py-3">{row.natureAward}</td>
-                  <td className="px-4 py-3">{formatDate(row.dateReceived)}</td>
-                  <td className="px-4 py-3">
-                    {row.attachment ? (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={row.attachment} target="_blank" rel="noopener noreferrer">
-                          <Paperclip className="h-3.5 w-3.5" />
-                          Files
-                        </a>
-                      </Button>
-                    ) : (
-                      <Button variant="outline" size="sm" disabled>
-                        <Paperclip className="h-3.5 w-3.5" />
-                        Files
-                      </Button>
-                    )}
-                  </td>
+                  {columns.map((column) => (
+                    <td key={column.header} className="px-4 py-3">
+                      {column.render(row, profileId)}
+                    </td>
+                  ))}
                 </tr>
               ))
             )}

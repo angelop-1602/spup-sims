@@ -13,28 +13,8 @@ import { Badge } from "@/components/ui/badge"
 import type { components } from "@/lib/api"
 import portfolioSections from "@/app/hrm/portfolio/data.json"
 import { PortfolioSectionNav } from "@/components/hrm/portfolio/portfolio-section-nav"
-import { EducationalBackgroundTable } from "@/components/hrm/portfolio/educational-background-table"
-import { WorkExperienceTable } from "@/components/hrm/portfolio/work-experience-table"
-import { NationalCertificationTable } from "@/components/hrm/portfolio/national-certification-table"
-import { OrganizationAffiliationTable } from "@/components/hrm/portfolio/organization-affiliation-table"
-import { ProfessionalEngagementTable } from "@/components/hrm/portfolio/professional-engagement-table"
-import { ResearchEngagementTable } from "@/components/hrm/portfolio/research-engagement-table"
-import { CommunityInvolvementTable } from "@/components/hrm/portfolio/community-involvement-table"
-import { AwardRecognitionTable } from "@/components/hrm/portfolio/award-recognition-table"
-
-const SECTION_TABLES: Record<
-  string,
-  React.ComponentType<{ profileId: number | string; headerActionsEl: HTMLElement | null }>
-> = {
-  "educational-background": EducationalBackgroundTable,
-  "work-experience": WorkExperienceTable,
-  "national-certification": NationalCertificationTable,
-  "organization-affiliation": OrganizationAffiliationTable,
-  "professional-engagement": ProfessionalEngagementTable,
-  "research-creative-work": ResearchEngagementTable,
-  "community-parish-involvement": CommunityInvolvementTable,
-  "awards-recognition": AwardRecognitionTable,
-}
+import { PortfolioTable } from "@/components/hrm/portfolio/portfolio-table"
+import { PORTFOLIO_TABLE_CONFIGS } from "@/components/hrm/portfolio/portfolio-table-configs"
 
 type ProfileFields = {
   label: string
@@ -49,7 +29,7 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
   const [activeSectionId, setActiveSectionId] = React.useState(portfolioSections[0].id)
   const [headerActionsEl, setHeaderActionsEl] = React.useState<HTMLDivElement | null>(null)
   const activeSection = portfolioSections.find((section) => section.id === activeSectionId) ?? portfolioSections[0]
-  const ActiveSectionTable = SECTION_TABLES[activeSectionId]
+  const activeTableConfig = PORTFOLIO_TABLE_CONFIGS[activeSectionId]
 
   React.useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("section")
@@ -147,8 +127,14 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
           </CardHeader>
 
           <CardContent className="p-0">
-            {ActiveSectionTable && (
-              <ActiveSectionTable profileId={profile.id} headerActionsEl={headerActionsEl} />
+            {activeTableConfig && (
+              <PortfolioTable
+                profileId={profile.id}
+                headerActionsEl={headerActionsEl}
+                endpoint={activeTableConfig.endpoint(profile.id)}
+                loadingLabel={activeTableConfig.loadingLabel}
+                columns={activeTableConfig.columns}
+              />
             )}
           </CardContent>
         </Card>
