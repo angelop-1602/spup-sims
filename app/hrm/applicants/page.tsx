@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
-import { useApiClient,useApiQuery, type components } from "@/lib/api"
+import { useApiQuery, type components } from "@/lib/api"
 
 interface ApplicantValues {
   Id: number | string
@@ -46,6 +46,7 @@ type PagedEntityRecords<TValues> = Omit<
 }
 
 type ApplicantsPayload = PagedEntityRecords<ApplicantValues>
+type ProfilesPayload = PagedEntityRecords<ProfileValues>
 
 const STATUS_STYLES: Record<string, string> = {
   Interview: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
@@ -107,9 +108,17 @@ export default function ApplicantsPage() {
     Status: "",
   })
 
-  const totalPages = applicantsPayload?.totalPages ?? 1
-  const totalRecords = applicantsPayload?.totalRecords ?? 0
-  const applicants = applicantsPayload?.data ?? []
+  const { data: profilesPayload } = useApiQuery<ProfilesPayload>("/api/v1/core/profiles", {
+    Page: 1,
+    PageSize: 100,
+  })
+
+  const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
+  const profiles = profilesPayload?.data ?? []
+
+
+  const totalPages = Number(applicantsPayload?.totalPages ?? 1)
+  const totalRecords = Number(applicantsPayload?.totalRecords ?? 0)
   const hasActiveFilters = Boolean(search || dateFrom || dateTo)
 
   return (
