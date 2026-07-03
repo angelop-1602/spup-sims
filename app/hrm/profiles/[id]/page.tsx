@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Loader2, ArrowLeft, FileText } from "lucide-react"
-import { useApiClient } from "@/lib/api"
+import { useApiClient, type components } from "@/lib/api"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card"
 // ─── Interfaces ────────────────────────────────────────────────
 
 interface ProfileValues {
-  Id: number
+  Id: number | string
   FirstName: string
   MiddleName: string | null
   LastName: string
@@ -36,15 +36,9 @@ interface ProfileValues {
   IsDeleted: boolean
 }
 
-interface ProfileResponse {
-  success: boolean
-  message: string
-  data: { entity: string; id: number; values: ProfileValues }
-}
-
 interface DocumentValues {
-  Id: number
-  EmployeeApplicantId: number
+  Id: number | string
+  EmployeeApplicantId: number | string
   RequirementName: string | null
   FileName: string | null
   StoragePath: string | null
@@ -54,19 +48,13 @@ interface DocumentValues {
 
 interface ApplicantDocument {
   entity: string
-  id: number
+  id: number | string
   values: DocumentValues
 }
 
-interface DocumentsResponse {
-  success: boolean
-  message: string
-  data: { data: ApplicantDocument[] }
-}
-
 interface StatusHistoryValues {
-  Id: number
-  EmployeeApplicantId: number
+  Id: number | string
+  EmployeeApplicantId: number | string
   Status: string
   Remarks: string | null
   CreatedAt: string
@@ -77,25 +65,13 @@ interface StatusHistoryValues {
 
 interface StatusHistoryEntry {
   entity: string
-  id: number
+  id: number | string
   values: StatusHistoryValues
 }
 
-interface StatusHistoryResponse {
-  success: boolean
-  message: string
-  data: {
-    data: StatusHistoryEntry[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
-}
-
 interface InterviewScheduleValues {
-  Id: number
-  EmployeeApplicantId: number
+  Id: number | string
+  EmployeeApplicantId: number | string
   ScheduledAt: string
   Venue: string | null
   Notes: string | null
@@ -106,21 +82,28 @@ interface InterviewScheduleValues {
 
 interface InterviewSchedule {
   entity: string
-  id: number
+  id: number | string
   values: InterviewScheduleValues
 }
 
-interface InterviewSchedulesResponse {
-  success: boolean
-  message: string
-  data: {
-    data: InterviewSchedule[]
-    page: number
-    pageSize: number
-    totalRecords: number
-    totalPages: number
-  }
+type EntityRecordWithValues<TValues> = Omit<
+  components["schemas"]["EntityRecord"],
+  "values"
+> & {
+  values: TValues
 }
+
+type PagedEntityRecords<TValues> = Omit<
+  components["schemas"]["PagedResponseOfEntityRecord"],
+  "data"
+> & {
+  data: Array<EntityRecordWithValues<TValues>>
+}
+
+type ProfileRecord = EntityRecordWithValues<ProfileValues>
+type ApplicantDocuments = PagedEntityRecords<DocumentValues>
+type ApplicantStatusHistory = PagedEntityRecords<StatusHistoryValues>
+type ApplicantInterviews = PagedEntityRecords<InterviewScheduleValues>
 
 // ─── Constants ─────────────────────────────────────────────────
 
@@ -223,51 +206,63 @@ export default function ProfileDetailPage() {
     async function fetchAll() {
       setIsLoading(true)
       try {
-        type ProfilePayload = { success: boolean; data?: { values?: ProfileValues } }
-        type ListPayload = { success: boolean; data?: { data?: unknown[] } }
+        const profileRequest = query<ProfileRecord>(`/api/v1/core/profiles/${id}`)
+        const documentsRequest = applicantId
+          ? query<ApplicantDocuments>(
+              "/api/v1/recruitment/employee-applicant-documents",
+              { EmployeeApplicantId: applicantId },
+            )
+          : Promise.resolve(null)
+        const historyRequest = applicantId
+          ? query<ApplicantStatusHistory>(
+              "/api/v1/recruitment/employee-applicant-status-history",
+              { EmployeeApplicantId: applicantId },
+            )
+          : Promise.resolve(null)
+        const interviewsRequest = applicantId
+          ? query<ApplicantInterviews>(
+              "/api/v1/recruitment/interview-schedules",
+              { EmployeeApplicantId: applicantId },
+            )
+          : Promise.resolve(null)
 
-        const requests: Promise<ProfilePayload | ListPayload>[] = [
-          query<ProfilePayload>(`/api/v1/core/profiles/${id}`),
-        ]
+        const [
+          profileResult,
+          documentsResult,
+          historyResult,
+          interviewsResult,
+        ] = await Promise.allSettled([
+          profileRequest,
+          documentsRequest,
+          historyRequest,
+          interviewsRequest,
+        ])
 
-        if (applicantId) {
-          requests.push(
-            query<ListPayload>(
-              `/api/v1/recruitment/employee-applicant-documents?EmployeeApplicantId=${applicantId}`,
-            ),
-            query<ListPayload>(
-              `/api/v1/recruitment/employee-applicant-status-history?EmployeeApplicantId=${applicantId}`,
-            ),
-            query<ListPayload>(
-              `/api/v1/recruitment/interview-schedules?EmployeeApplicantId=${applicantId}`,
-            ),
-          )
-        }
-
-        const results = await Promise.allSettled(requests)
-        const [profileResult, docsResult, historyResult, interviewsResult] = results
-
-        const fulfilled = (
-          result: PromiseSettledResult<ProfilePayload | ListPayload>,
-        ): ProfilePayload | ListPayload | null =>
-          result.status === "fulfilled" ? (result.value as ProfilePayload | ListPayload) : null
-
-        const profilePayload = fulfilled(profileResult) as ProfilePayload | null
-        setProfile(profilePayload?.success ? (profilePayload.data?.values ?? null) : null)
-
-        const toArray = (
-          result: PromiseSettledResult<ProfilePayload | ListPayload>,
-        ): unknown[] => {
-          const payload = fulfilled(result)
-          if (!payload?.success) return []
-          return (payload.data?.data as unknown[]) ?? []
-        }
-
-        setDocuments(toArray(docsResult) as ApplicantDocument[])
-        setStatusHistory(toArray(historyResult) as StatusHistoryEntry[])
-        setInterviews(toArray(interviewsResult) as InterviewSchedule[])
+        setProfile(
+          profileResult.status === "fulfilled"
+            ? profileResult.value.values
+            : null,
+        )
+        setDocuments(
+          documentsResult.status === "fulfilled"
+            ? documentsResult.value?.data ?? []
+            : [],
+        )
+        setStatusHistory(
+          historyResult.status === "fulfilled"
+            ? historyResult.value?.data ?? []
+            : [],
+        )
+        setInterviews(
+          interviewsResult.status === "fulfilled"
+            ? interviewsResult.value?.data ?? []
+            : [],
+        )
       } catch {
         setProfile(null)
+        setDocuments([])
+        setStatusHistory([])
+        setInterviews([])
       } finally {
         setIsLoading(false)
       }
