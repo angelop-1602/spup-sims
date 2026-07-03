@@ -3,6 +3,18 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { Instrument_Serif, Inter } from 'next/font/google';
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+});
 
 const faqData: Record<string, { id: string; question: string; answer: string }[]> = {
   'General': [
@@ -72,11 +84,11 @@ export default function FaqSection() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-left"> 
-          <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
+          <h2 className={`${instrumentSerif.className} text-xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight lg:whitespace-nowrap [-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
             Frequently Asked Questions
           </h2>
-          <p className="text-xs text-neutral-500 mt-1">
-            We compiled a list of answers to address your most pressing questions regarding our pathways and application mechanics.
+          <p className={`${inter.className} text-sm text-neutral-600 mt-1`}>
+            We compiled a list of answers to address your most pressing questions regarding our job openings and application requirements.
           </p>
         </div>
 
@@ -90,37 +102,58 @@ export default function FaqSection() {
                   key={cat}
                   type="button"
                   onClick={() => handleTabChange(cat)}
-                  className={`text-xs font-semibold px-4 py-2.5 rounded-xl text-left whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer ${
+                  className={`${inter.className} text-xs font-semibold px-4 py-2.5 rounded-xl text-left whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer flex items-center justify-between gap-2 ${
                     isActive 
                       ? 'bg-neutral-100 text-neutral-900 font-bold' 
                       : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
                   }`}
                 >
-                  {cat}
+                  <span>{cat}</span>
+
+                  {isActive && (
+                    <svg 
+                      className="w-3 h-3 text-neutral-400 hidden md:block shrink-0 animate-fade-in" 
+                      fill="none" 
+                      viewBox="0 0 24 24" 
+                      strokeWidth="2.5" 
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  )}
                 </button>
               );
             })}
           </div>
 
           {/* Accordion Content Stack */}
-          <div className="md:col-span-9 space-y-0.5 border-t border-neutral-100 md:border-t-0">
+          <div className="md:col-span-9 space-y-4 border-t border-neutral-100 md:border-t-0">
             {currentFaqs.map((item) => {
               const isOpen = openFaqId === item.id;
               
               return (
                 <div 
                   key={item.id} 
-                  className={`border-b border-neutral-100 transition-colors duration-200 ${isOpen ? 'bg-neutral-50/40 rounded-xl px-4 py-2' : 'py-1'}`}
+                  className={`rounded-xl overflow-hidden transition-all duration-300 border-2 border-emerald-950 ${
+                    isOpen 
+                      ? 'bg-white [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]' 
+                      : 'bg-emerald-900'
+                  }`}
                 >
                   <button
                     type="button"
                     onClick={() => setOpenFaqId(isOpen ? null : item.id)}
-                    className="w-full py-4 flex items-center justify-between text-left gap-4 hover:text-neutral-900 group cursor-pointer"
+                    className="w-full px-5 py-4 flex items-center justify-between text-left gap-4 group cursor-pointer relative bg-emerald-800"
                   >
-                    <span className={`text-xs tracking-wide transition-colors ${isOpen ? 'font-bold text-neutral-950' : 'font-semibold text-neutral-800'}`}>
+                    <span className="text-xs tracking-wide font-semibold text-white selection:bg-amber-400">
                       {item.question}
                     </span>
-                    <span className="text-neutral-400 group-hover:text-neutral-600 transition-colors text-sm font-mono shrink-0 select-none">
+                    
+                    <span className={`w-5 h-5 rounded-full font-bold flex items-center justify-center shrink-0 select-none text-xs font-mono transition-all duration-200 ${
+                      isOpen 
+                        ? 'bg-amber-400 text-emerald-900' 
+                        : 'bg-amber-400/15 text-amber-400/80 group-hover:text-amber-400'
+                    }`}>
                       {isOpen ? '−' : '+'}
                     </span>
                   </button>
@@ -132,9 +165,9 @@ export default function FaqSection() {
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
                         transition={{ duration: 0.2, ease: "easeInOut" }}
-                        className="overflow-hidden"
+                        className="bg-white"
                       >
-                        <p className="text-xs text-neutral-500 text-justify pb-4 pr-6 font-normal leading-relaxed">
+                        <p className={`${inter.className} text-xs text-neutral-700 text-justify px-5 pt-5 pb-5 pr-8 font-normal leading-relaxed`}>
                           {item.answer}
                         </p>
                       </motion.div>
@@ -143,25 +176,27 @@ export default function FaqSection() {
                 </div>
               );
             })}
+          </div>
+        </div> 
 
-            {/* Support Box Link Footer Block */}
-            <div className="pt-8">
-              <div className="bg-neutral-50/60 border border-neutral-100 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
-                  <h4 className="text-xs font-bold text-neutral-900 tracking-wide">Still have questions?</h4>
-                  <p className="text-[11px] text-neutral-400 mt-1 font-normal">Please connect with our system support team, we're happy to help!</p>
-                </div>
-                <Link
-                  href="mailto:support@spup.edu.ph"
-                  className="inline-flex items-center justify-center bg-white border border-neutral-200 text-neutral-800 hover:bg-neutral-50 text-[11px] font-bold px-4 py-2.5 rounded-xl shadow-2xs transition-colors shrink-0 text-center"
-                >
-                  Contact support
-                </Link>
-              </div>
+        {/* Contact Support */}
+        <div className="pt-8 w-full">
+          <div className="bg-neutral-50/60 border border-neutral-200/60 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h4 className="text-xs font-bold text-neutral-900 tracking-wide">Still have questions?</h4>
+              <p className={`${inter.className} text-[11px] text-neutral-400 mt-1 font-normal`}>
+                Please connect with our system support team, we're happy to help!
+              </p>
             </div>
-
+            <Link
+              href="mailto:support@spup.edu.ph"
+              className="inline-flex items-center justify-center bg-white border border-neutral-200 text-neutral-800 hover:bg-neutral-50 text-[11px] font-bold px-4 py-2.5 rounded-xl shadow-2xs transition-colors shrink-0 text-center"
+            >
+              Contact support
+            </Link>
           </div>
         </div>
+
       </div>
     </section>
   );
