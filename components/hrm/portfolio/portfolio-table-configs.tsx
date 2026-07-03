@@ -1,15 +1,22 @@
+import * as React from "react"
 import type { components } from "@/lib/api"
 import {
   AttachmentCell,
   formatDate,
+  PortfolioTable,
   type PortfolioTableColumn,
 } from "@/components/hrm/portfolio/portfolio-table"
 import { EducationCredentialsCell } from "@/components/hrm/portfolio/education-credentials-cell"
+import { EducationalBackgroundAddDialog } from "@/components/hrm/portfolio/modals/educational-background-add-dialog"
 
 export type PortfolioTableConfig<TRow> = {
   endpoint: (profileId: number | string) => string
   loadingLabel: string
   columns: PortfolioTableColumn<TRow>[]
+  renderAddButton?: (args: {
+    profileId: number | string
+    onCreated: () => void
+  }) => React.ReactNode
 }
 
 type EducationalBackground = components["schemas"]["EducationalBackgroundResponse"]
@@ -36,6 +43,9 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
       ),
     },
   ],
+  renderAddButton: ({ profileId, onCreated }) => (
+    <EducationalBackgroundAddDialog profileId={profileId} onCreated={onCreated} />
+  ),
 }
 
 const workExperience: PortfolioTableConfig<WorkExperience> = {
@@ -118,13 +128,37 @@ const awardsRecognition: PortfolioTableConfig<AwardRecognition> = {
   ],
 }
 
-export const PORTFOLIO_TABLE_CONFIGS: Record<string, PortfolioTableConfig<any>> = {
-  "educational-background": educationalBackground,
-  "work-experience": workExperience,
-  "national-certification": nationalCertification,
-  "organization-affiliation": organizationAffiliation,
-  "professional-engagement": professionalEngagement,
-  "research-creative-work": researchEngagement,
-  "community-parish-involvement": communityInvolvement,
-  "awards-recognition": awardsRecognition,
+type PortfolioTableRenderer = (
+  profileId: number | string,
+  headerActionsEl: HTMLElement | null,
+) => React.ReactNode
+
+// TRow is captured here, at the one place it's still concrete — the returned
+// renderer is a plain function with no generic left to erase into `any`.
+function makeRenderer<TRow extends { id: number | string }>(
+  config: PortfolioTableConfig<TRow>,
+): PortfolioTableRenderer {
+  return (profileId, headerActionsEl) => (
+    <PortfolioTable<TRow>
+      profileId={profileId}
+      headerActionsEl={headerActionsEl}
+      endpoint={config.endpoint(profileId)}
+      loadingLabel={config.loadingLabel}
+      columns={config.columns}
+      renderAddButton={config.renderAddButton}
+    />
+  )
 }
+
+export const PORTFOLIO_TABLE_RENDERERS = {
+  "educational-background": makeRenderer(educationalBackground),
+  "work-experience": makeRenderer(workExperience),
+  "national-certification": makeRenderer(nationalCertification),
+  "organization-affiliation": makeRenderer(organizationAffiliation),
+  "professional-engagement": makeRenderer(professionalEngagement),
+  "research-creative-work": makeRenderer(researchEngagement),
+  "community-parish-involvement": makeRenderer(communityInvolvement),
+  "awards-recognition": makeRenderer(awardsRecognition),
+}
+
+export type PortfolioSectionId = keyof typeof PORTFOLIO_TABLE_RENDERERS

@@ -13,8 +13,14 @@ import { Badge } from "@/components/ui/badge"
 import type { components } from "@/lib/api"
 import portfolioSections from "@/app/hrm/portfolio/data.json"
 import { PortfolioSectionNav } from "@/components/hrm/portfolio/portfolio-section-nav"
-import { PortfolioTable } from "@/components/hrm/portfolio/portfolio-table"
-import { PORTFOLIO_TABLE_CONFIGS } from "@/components/hrm/portfolio/portfolio-table-configs"
+import {
+  PORTFOLIO_TABLE_RENDERERS,
+  type PortfolioSectionId,
+} from "@/components/hrm/portfolio/portfolio-table-configs"
+
+function isPortfolioSectionId(id: string): id is PortfolioSectionId {
+  return id in PORTFOLIO_TABLE_RENDERERS
+}
 
 type ProfileFields = {
   label: string
@@ -29,7 +35,9 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
   const [activeSectionId, setActiveSectionId] = React.useState(portfolioSections[0].id)
   const [headerActionsEl, setHeaderActionsEl] = React.useState<HTMLDivElement | null>(null)
   const activeSection = portfolioSections.find((section) => section.id === activeSectionId) ?? portfolioSections[0]
-  const activeTableConfig = PORTFOLIO_TABLE_CONFIGS[activeSectionId]
+  const activeTableRenderer = isPortfolioSectionId(activeSectionId)
+    ? PORTFOLIO_TABLE_RENDERERS[activeSectionId]
+    : undefined
 
   React.useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("section")
@@ -127,15 +135,7 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
           </CardHeader>
 
           <CardContent className="p-0">
-            {activeTableConfig && (
-              <PortfolioTable
-                profileId={profile.id}
-                headerActionsEl={headerActionsEl}
-                endpoint={activeTableConfig.endpoint(profile.id)}
-                loadingLabel={activeTableConfig.loadingLabel}
-                columns={activeTableConfig.columns}
-              />
-            )}
+            {activeTableRenderer?.(profile.id, headerActionsEl)}
           </CardContent>
         </Card>
       </div>
