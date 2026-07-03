@@ -3,10 +3,11 @@
 import React from 'react';
 import { Search, FileText, User, UserCheck, HelpCircle } from 'lucide-react';
 
+// Temporary data for application requirements
 const applicationRequirements = [
   {
     title: "Resume",
-    description: "An updated, one-page summary of your professional milestones, technical expertise, and employment background.",
+    description: "An updated summary of your professional milestones, technical expertise, and employment background.",
     status: "Required",
     statusColor: "bg-red-800 text-white border-red-800",
     tooltip: "Insert additional information here."
@@ -33,7 +34,14 @@ const applicationRequirements = [
     tooltip: "Insert additional information here."
   },
   {
-    title: "PRC License",
+    title: "Valid ID",
+    description: "A clear, scanned copy of any valid government-issued identification card to verify your identity.",
+    status: "Required",
+    statusColor: "bg-red-800 text-white border-red-800",
+    tooltip: "E.g., List of valid IDs: Insert them here."
+  },
+  {
+    title: "PRC ID",
     description: "Valid Professional Regulation Commission identification card for board-regulated professions.",
     status: "If Applicable",
     statusColor: "bg-neutral-100 text-neutral-800 border-neutral-300",
