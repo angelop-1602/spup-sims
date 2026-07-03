@@ -17,6 +17,7 @@ import JobCard from '@/components/hrm/careers/JobCard';
 import JobDetailsModal from '@/components/hrm/careers/JobDetailsModal';
 import ProcessTimeline from '@/components/hrm/careers/ApplicationProcess';
 import FaqSection from '@/components/hrm/careers/Faq';
+import JobBoardCTA from '@/components/hrm/careers/Cta';
 
 export default function HrmPage() {
   const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile'>('explore');
@@ -301,6 +302,7 @@ export default function HrmPage() {
         {/* Modular Feature Sections */}
         <ProcessTimeline />
         <FaqSection />
+        <JobBoardCTA />
 
       </main>
 
