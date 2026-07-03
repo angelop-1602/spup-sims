@@ -4,34 +4,70 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 
-const faqItems = [
-  {
-    id: 'q1',
-    question: 'How do I get started with my application tracking?',
-    answer: 'Browse available job openings on the Home dashboard, locate a position that aligns with your educational background, and select "View Details" to initiate your onboarding profile submission.'
-  },
-  {
-    id: 'q2',
-    question: 'Are there training resources available for new system users?',
-    answer: 'Absolutely! We provide complete technical walk-through documentation, user guides, and interactive support run-through channels to bring incoming academic faculty and administrative personnel quickly up to operational speed.'
-  },
-  {
-    id: 'q3',
-    question: 'What file formats are recognized by the screening engines?',
-    answer: 'All formal digital dossiers, including Application Letters, CVs, and official Transcript of Records payloads must be submitted in a unified PDF configuration under 5MB.'
-  },
-  {
-    id: 'q4',
-    question: 'Are my credentials and reference indices secure?',
-    answer: 'Yes, absolutely. Profile metrics and data points reside encrypted within a secure server registry layout adhering closely to native data protection policies.'
-  }
-];
+const faqData: Record<string, { id: string; question: string; answer: string }[]> = {
+  'General': [
+    {
+      id: 'g1',
+      question: 'How do I get started with my application?',
+      answer: 'Begin by reviewing the available positions in the "Featured Job Openings" section on our homepage. Once you find a role that aligns with your background, click "View Details" to start your application.'
+    },
+    {
+      id: 'g2',
+      question: 'What file formats are accepted for document uploads?',
+      answer: 'All required documents must be scanned and uploaded in PDF format. Please ensure that each individual file size does not exceed 5MB.'
+    },
+    {
+      id: 'g3',
+      question: 'Is my personal information safe?',
+      answer: 'Data privacy is a matter of paramount importance to us. In strict compliance with the Data Privacy Act of 2012 (R.A. 10173), all profile details and uploaded documents are securely processed to guarantee the absolute confidentiality and protection of your personal data.'
+    }
+  ],
+  'Requirements': [
+    {
+      id: 'r1',
+      question: 'What should I do if I do not have a PRC license or COE yet?',
+      answer: 'These documents are only mandatory if they apply directly to your specific profession, such as board-regulated academic disciplines. If they are not required for your role or are currently being processed, you may leave those fields blank for the time being.'
+    },
+    {
+      id: 'r2',
+      question: 'Can I initially submit an unofficial Transcript of Records (TOR)?',
+      answer: 'A clear copy of your temporary or unofficial transcript is acceptable for the initial screening phase. However, should your application advance further in the selection process, you will be required to provide an official, certified true copy.'
+    }
+  ],
+  'Application Process': [
+    {
+      id: 'p1',
+      question: 'How long does the initial screening process usually take?',
+      answer: 'The Human Resource Management Office typically reviews submissions within 14 calendar days. We appreciate your patience during this period, and you are welcome to monitor your application status directly through this portal.'
+    },
+    {
+      id: 'p2',
+      question: 'What are the next steps if my profile passes the initial HR evaluation?',
+      answer: 'If your credentials satisfy the core requirements of the position, our HR team will contact you directly to arrange an official interview with the respective departmental evaluation committee.'
+    }
+  ],
+  'System Support': [
+    {
+      id: 's1',
+      question: 'Who should I contact if I experience technical difficulties?',
+      answer: 'If you encounter any technical glitches or document upload errors, please send an email describing the issue to support@spup.edu.ph. Our system support team will assist you as promptly as possible.'
+    }
+  ]
+};
 
 export default function FaqSection() {
+  const [activeTab, setActiveTab] = useState<string>('General');
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
 
+  const currentFaqs = faqData[activeTab] || [];
+
+  const handleTabChange = (tabName: string) => {
+    setActiveTab(tabName);
+    setOpenFaqId(null); 
+  };
+
   return (
-    <section className="bg-white p-6 md:p-10 shadow-xs mt-0 w-full">
+    <section className="bg-white p-6 md:p-10 mt-0 w-full">
       <div className="max-w-5xl mx-auto">
         <div className="mb-10 text-center"> 
           <h2 className="text-2xl text-left uppercase font-extrabold text-neutral-900 tracking-tight">
@@ -45,22 +81,28 @@ export default function FaqSection() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           {/* Sidebar */}
           <div className="md:col-span-3 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible gap-1 pb-2 md:pb-0 border-b md:border-b-0 border-neutral-100">
-            {['General', 'Requirements', 'Application Process', 'System Support'].map((cat, idx) => (
-              <button
-                key={idx}
-                type="button"
-                className={`text-xs font-semibold px-4 py-2.5 rounded-xl text-left whitespace-nowrap transition-all duration-200 shrink-0 ${
-                  idx === 0 ? 'bg-neutral-100 text-neutral-900 font-bold' : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {Object.keys(faqData).map((cat) => {
+              const isActive = activeTab === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => handleTabChange(cat)}
+                  className={`text-xs font-semibold px-4 py-2.5 rounded-xl text-left whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer ${
+                    isActive 
+                      ? 'bg-neutral-100 text-neutral-900 font-bold' 
+                      : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
+                  }`}
+                >
+                  {cat}
+                </button>
+              );
+            })}
           </div>
 
           {/* Accordion Column */}
           <div className="md:col-span-9 space-y-0.5 border-t border-neutral-100 md:border-t-0">
-            {faqItems.map((item) => {
+            {currentFaqs.map((item) => {
               const isOpen = openFaqId === item.id;
               
               return (
@@ -100,7 +142,7 @@ export default function FaqSection() {
               );
             })}
 
-            {/* Support Callout Box */}
+            {/* Contact Support */}
             <div className="pt-8">
               <div className="bg-neutral-50/60 border border-neutral-100 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
