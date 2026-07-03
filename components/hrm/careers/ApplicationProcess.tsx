@@ -58,8 +58,10 @@ const applicationRequirements = [
 
 export default function ProcessTimeline() {
   return (
-    <section className="bg-white border border-neutral-200 p-6 md:p-10 shadow-xs w-full rounded-none">
-      <div className="max-w-5xl mx-auto">
+    <section className="bg-white border-t border-neutral-200 pt-12 pb-0 w-full rounded-none">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Application Process Title Block */}
         <div className="mb-12 text-left">
           <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
             Our Application Process
@@ -69,8 +71,8 @@ export default function ProcessTimeline() {
           </p>
         </div>
 
-        {/* Application Process Steps */}
-        <div className="relative w-full mb-12">
+        {/* Application Process Steps Timeline */}
+        <div className="relative w-full mb-16">
           <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-neutral-200 z-0" />
           
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
@@ -89,7 +91,7 @@ export default function ProcessTimeline() {
                 <FileText className="w-5 h-5" />
               </div>
               <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">Submit Application</h3>
-              <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">Upload your digital curriculum vitae and complete the application profile.</p>
+              <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">Upload your digital resume and complete the application profile.</p>
             </div>
 
             <div className="flex flex-col items-center text-center">
@@ -111,10 +113,12 @@ export default function ProcessTimeline() {
             </div>
           </div>
         </div>
+      </div>
 
-        <hr className="my-12 border-neutral-200" />
+      <hr className="w-full my-12 border-neutral-200" />
 
-        {/* Requirements Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Requirements Title Block */}
         <div className="mb-8 text-left">
           <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
             Application Requirements
@@ -124,10 +128,10 @@ export default function ProcessTimeline() {
           </p>
         </div>
 
-        {/* Requirements Cards Grid with Tooltips */}
+        {/* Requirements Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {applicationRequirements.map((req, index) => (
-            <div key={index} className="p-5 bg-white border border-neutral-200 rounded-xl shadow-2xs flex flex-col justify-between group relative">
+            <div key={index} className="p-5 bg-white border border-neutral-200 rounded-xl flex flex-col justify-between group relative">
               <div>
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">

@@ -67,19 +67,21 @@ export default function FaqSection() {
   };
 
   return (
-    <section className="bg-white p-6 md:p-10 mt-0 w-full">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-10 text-center"> 
-          <h2 className="text-2xl text-left uppercase font-extrabold text-neutral-900 tracking-tight">
+    <section className="bg-white pt-12 pb-0 w-full rounded-none">
+      <hr className="w-full mb-12 border-neutral-200" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-left"> 
+          <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
             Frequently Asked Questions
           </h2>
-          <p className="text-xs text-left text-neutral-500 mt-1">
+          <p className="text-xs text-neutral-500 mt-1">
             We compiled a list of answers to address your most pressing questions regarding our pathways and application mechanics.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          {/* Sidebar */}
+          {/* Sidebar Tabs */}
           <div className="md:col-span-3 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible gap-1 pb-2 md:pb-0 border-b md:border-b-0 border-neutral-100">
             {Object.keys(faqData).map((cat) => {
               const isActive = activeTab === cat;
@@ -100,7 +102,7 @@ export default function FaqSection() {
             })}
           </div>
 
-          {/* Accordion Column */}
+          {/* Accordion Content Stack */}
           <div className="md:col-span-9 space-y-0.5 border-t border-neutral-100 md:border-t-0">
             {currentFaqs.map((item) => {
               const isOpen = openFaqId === item.id;
@@ -142,7 +144,7 @@ export default function FaqSection() {
               );
             })}
 
-            {/* Contact Support */}
+            {/* Support Box Link Footer Block */}
             <div className="pt-8">
               <div className="bg-neutral-50/60 border border-neutral-100 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -157,6 +159,7 @@ export default function FaqSection() {
                 </Link>
               </div>
             </div>
+
           </div>
         </div>
       </div>
