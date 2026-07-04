@@ -263,15 +263,15 @@ export default function HrmPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.35 }}
-              className="relative w-full h-[400px] md:h-[480px] overflow-hidden shadow-xs flex items-center bg-neutral-900 bg-cover bg-center bg-no-repeat mb-8"
+              className="relative w-full h-[460px] md:h-[480px] overflow-hidden shadow-xs flex items-center bg-neutral-900 bg-cover bg-center bg-no-repeat mb-8"
               style={{ backgroundImage: "url('/img/bg-auth.png')", backgroundPosition: 'center center' }} 
             >
               <div className="absolute inset-0 bg-neutral-950/40 z-0 pointer-events-none" />
 
               <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="w-full max-w-lg bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-10 border-2 border-emerald-900 shadow-xl flex flex-col space-y-5 [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
+                <div className="w-full max-w-xl bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-10 border-2 border-emerald-900 shadow-xl flex flex-col space-y-5 [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
                   <div className="space-y-3">
-                    <h1 className={`${instrumentSerif.className} text-xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight lg:whitespace-nowrap [-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
+                    <h1 className={`${instrumentSerif.className} text-4xl sm:text-5xl lg:text-6xl font-normal text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] md:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
                       Build Your Career with SPUP
                     </h1>
                     <p className={`${inter.className} text-sm text-neutral-600 text-justify font-normal leading-relaxed`}>
@@ -302,7 +302,7 @@ export default function HrmPage() {
             {/* Featured Jobs Header*/}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
-                <h2 className={`${instrumentSerif.className} text-xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight lg:whitespace-nowrap [-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
+                <h2 className={`${instrumentSerif.className} text-3xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] sm:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
                   Featured Job Openings
                 </h2>
               <p className={`${inter.className} text-sm text-neutral-500 mt-1`}>
