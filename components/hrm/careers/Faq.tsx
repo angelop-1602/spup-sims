@@ -79,7 +79,7 @@ export default function FaqSection() {
   };
 
   return (
-    <section className="bg-white pt-12 pb-0 w-full rounded-none">
+    <section id="faqs" className="bg-white pt-12 pb-0 w-full rounded-none">
       <hr className="w-full mb-12 border-neutral-200" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
