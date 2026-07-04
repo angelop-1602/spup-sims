@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { request, useAuthorizedHeaders, type components } from "@/lib/api"
+import { useApiMutation, type components } from "@/lib/api"
 import { readFileAsDataUrl } from "@/lib/utils"
 
 type CommunityInvolvementForm = components["schemas"]["CommunityInvolvementRequest"]
@@ -34,8 +34,7 @@ export function CommunityInvolvementAddDialog({
 }) {
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState<CommunityInvolvementForm>(EMPTY_FORM)
-  const { headers } = useAuthorizedHeaders()
-  const [loading, setLoading] = React.useState(false)
+  const { mutate, loading } = useApiMutation()
   const [error, setError] = React.useState<Error | null>(null)
 
   // Dismissing via outside-click/Escape keeps the draft so reopening later
@@ -48,24 +47,22 @@ export function CommunityInvolvementAddDialog({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setLoading(true)
     setError(null)
 
-    try {
-      await request(
-        `/api/v1/hrms/profiles/${profileId}/community-involvements`,
-        headers,
-        { method: "POST", body: form },
-      )
+    const success = await mutate({
+      path: `/api/v1/hrms/profiles/${profileId}/community-involvements`,
+      method: "POST",
+      body: form,
+    })
 
-      onCreated()
-      setForm(EMPTY_FORM)
-      setOpen(false)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error(String(err)))
-    } finally {
-      setLoading(false)
+    if (!success) {
+      setError(new Error("Unable to create community involvement"))
+      return
     }
+
+    onCreated()
+    setForm(EMPTY_FORM)
+    setOpen(false)
   }
 
   return (

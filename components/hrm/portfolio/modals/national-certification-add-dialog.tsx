@@ -13,7 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { request, useAuthorizedHeaders, type components } from "@/lib/api"
+import { useApiMutation, type components } from "@/lib/api"
 import { readFileAsDataUrl } from "@/lib/utils"
 
 type NationalBoardForm = components["schemas"]["NationalBoardRequest"]
@@ -36,8 +36,7 @@ export function NationalCertificationAddDialog({
 }) {
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState<NationalBoardForm>(EMPTY_FORM)
-  const { headers } = useAuthorizedHeaders()
-  const [loading, setLoading] = React.useState(false)
+  const { mutate, loading } = useApiMutation()
   const [error, setError] = React.useState<Error | null>(null)
 
   // Dismissing via outside-click/Escape keeps the draft so reopening later
@@ -50,24 +49,22 @@ export function NationalCertificationAddDialog({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setLoading(true)
     setError(null)
 
-    try {
-      await request(
-        `/api/v1/hrms/profiles/${profileId}/national-boards`,
-        headers,
-        { method: "POST", body: form },
-      )
+    const success = await mutate({
+      path: `/api/v1/hrms/profiles/${profileId}/national-boards`,
+      method: "POST",
+      body: form,
+    })
 
-      onCreated()
-      setForm(EMPTY_FORM)
-      setOpen(false)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error(String(err)))
-    } finally {
-      setLoading(false)
+    if (!success) {
+      setError(new Error("Unable to create national certification"))
+      return
     }
+
+    onCreated()
+    setForm(EMPTY_FORM)
+    setOpen(false)
   }
 
   return (

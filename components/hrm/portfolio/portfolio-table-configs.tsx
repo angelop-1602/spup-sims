@@ -10,12 +10,19 @@ import { EducationCredentialsCell } from "@/components/hrm/portfolio/education-c
 import { EducationalBackgroundAddDialog } from "@/components/hrm/portfolio/modals/educational-background-add-dialog"
 import { EducationalBackgroundRowActions } from "@/components/hrm/portfolio/modals/educational-background-row-actions"
 import { WorkExperienceAddDialog } from "@/components/hrm/portfolio/modals/work-experience-add-dialog"
+import { WorkExperienceRowActions } from "@/components/hrm/portfolio/modals/work-experience-row-actions"
 import { NationalCertificationAddDialog } from "@/components/hrm/portfolio/modals/national-certification-add-dialog"
+import { NationalCertificationRowActions } from "@/components/hrm/portfolio/modals/national-certification-row-actions"
 import { OrganizationAffiliationAddDialog } from "@/components/hrm/portfolio/modals/organization-affiliation-add-dialog"
+import { OrganizationAffiliationRowActions } from "@/components/hrm/portfolio/modals/organization-affiliation-row-actions"
 import { ProfessionalEngagementAddDialog } from "@/components/hrm/portfolio/modals/professional-engagement-add-dialog"
+import { ProfessionalEngagementRowActions } from "@/components/hrm/portfolio/modals/professional-engagement-row-actions"
 import { ResearchEngagementAddDialog } from "@/components/hrm/portfolio/modals/research-engagement-add-dialog"
+import { ResearchEngagementRowActions } from "@/components/hrm/portfolio/modals/research-engagement-row-actions"
 import { CommunityInvolvementAddDialog } from "@/components/hrm/portfolio/modals/community-involvement-add-dialog"
+import { CommunityInvolvementRowActions } from "@/components/hrm/portfolio/modals/community-involvement-row-actions"
 import { AwardRecognitionAddDialog } from "@/components/hrm/portfolio/modals/award-recognition-add-dialog"
+import { AwardRecognitionRowActions } from "@/components/hrm/portfolio/modals/award-recognition-row-actions"
 
 export type PortfolioTableConfig<TRow> = {
   endpoint: (profileId: number | string) => string
@@ -71,6 +78,12 @@ const workExperience: PortfolioTableConfig<WorkExperience> = {
     { header: "From", render: (row) => formatDate(row.startDate) },
     { header: "To", render: (row) => formatDate(row.endDate) },
     { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Actions",
+      render: (row, profileId, refresh) => (
+        <WorkExperienceRowActions profileId={profileId} row={row} onChanged={refresh} />
+      ),
+    },
   ],
   renderAddButton: ({ profileId, onCreated }) => (
     <WorkExperienceAddDialog profileId={profileId} onCreated={onCreated} />
@@ -86,6 +99,12 @@ const nationalCertification: PortfolioTableConfig<NationalBoard> = {
     { header: "Rating", render: (row) => row.rating ?? "—" },
     { header: "Validity", render: (row) => formatDate(row.validity) },
     { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Actions",
+      render: (row, profileId, refresh) => (
+        <NationalCertificationRowActions profileId={profileId} row={row} onChanged={refresh} />
+      ),
+    },
   ],
   renderAddButton: ({ profileId, onCreated }) => (
     <NationalCertificationAddDialog profileId={profileId} onCreated={onCreated} />
@@ -100,6 +119,12 @@ const organizationAffiliation: PortfolioTableConfig<ProfessionalOrganization> = 
     { header: "Membership", render: (row) => row.membership },
     { header: "Remarks", render: (row) => row.remarks ?? "—" },
     { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Actions",
+      render: (row, profileId, refresh) => (
+        <OrganizationAffiliationRowActions profileId={profileId} row={row} onChanged={refresh} />
+      ),
+    },
   ],
   renderAddButton: ({ profileId, onCreated }) => (
     <OrganizationAffiliationAddDialog profileId={profileId} onCreated={onCreated} />
@@ -114,6 +139,12 @@ const professionalEngagement: PortfolioTableConfig<ProfessionalEngagement> = {
     { header: "Engagement Name", render: (row) => row.engagementName },
     { header: "Remarks", render: (row) => row.remarks ?? "—" },
     { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Actions",
+      render: (row, profileId, refresh) => (
+        <ProfessionalEngagementRowActions profileId={profileId} row={row} onChanged={refresh} />
+      ),
+    },
   ],
   renderAddButton: ({ profileId, onCreated }) => (
     <ProfessionalEngagementAddDialog profileId={profileId} onCreated={onCreated} />
@@ -129,6 +160,12 @@ const researchEngagement: PortfolioTableConfig<ResearchEngagement> = {
     { header: "Nature of Utilization", render: (row) => row.natureUtilization ?? "—" },
     { header: "Date Published", render: (row) => formatDate(row.datePublished) },
     { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Actions",
+      render: (row, profileId, refresh) => (
+        <ResearchEngagementRowActions profileId={profileId} row={row} onChanged={refresh} />
+      ),
+    },
   ],
   renderAddButton: ({ profileId, onCreated }) => (
     <ResearchEngagementAddDialog profileId={profileId} onCreated={onCreated} />
@@ -143,6 +180,12 @@ const communityInvolvement: PortfolioTableConfig<CommunityInvolvement> = {
     { header: "Nature of Involvement", render: (row) => row.natureInvolvement },
     { header: "Date of Activity", render: (row) => formatDate(row.dateActivity) },
     { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Actions",
+      render: (row, profileId, refresh) => (
+        <CommunityInvolvementRowActions profileId={profileId} row={row} onChanged={refresh} />
+      ),
+    },
   ],
   renderAddButton: ({ profileId, onCreated }) => (
     <CommunityInvolvementAddDialog profileId={profileId} onCreated={onCreated} />
@@ -157,6 +200,12 @@ const awardsRecognition: PortfolioTableConfig<AwardRecognition> = {
     { header: "Nature of Award", render: (row) => row.natureAward },
     { header: "Date Received", render: (row) => formatDate(row.dateReceived) },
     { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Actions",
+      render: (row, profileId, refresh) => (
+        <AwardRecognitionRowActions profileId={profileId} row={row} onChanged={refresh} />
+      ),
+    },
   ],
   renderAddButton: ({ profileId, onCreated }) => (
     <AwardRecognitionAddDialog profileId={profileId} onCreated={onCreated} />

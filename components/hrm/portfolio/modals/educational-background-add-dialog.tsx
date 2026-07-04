@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
+import { readFileAsDataUrl } from "@/lib/utils"
 
 type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"]
 type EducationCredentialForm = components["schemas"]["EducationCredentialRequest"]
@@ -29,15 +30,6 @@ const EMPTY_FORM: EducationalBackgroundForm = {
 const EMPTY_CREDENTIALS = {
   diploma: "",
   transcriptOfRecords: "",
-}
-
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
 }
 
 export function EducationalBackgroundAddDialog({
