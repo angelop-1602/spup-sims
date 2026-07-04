@@ -15,7 +15,6 @@ const inter = Inter({
   weight: ['400', '500'],
 });
 
-
 // Temporary data for application requirements
 const applicationRequirements = [
   {
