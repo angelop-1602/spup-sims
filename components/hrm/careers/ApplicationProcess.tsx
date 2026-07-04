@@ -2,6 +2,19 @@
 
 import React from 'react';
 import { Search, FileText, User, UserCheck, HelpCircle } from 'lucide-react';
+import { Instrument_Serif, Inter } from 'next/font/google';
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+});
+
 
 // Temporary data for application requirements
 const applicationRequirements = [
@@ -120,50 +133,55 @@ export default function ProcessTimeline() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Requirements Title Block */}
         <div className="mb-8 text-left">
-          <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
+          <h2 className={`${instrumentSerif.className} text-xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight lg:whitespace-nowrap [-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
             Application Requirements
           </h2>
-          <p className="text-xs text-neutral-500 mt-1">
-            Please prepare the following valid credentials and documentation payloads for your dossier submission.
+          <p className={`${inter.className} text-sm text-neutral-500 mt-1`}>
+            Please prepare the following valid credentials and documentation for your submission.
           </p>
         </div>
 
         {/* Requirements Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {applicationRequirements.map((req, index) => (
-            <div key={index} className="p-5 bg-white border border-neutral-200 rounded-xl flex flex-col justify-between group relative">
-              <div>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    <FileText className="w-4 h-4 text-neutral-900 shrink-0" />
-                    <span>{req.title}</span>
-                  </div>
-                  
-                  {/* Tooltip Target Icon */}
-                  <div className="relative flex items-center justify-center">
-                    <button type="button" className="text-neutral-400 hover:text-neutral-600 transition-colors cursor-help">
-                      <HelpCircle className="w-3.5 h-3.5" />
-                    </button>
-                    
-                    {/* Hover Tooltip Popup */}
-                    <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-neutral-900 text-white text-[10px] rounded-lg shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-30 text-center leading-normal font-normal">
-                      {req.tooltip}
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900" />
-                    </div>
-                  </div>
-                </div>
-                
-                <p className="text-xs text-neutral-500 mt-2 leading-relaxed font-normal">
-                  {req.description}
-                </p>
+        {applicationRequirements.map((req, index) => (
+          <div 
+            key={index} 
+            className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-visible [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]"
+          >
+            <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
+                <FileText className="w-4 h-4 text-white shrink-0" />
+                <span>{req.title}</span>
               </div>
               
+              {/* Tooltip Target Icon */}
+              <div className="relative flex items-center justify-center">
+                <button type="button" className="text-amber-300/80 hover:text-white transition-colors cursor-help">
+                  <HelpCircle className="w-3.5 h-3.5" />
+                </button>
+                
+                {/* Hover Tooltip Popup*/}
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-neutral-900 text-white text-[10px] rounded-lg shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 z-50 text-center leading-normal font-normal normal-case tracking-normal">
+                  {req.tooltip}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-neutral-900" />
+                </div>
+              </div>
+            </div>
+            
+            {/* White Content Block */}
+            <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px]">
+              <p className="text-xs text-neutral-600 leading-normal font-normal text-justify">
+                {req.description}
+              </p>
+              
+              {/* Status Area */}
               <div className="mt-5 flex items-center">
-                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${req.statusColor}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border-2 ${req.statusColor}`}>
                   {req.status}
                 </span>
               </div>
             </div>
+          </div>
           ))}
         </div>
       </div>
