@@ -219,10 +219,7 @@ export default function ApplicantsPage() {
               <tbody>
                 {applicants.map((applicant) => {
                   const v = applicant.values
-                  const matchingProfile = profiles.find((p) => String(p.id) === String(v.ProfileId))
-                  const fullName = matchingProfile
-                    ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`
-                    : "No linked profile"
+                  const fullName = "—"  // Profile names not loaded in this view
 
                   return (
                     <tr
@@ -286,8 +283,8 @@ export default function ApplicantsPage() {
             </button>
             <button
               type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
+              onClick={() => setPage((p) => Math.min(Number(totalPages), p + 1))}
+              disabled={page >= Number(totalPages)}
               className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
             >
               Next
