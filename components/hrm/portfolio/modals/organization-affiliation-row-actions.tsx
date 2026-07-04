@@ -25,17 +25,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
 
 type ProfessionalOrganization = components["schemas"]["ProfessionalOrganizationResponse"]
-type ProfessionalOrganizationForm = components["schemas"]["ProfessionalOrganizationRequest"]
+type ProfessionalOrganizationForm = Omit<components["schemas"]["ProfessionalOrganizationRequest"], "attachment">
 
 function toForm(row: ProfessionalOrganization): ProfessionalOrganizationForm {
   return {
     affiliation: row.affiliation,
     membership: row.membership,
     remarks: row.remarks,
-    attachment: row.attachment,
   }
 }
 
@@ -50,6 +48,7 @@ export function OrganizationAffiliationRowActions({
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [form, setForm] = React.useState<ProfessionalOrganizationForm>(() => toForm(row))
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
   const [error, setError] = React.useState<Error | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
@@ -57,6 +56,7 @@ export function OrganizationAffiliationRowActions({
   const handleEditOpenChange = (open: boolean) => {
     if (open) {
       setForm(toForm(row))
+      setAttachmentFile(null)
       setError(null)
     }
     setEditOpen(open)
@@ -75,6 +75,21 @@ export function OrganizationAffiliationRowActions({
     if (!success) {
       setError(new Error("Unable to update organization affiliation"))
       return
+    }
+
+    if (attachmentFile) {
+      const formData = new FormData()
+      formData.append("file", attachmentFile)
+      const uploaded = await saveRow({
+        path: `/api/v1/hrms/profiles/${profileId}/professional-organizations/${row.id}/attachment`,
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploaded) {
+        setError(new Error("Unable to upload attachment"))
+        return
+      }
     }
 
     onChanged()
@@ -107,7 +122,9 @@ export function OrganizationAffiliationRowActions({
 
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium">Affiliation</label>
+              <label className="mb-2 block text-sm font-medium">
+                Affiliation <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.affiliation}
                 onChange={(event) =>
@@ -119,7 +136,9 @@ export function OrganizationAffiliationRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Membership</label>
+              <label className="mb-2 block text-sm font-medium">
+                Membership <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.membership}
                 onChange={(event) =>
@@ -143,14 +162,16 @@ export function OrganizationAffiliationRowActions({
 
             <div>
               <label className="mb-2 block text-sm font-medium">Attachment</label>
+              {row.attachment && (
+                <p className="mb-2 truncate text-sm text-muted-foreground">
+                  Current: {row.attachment.split("/").pop()}
+                </p>
+              )}
               <Input
                 type="file"
                 accept="image/*,.pdf"
-                onChange={async (event) => {
-                  const file = event.target.files?.[0]
-                  if (!file) return
-                  const dataUrl = await readFileAsDataUrl(file)
-                  setForm((current) => ({ ...current, attachment: dataUrl }))
+                onChange={(event) => {
+                  setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
               />
             </div>

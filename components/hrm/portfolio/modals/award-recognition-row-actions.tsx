@@ -25,17 +25,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
 
 type AwardRecognition = components["schemas"]["AwardRecognitionResponse"]
-type AwardRecognitionForm = components["schemas"]["AwardRecognitionRequest"]
+type AwardRecognitionForm = Omit<components["schemas"]["AwardRecognitionRequest"], "attachment">
 
 function toForm(row: AwardRecognition): AwardRecognitionForm {
   return {
     awardingBody: row.awardingBody,
     natureAward: row.natureAward,
     dateReceived: row.dateReceived,
-    attachment: row.attachment,
   }
 }
 
@@ -50,6 +48,7 @@ export function AwardRecognitionRowActions({
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [form, setForm] = React.useState<AwardRecognitionForm>(() => toForm(row))
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
   const [error, setError] = React.useState<Error | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
@@ -57,6 +56,7 @@ export function AwardRecognitionRowActions({
   const handleEditOpenChange = (open: boolean) => {
     if (open) {
       setForm(toForm(row))
+      setAttachmentFile(null)
       setError(null)
     }
     setEditOpen(open)
@@ -75,6 +75,21 @@ export function AwardRecognitionRowActions({
     if (!success) {
       setError(new Error("Unable to update award / recognition"))
       return
+    }
+
+    if (attachmentFile) {
+      const formData = new FormData()
+      formData.append("file", attachmentFile)
+      const uploaded = await saveRow({
+        path: `/api/v1/hrms/profiles/${profileId}/award-recognitions/${row.id}/attachment`,
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploaded) {
+        setError(new Error("Unable to upload attachment"))
+        return
+      }
     }
 
     onChanged()
@@ -107,7 +122,9 @@ export function AwardRecognitionRowActions({
 
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium">Awarding Body</label>
+              <label className="mb-2 block text-sm font-medium">
+                Awarding Body <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.awardingBody}
                 onChange={(event) =>
@@ -119,7 +136,9 @@ export function AwardRecognitionRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Nature of Award</label>
+              <label className="mb-2 block text-sm font-medium">
+                Nature of Award <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.natureAward}
                 onChange={(event) =>
@@ -131,7 +150,9 @@ export function AwardRecognitionRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Date Received</label>
+              <label className="mb-2 block text-sm font-medium">
+                Date Received <span className="text-destructive">*</span>
+              </label>
               <Input
                 type="date"
                 value={form.dateReceived}
@@ -144,14 +165,16 @@ export function AwardRecognitionRowActions({
 
             <div>
               <label className="mb-2 block text-sm font-medium">Attachment</label>
+              {row.attachment && (
+                <p className="mb-2 truncate text-sm text-muted-foreground">
+                  Current: {row.attachment.split("/").pop()}
+                </p>
+              )}
               <Input
                 type="file"
                 accept="image/*,.pdf"
-                onChange={async (event) => {
-                  const file = event.target.files?.[0]
-                  if (!file) return
-                  const dataUrl = await readFileAsDataUrl(file)
-                  setForm((current) => ({ ...current, attachment: dataUrl }))
+                onChange={(event) => {
+                  setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
               />
             </div>

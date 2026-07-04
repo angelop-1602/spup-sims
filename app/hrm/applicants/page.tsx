@@ -5,48 +5,27 @@ import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
 import { useApiQuery, type components } from "@/lib/api"
 
-interface ApplicantValues {
-  Id: number | string
-  ProfileId: number | string
-  ApplicationNumber: string
-  Status: string
-  CreatedAt: string
-  UpdatedAt: string | null
-  DeletedAt: string | null
-  CreatedBy: string | null
-  UpdatedBy: string | null
-  DeletedBy: string | null
-  IsDeleted: boolean
-}
-
 interface Applicant {
-  entity: string
   id: number | string
-  values: ApplicantValues
-}
-
-interface ProfileValues {
-  FirstName: string
-  LastName: string
-  [key: string]: unknown
+  profileId: number | string
+  applicationNumber: string
+  status: string
+  createdAt: string
+  updatedAt: string | null
 }
 
 interface Profile {
   id: number | string
-  values: ProfileValues
+  firstName: string
+  lastName: string
 }
 
-type PagedEntityRecords<TValues> = Omit<
-  components["schemas"]["PagedResponseOfEntityRecord"],
-  "data"
-> & {
-  data: Array<Omit<components["schemas"]["EntityRecord"], "values"> & {
-    values: TValues
-  }>
+type ApplicantsPayload = Omit<components["schemas"]["PagedResponseOfEntityRecord"], "data"> & {
+  data: Applicant[]
 }
-
-type ApplicantsPayload = PagedEntityRecords<ApplicantValues>
-type ProfilesPayload = PagedEntityRecords<ProfileValues>
+type ProfilesPayload = Omit<components["schemas"]["PagedResponseOfEntityRecord"], "data"> & {
+  data: Profile[]
+}
 
 const STATUS_STYLES: Record<string, string> = {
   Interview: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
@@ -218,8 +197,12 @@ export default function ApplicantsPage() {
               </thead>
               <tbody>
                 {applicants.map((applicant) => {
-                  const v = applicant.values
-                  const fullName = "—"  // Profile names not loaded in this view
+                  const matchingProfile = profiles.find(
+                    (p) => String(p.id) === String(applicant.profileId),
+                  )
+                  const fullName = matchingProfile
+                    ? `${matchingProfile.firstName} ${matchingProfile.lastName}`
+                    : "No linked profile"
 
                   return (
                     <tr
@@ -227,7 +210,7 @@ export default function ApplicantsPage() {
                       className="border-b last:border-0 hover:bg-muted/30"
                     >
                       <td className="px-4 py-3 font-medium">
-                        {v.ApplicationNumber}
+                        {applicant.applicationNumber}
                       </td>
                       <td className="px-4 py-3">
                         {fullName}
@@ -236,22 +219,22 @@ export default function ApplicantsPage() {
                         <span
                           className={
                             "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " +
-                            getStatusStyle(v.Status)
+                            getStatusStyle(applicant.status)
                           }
                         >
-                          {v.Status}
+                          {applicant.status}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {formatDate(v.CreatedAt)}
+                        {formatDate(applicant.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {formatDate(v.UpdatedAt)}
+                        {formatDate(applicant.updatedAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <button
                           type="button"
-                          onClick={() => router.push(`/hrm/profiles/${v.ProfileId}?status=${encodeURIComponent(v.Status)}&applicantId=${v.Id}`)}
+                          onClick={() => router.push(`/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`)}
                           className="inline-flex items-center gap-1.5 rounded-lg bg-secondary/50 px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-all hover:bg-secondary focus-visible:outline-none"
                         >
                           <Eye className="h-3.5 w-3.5 opacity-70" />

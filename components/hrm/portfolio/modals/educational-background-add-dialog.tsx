@@ -14,10 +14,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
 
 type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"]
-type EducationCredentialForm = components["schemas"]["EducationCredentialRequest"]
 
 const EMPTY_FORM: EducationalBackgroundForm = {
   educationId: null,
@@ -25,11 +23,6 @@ const EMPTY_FORM: EducationalBackgroundForm = {
   degree: "",
   institution: "",
   dateGraduated: null,
-}
-
-const EMPTY_CREDENTIALS = {
-  diploma: "",
-  transcriptOfRecords: "",
 }
 
 export function EducationalBackgroundAddDialog({
@@ -41,7 +34,7 @@ export function EducationalBackgroundAddDialog({
 }) {
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState<EducationalBackgroundForm>(EMPTY_FORM)
-  const [credentials, setCredentials] = React.useState(EMPTY_CREDENTIALS)
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
   const { headers } = useAuthorizedHeaders()
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
@@ -50,7 +43,7 @@ export function EducationalBackgroundAddDialog({
   // in this session picks up where you left off. Only Cancel discards it.
   const handleCancel = () => {
     setForm(EMPTY_FORM)
-    setCredentials(EMPTY_CREDENTIALS)
+    setAttachmentFile(null)
     setError(null)
     setOpen(false)
   }
@@ -67,21 +60,19 @@ export function EducationalBackgroundAddDialog({
         { method: "POST", body: form },
       )
 
-      const credentialBody: EducationCredentialForm = {
-        educationalBackgroundId: created.id,
-        diploma: credentials.diploma || null,
-        transcriptOfRecords: credentials.transcriptOfRecords || null,
+      if (attachmentFile) {
+        const formData = new FormData()
+        formData.append("file", attachmentFile)
+        await request(
+          `/api/v1/hrms/profiles/${profileId}/educational-backgrounds/${created.id}/attachment`,
+          headers,
+          { method: "POST", body: formData },
+        )
       }
-
-      await request(
-        `/api/v1/hrms/profiles/${profileId}/education-credentials`,
-        headers,
-        { method: "POST", body: credentialBody },
-      )
 
       onCreated()
       setForm(EMPTY_FORM)
-      setCredentials(EMPTY_CREDENTIALS)
+      setAttachmentFile(null)
       setOpen(false)
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)))
@@ -109,7 +100,9 @@ export function EducationalBackgroundAddDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">Degree Level</label>
+            <label className="mb-2 block text-sm font-medium">
+              Degree Level <span className="text-destructive">*</span>
+            </label>
             <Input
               value={form.degreeLevel}
               onChange={(event) =>
@@ -121,7 +114,9 @@ export function EducationalBackgroundAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Degree</label>
+            <label className="mb-2 block text-sm font-medium">
+              Degree <span className="text-destructive">*</span>
+            </label>
             <Input
               value={form.degree}
               onChange={(event) =>
@@ -133,7 +128,9 @@ export function EducationalBackgroundAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Institution</label>
+            <label className="mb-2 block text-sm font-medium">
+              Institution <span className="text-destructive">*</span>
+            </label>
             <Input
               value={form.institution}
               onChange={(event) =>
@@ -159,29 +156,12 @@ export function EducationalBackgroundAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Diploma</label>
+            <label className="mb-2 block text-sm font-medium">Attachment</label>
             <Input
               type="file"
               accept="image/*,.pdf"
-              onChange={async (event) => {
-                const file = event.target.files?.[0]
-                if (!file) return
-                const dataUrl = await readFileAsDataUrl(file)
-                setCredentials((current) => ({ ...current, diploma: dataUrl }))
-              }}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium">Transcript of Records</label>
-            <Input
-              type="file"
-              accept="image/*,.pdf"
-              onChange={async (event) => {
-                const file = event.target.files?.[0]
-                if (!file) return
-                const dataUrl = await readFileAsDataUrl(file)
-                setCredentials((current) => ({ ...current, transcriptOfRecords: dataUrl }))
+              onChange={(event) => {
+                setAttachmentFile(event.target.files?.[0] ?? null)
               }}
             />
           </div>

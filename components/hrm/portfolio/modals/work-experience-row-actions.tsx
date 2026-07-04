@@ -25,10 +25,9 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
 
 type WorkExperience = components["schemas"]["WorkExperienceResponse"]
-type WorkExperienceForm = components["schemas"]["WorkExperienceRequest"]
+type WorkExperienceForm = Omit<components["schemas"]["WorkExperienceRequest"], "attachment">
 
 function toForm(row: WorkExperience): WorkExperienceForm {
   return {
@@ -36,7 +35,6 @@ function toForm(row: WorkExperience): WorkExperienceForm {
     institution: row.institution,
     startDate: row.startDate,
     endDate: row.endDate,
-    attachment: row.attachment,
   }
 }
 
@@ -51,6 +49,7 @@ export function WorkExperienceRowActions({
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [form, setForm] = React.useState<WorkExperienceForm>(() => toForm(row))
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
   const [error, setError] = React.useState<Error | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
@@ -58,6 +57,7 @@ export function WorkExperienceRowActions({
   const handleEditOpenChange = (open: boolean) => {
     if (open) {
       setForm(toForm(row))
+      setAttachmentFile(null)
       setError(null)
     }
     setEditOpen(open)
@@ -76,6 +76,21 @@ export function WorkExperienceRowActions({
     if (!success) {
       setError(new Error("Unable to update work experience"))
       return
+    }
+
+    if (attachmentFile) {
+      const formData = new FormData()
+      formData.append("file", attachmentFile)
+      const uploaded = await saveRow({
+        path: `/api/v1/hrms/profiles/${profileId}/work-experiences/${row.id}/attachment`,
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploaded) {
+        setError(new Error("Unable to upload attachment"))
+        return
+      }
     }
 
     onChanged()
@@ -108,7 +123,9 @@ export function WorkExperienceRowActions({
 
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium">Job Title</label>
+              <label className="mb-2 block text-sm font-medium">
+                Job Title <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.jobTitle}
                 onChange={(event) =>
@@ -120,7 +137,9 @@ export function WorkExperienceRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Institution</label>
+              <label className="mb-2 block text-sm font-medium">
+                Institution <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.institution}
                 onChange={(event) =>
@@ -132,7 +151,9 @@ export function WorkExperienceRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Start Date</label>
+              <label className="mb-2 block text-sm font-medium">
+                Start Date <span className="text-destructive">*</span>
+              </label>
               <Input
                 type="date"
                 value={form.startDate}
@@ -159,14 +180,16 @@ export function WorkExperienceRowActions({
 
             <div>
               <label className="mb-2 block text-sm font-medium">Attachment</label>
+              {row.attachment && (
+                <p className="mb-2 truncate text-sm text-muted-foreground">
+                  Current: {row.attachment.split("/").pop()}
+                </p>
+              )}
               <Input
                 type="file"
                 accept="image/*,.pdf"
-                onChange={async (event) => {
-                  const file = event.target.files?.[0]
-                  if (!file) return
-                  const dataUrl = await readFileAsDataUrl(file)
-                  setForm((current) => ({ ...current, attachment: dataUrl }))
+                onChange={(event) => {
+                  setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
               />
             </div>

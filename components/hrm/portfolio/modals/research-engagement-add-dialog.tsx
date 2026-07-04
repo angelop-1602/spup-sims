@@ -13,17 +13,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useApiMutation, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
+import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 
-type ResearchEngagementForm = components["schemas"]["ResearchEngagementRequest"]
+type ResearchEngagementForm = Omit<components["schemas"]["ResearchEngagementRequest"], "attachment">
 
 const EMPTY_FORM: ResearchEngagementForm = {
   researchTitle: "",
   natureEngagement: "",
   natureUtilization: null,
   datePublished: null,
-  attachment: null,
 }
 
 export function ResearchEngagementAddDialog({
@@ -35,35 +33,51 @@ export function ResearchEngagementAddDialog({
 }) {
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState<ResearchEngagementForm>(EMPTY_FORM)
-  const { mutate, loading } = useApiMutation()
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
+  const { headers } = useAuthorizedHeaders()
+  const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
 
   // Dismissing via outside-click/Escape keeps the draft so reopening later
   // in this session picks up where you left off. Only Cancel discards it.
   const handleCancel = () => {
     setForm(EMPTY_FORM)
+    setAttachmentFile(null)
     setError(null)
     setOpen(false)
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setLoading(true)
     setError(null)
 
-    const success = await mutate({
-      path: `/api/v1/hrms/profiles/${profileId}/research-engagements`,
-      method: "POST",
-      body: form,
-    })
+    try {
+      const created = await request<components["schemas"]["ResearchEngagementResponse"]>(
+        `/api/v1/hrms/profiles/${profileId}/research-engagements`,
+        headers,
+        { method: "POST", body: form },
+      )
 
-    if (!success) {
-      setError(new Error("Unable to create research engagement"))
-      return
+      if (attachmentFile) {
+        const formData = new FormData()
+        formData.append("file", attachmentFile)
+        await request(
+          `/api/v1/hrms/profiles/${profileId}/research-engagements/${created.id}/attachment`,
+          headers,
+          { method: "POST", body: formData },
+        )
+      }
+
+      onCreated()
+      setForm(EMPTY_FORM)
+      setAttachmentFile(null)
+      setOpen(false)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error(String(err)))
+    } finally {
+      setLoading(false)
     }
-
-    onCreated()
-    setForm(EMPTY_FORM)
-    setOpen(false)
   }
 
   return (
@@ -85,7 +99,9 @@ export function ResearchEngagementAddDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">Research Title</label>
+            <label className="mb-2 block text-sm font-medium">
+              Research Title <span className="text-destructive">*</span>
+            </label>
             <Input
               value={form.researchTitle}
               onChange={(event) =>
@@ -97,7 +113,9 @@ export function ResearchEngagementAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Nature of Engagement</label>
+            <label className="mb-2 block text-sm font-medium">
+              Nature of Engagement <span className="text-destructive">*</span>
+            </label>
             <Input
               value={form.natureEngagement}
               onChange={(event) =>
@@ -141,11 +159,8 @@ export function ResearchEngagementAddDialog({
             <Input
               type="file"
               accept="image/*,.pdf"
-              onChange={async (event) => {
-                const file = event.target.files?.[0]
-                if (!file) return
-                const dataUrl = await readFileAsDataUrl(file)
-                setForm((current) => ({ ...current, attachment: dataUrl }))
+              onChange={(event) => {
+                setAttachmentFile(event.target.files?.[0] ?? null)
               }}
             />
           </div>

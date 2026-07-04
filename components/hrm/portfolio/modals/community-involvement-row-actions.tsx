@@ -25,17 +25,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
 
 type CommunityInvolvement = components["schemas"]["CommunityInvolvementResponse"]
-type CommunityInvolvementForm = components["schemas"]["CommunityInvolvementRequest"]
+type CommunityInvolvementForm = Omit<components["schemas"]["CommunityInvolvementRequest"], "attachment">
 
 function toForm(row: CommunityInvolvement): CommunityInvolvementForm {
   return {
     involvement: row.involvement,
     natureInvolvement: row.natureInvolvement,
     dateActivity: row.dateActivity,
-    attachment: row.attachment,
   }
 }
 
@@ -50,6 +48,7 @@ export function CommunityInvolvementRowActions({
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [form, setForm] = React.useState<CommunityInvolvementForm>(() => toForm(row))
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
   const [error, setError] = React.useState<Error | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
@@ -57,6 +56,7 @@ export function CommunityInvolvementRowActions({
   const handleEditOpenChange = (open: boolean) => {
     if (open) {
       setForm(toForm(row))
+      setAttachmentFile(null)
       setError(null)
     }
     setEditOpen(open)
@@ -75,6 +75,21 @@ export function CommunityInvolvementRowActions({
     if (!success) {
       setError(new Error("Unable to update community involvement"))
       return
+    }
+
+    if (attachmentFile) {
+      const formData = new FormData()
+      formData.append("file", attachmentFile)
+      const uploaded = await saveRow({
+        path: `/api/v1/hrms/profiles/${profileId}/community-involvements/${row.id}/attachment`,
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploaded) {
+        setError(new Error("Unable to upload attachment"))
+        return
+      }
     }
 
     onChanged()
@@ -107,7 +122,9 @@ export function CommunityInvolvementRowActions({
 
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium">Involvement</label>
+              <label className="mb-2 block text-sm font-medium">
+                Involvement <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.involvement}
                 onChange={(event) =>
@@ -119,7 +136,9 @@ export function CommunityInvolvementRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Nature of Involvement</label>
+              <label className="mb-2 block text-sm font-medium">
+                Nature of Involvement <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.natureInvolvement}
                 onChange={(event) =>
@@ -131,7 +150,9 @@ export function CommunityInvolvementRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Date of Activity</label>
+              <label className="mb-2 block text-sm font-medium">
+                Date of Activity <span className="text-destructive">*</span>
+              </label>
               <Input
                 type="date"
                 value={form.dateActivity}
@@ -144,14 +165,16 @@ export function CommunityInvolvementRowActions({
 
             <div>
               <label className="mb-2 block text-sm font-medium">Attachment</label>
+              {row.attachment && (
+                <p className="mb-2 truncate text-sm text-muted-foreground">
+                  Current: {row.attachment.split("/").pop()}
+                </p>
+              )}
               <Input
                 type="file"
                 accept="image/*,.pdf"
-                onChange={async (event) => {
-                  const file = event.target.files?.[0]
-                  if (!file) return
-                  const dataUrl = await readFileAsDataUrl(file)
-                  setForm((current) => ({ ...current, attachment: dataUrl }))
+                onChange={(event) => {
+                  setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
               />
             </div>

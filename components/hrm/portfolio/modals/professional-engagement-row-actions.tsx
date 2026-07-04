@@ -25,17 +25,15 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
 
 type ProfessionalEngagement = components["schemas"]["ProfessionalEngagementResponse"]
-type ProfessionalEngagementForm = components["schemas"]["ProfessionalEngagementRequest"]
+type ProfessionalEngagementForm = Omit<components["schemas"]["ProfessionalEngagementRequest"], "attachment">
 
 function toForm(row: ProfessionalEngagement): ProfessionalEngagementForm {
   return {
     engagementType: row.engagementType,
     engagementName: row.engagementName,
     remarks: row.remarks,
-    attachment: row.attachment,
   }
 }
 
@@ -50,6 +48,7 @@ export function ProfessionalEngagementRowActions({
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [form, setForm] = React.useState<ProfessionalEngagementForm>(() => toForm(row))
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
   const [error, setError] = React.useState<Error | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
@@ -57,6 +56,7 @@ export function ProfessionalEngagementRowActions({
   const handleEditOpenChange = (open: boolean) => {
     if (open) {
       setForm(toForm(row))
+      setAttachmentFile(null)
       setError(null)
     }
     setEditOpen(open)
@@ -75,6 +75,21 @@ export function ProfessionalEngagementRowActions({
     if (!success) {
       setError(new Error("Unable to update professional engagement"))
       return
+    }
+
+    if (attachmentFile) {
+      const formData = new FormData()
+      formData.append("file", attachmentFile)
+      const uploaded = await saveRow({
+        path: `/api/v1/hrms/profiles/${profileId}/professional-engagements/${row.id}/attachment`,
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploaded) {
+        setError(new Error("Unable to upload attachment"))
+        return
+      }
     }
 
     onChanged()
@@ -107,7 +122,9 @@ export function ProfessionalEngagementRowActions({
 
           <form onSubmit={handleSave} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium">Engagement Type</label>
+              <label className="mb-2 block text-sm font-medium">
+                Engagement Type <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.engagementType}
                 onChange={(event) =>
@@ -119,7 +136,9 @@ export function ProfessionalEngagementRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Engagement Name</label>
+              <label className="mb-2 block text-sm font-medium">
+                Engagement Name <span className="text-destructive">*</span>
+              </label>
               <Input
                 value={form.engagementName}
                 onChange={(event) =>
@@ -143,14 +162,16 @@ export function ProfessionalEngagementRowActions({
 
             <div>
               <label className="mb-2 block text-sm font-medium">Attachment</label>
+              {row.attachment && (
+                <p className="mb-2 truncate text-sm text-muted-foreground">
+                  Current: {row.attachment.split("/").pop()}
+                </p>
+              )}
               <Input
                 type="file"
                 accept="image/*,.pdf"
-                onChange={async (event) => {
-                  const file = event.target.files?.[0]
-                  if (!file) return
-                  const dataUrl = await readFileAsDataUrl(file)
-                  setForm((current) => ({ ...current, attachment: dataUrl }))
+                onChange={(event) => {
+                  setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
               />
             </div>

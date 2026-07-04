@@ -13,16 +13,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { useApiMutation, type components } from "@/lib/api"
-import { readFileAsDataUrl } from "@/lib/utils"
+import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 
-type CommunityInvolvementForm = components["schemas"]["CommunityInvolvementRequest"]
+type CommunityInvolvementForm = Omit<components["schemas"]["CommunityInvolvementRequest"], "attachment">
 
 const EMPTY_FORM: CommunityInvolvementForm = {
   involvement: "",
   natureInvolvement: "",
   dateActivity: "",
-  attachment: null,
 }
 
 export function CommunityInvolvementAddDialog({
@@ -34,35 +32,51 @@ export function CommunityInvolvementAddDialog({
 }) {
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState<CommunityInvolvementForm>(EMPTY_FORM)
-  const { mutate, loading } = useApiMutation()
+  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
+  const { headers } = useAuthorizedHeaders()
+  const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
 
   // Dismissing via outside-click/Escape keeps the draft so reopening later
   // in this session picks up where you left off. Only Cancel discards it.
   const handleCancel = () => {
     setForm(EMPTY_FORM)
+    setAttachmentFile(null)
     setError(null)
     setOpen(false)
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setLoading(true)
     setError(null)
 
-    const success = await mutate({
-      path: `/api/v1/hrms/profiles/${profileId}/community-involvements`,
-      method: "POST",
-      body: form,
-    })
+    try {
+      const created = await request<components["schemas"]["CommunityInvolvementResponse"]>(
+        `/api/v1/hrms/profiles/${profileId}/community-involvements`,
+        headers,
+        { method: "POST", body: form },
+      )
 
-    if (!success) {
-      setError(new Error("Unable to create community involvement"))
-      return
+      if (attachmentFile) {
+        const formData = new FormData()
+        formData.append("file", attachmentFile)
+        await request(
+          `/api/v1/hrms/profiles/${profileId}/community-involvements/${created.id}/attachment`,
+          headers,
+          { method: "POST", body: formData },
+        )
+      }
+
+      onCreated()
+      setForm(EMPTY_FORM)
+      setAttachmentFile(null)
+      setOpen(false)
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error(String(err)))
+    } finally {
+      setLoading(false)
     }
-
-    onCreated()
-    setForm(EMPTY_FORM)
-    setOpen(false)
   }
 
   return (
@@ -84,7 +98,9 @@ export function CommunityInvolvementAddDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">Involvement</label>
+            <label className="mb-2 block text-sm font-medium">
+              Involvement <span className="text-destructive">*</span>
+            </label>
             <Input
               value={form.involvement}
               onChange={(event) =>
@@ -96,7 +112,9 @@ export function CommunityInvolvementAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Nature of Involvement</label>
+            <label className="mb-2 block text-sm font-medium">
+              Nature of Involvement <span className="text-destructive">*</span>
+            </label>
             <Input
               value={form.natureInvolvement}
               onChange={(event) =>
@@ -108,7 +126,9 @@ export function CommunityInvolvementAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Date of Activity</label>
+            <label className="mb-2 block text-sm font-medium">
+              Date of Activity <span className="text-destructive">*</span>
+            </label>
             <Input
               type="date"
               value={form.dateActivity}
@@ -124,11 +144,8 @@ export function CommunityInvolvementAddDialog({
             <Input
               type="file"
               accept="image/*,.pdf"
-              onChange={async (event) => {
-                const file = event.target.files?.[0]
-                if (!file) return
-                const dataUrl = await readFileAsDataUrl(file)
-                setForm((current) => ({ ...current, attachment: dataUrl }))
+              onChange={(event) => {
+                setAttachmentFile(event.target.files?.[0] ?? null)
               }}
             />
           </div>

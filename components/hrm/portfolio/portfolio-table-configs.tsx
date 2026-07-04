@@ -6,7 +6,6 @@ import {
   PortfolioTable,
   type PortfolioTableColumn,
 } from "@/components/hrm/portfolio/portfolio-table"
-import { EducationCredentialsCell } from "@/components/hrm/portfolio/education-credentials-cell"
 import { EducationalBackgroundAddDialog } from "@/components/hrm/portfolio/modals/educational-background-add-dialog"
 import { EducationalBackgroundRowActions } from "@/components/hrm/portfolio/modals/educational-background-row-actions"
 import { WorkExperienceAddDialog } from "@/components/hrm/portfolio/modals/work-experience-add-dialog"
@@ -34,7 +33,9 @@ export type PortfolioTableConfig<TRow> = {
   }) => React.ReactNode
 }
 
-type EducationalBackground = components["schemas"]["EducationalBackgroundResponse"]
+type EducationalBackground = components["schemas"]["EducationalBackgroundResponse"] & {
+  attachment?: string | null
+}
 type WorkExperience = components["schemas"]["WorkExperienceResponse"]
 type NationalBoard = components["schemas"]["NationalBoardResponse"]
 type ProfessionalOrganization = components["schemas"]["ProfessionalOrganizationResponse"]
@@ -51,12 +52,7 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
     { header: "Degree", render: (row) => row.degree },
     { header: "Institution", render: (row) => row.institution },
     { header: "Date Graduated", render: (row) => formatDate(row.dateGraduated) },
-    {
-      header: "Attachments",
-      render: (row, profileId) => (
-        <EducationCredentialsCell profileId={profileId} educationalBackgroundId={row.id} />
-      ),
-    },
+    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
