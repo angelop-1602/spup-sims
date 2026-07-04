@@ -9,7 +9,9 @@ import {
   TrendingUp,
   X,
   User,
-  ShieldCheck
+  ShieldCheck,
+  Bookmark,
+  ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { Job, UserProfile, Application, INITIAL_JOBS } from '@/components/hrm/types';
@@ -240,18 +242,18 @@ export default function HrmPage() {
               <div className="absolute inset-0 bg-neutral-950/40 z-0 pointer-events-none" />
 
               <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="w-full max-w-lg bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-10 border border-white/20 shadow-xl flex flex-col space-y-5">
+                <div className="w-full max-w-lg bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-10 border-2 border-emerald-900 shadow-xl flex flex-col space-y-5 [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
                   <div className="space-y-3">
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-neutral-950 tracking-tight leading-tight">
+                    <h1 className={`${instrumentSerif.className} text-xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight lg:whitespace-nowrap [-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
                       Build Your Career with SPUP
                     </h1>
-                    <p className="text-xs md:text-sm text-neutral-600 font-normal leading-relaxed">
+                    <p className={`${inter.className} text-sm text-neutral-600 text-justify font-normal leading-relaxed`}>
                       Join a mission-driven academic community committed to service, excellence, and transformative education. Discover where your passion aligns with systemic impact.
                     </p>
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <a href="#advanced-search-box" className="inline-flex items-center justify-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-xs transition-colors">
+                    <a href="#advanced-search-box" className="inline-flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-xs transition-colors">
                       <Briefcase className="w-3.5 h-3.5" />
                       Browse Job Openings
                     </a>
@@ -267,49 +269,99 @@ export default function HrmPage() {
         </AnimatePresence>
 
         <div id="workspace-layout" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-          {activeTab === 'explore' && (
-            <div className="space-y-6">
-              
-              {/* Featured Jobs Header*/}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                  <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
-                    Featured Job Openings
-                  </h2>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    Explore premier pathways currently accepting applications.
-                  </p>
-                </div>
-                <Link 
-                  href="#" 
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-neutral-900 bg-neutral-950 text-white hover:bg-neutral-800 text-xs font-bold rounded-xl transition-colors shadow-sm cursor-pointer"
-                >
-                  View all openings
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-
-              {/* Featured Jobs Grid Display */}
-              <div id="vacancies" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <AnimatePresence mode="popLayout">
-                    {jobs.slice(0, 3).map((job) => (
-                      <JobCard
-                        key={job.id}
-                        job={job}
-                        isSaved={savedJobIds.includes(job.id)}
-                        onToggleSave={(e) => handleToggleSave(job.id, e)}
-                        onViewDetails={() => setSelectedJob(job)}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </div>
-
+        {activeTab === 'explore' && (
+          <div className="space-y-6">
+            
+            {/* Featured Jobs Header*/}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <div>
+                <h2 className={`${instrumentSerif.className} text-xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight lg:whitespace-nowrap [-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
+                  Featured Job Openings
+                </h2>
+              <p className={`${inter.className} text-sm text-neutral-500 mt-1`}>
+                Explore premier pathways currently accepting applications.
+              </p>
             </div>
-          )}
+              <Link 
+                href="#" 
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border-1 border-emerald-950 bg-emerald-800 text-white hover:bg-emerald-900 text-xs font-bold rounded-xl transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+              >
+                View all openings
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
 
-        </div>
+            {/* Featured Jobs Grid Display */}
+            <div id="vacancies" className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <AnimatePresence mode="popLayout">
+                  {jobs.slice(0, 3).map((job) => (
+                    <div 
+                      key={job.id}
+                      className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-visible [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]"
+                    >
+                      <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
+                        <div className="flex flex-col">
+                          <span className="font-instrument text-[16px] font-medium text-white tracking-wide leading-tight">
+                            {job.title}
+                          </span>
+                          <span className="font-inter text-[10px] font-bold uppercase tracking-wider text-amber-400 mt-0.5">
+                            {job.department || "Academic Unit"}
+                          </span>
+                        </div>
+                        
+                        {/* Save/Bookmark Button */}
+                        <button 
+                          type="button" 
+                          onClick={(e) => handleToggleSave(job.id, e)}
+                          className="text-amber-300 hover:text-amber-400 transition-colors shrink-0 z-10"
+                        >
+                          <Bookmark className={`w-4 h-4 ${savedJobIds.includes(job.id) ? 'fill-amber-400 text-amber-400' : ''}`} />
+                        </button>
+                      </div>
+
+                      <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] font-inter">
+                        <div>
+                          {/* Job Details Meta Row */}
+                          <div className="flex flex-wrap gap-2 mb-3">
+                            <span className="text-[10px] font-semibold bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded border border-neutral-200">
+                              {job.type || "Full-time"}
+                            </span>
+                            <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                              {job.location || "Main Campus"}
+                            </span>
+                          </div>
+
+                          <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify line-clamp-3">
+                            {job.description}
+                          </p>
+                        </div>
+                        
+                        {/* Action Footer */}
+                        <div className="mt-5 pt-4 border-t border-neutral-100 flex items-center justify-between">
+                          <span className="text-[10px] text-neutral-400 font-medium">
+                            Posted {job.postedDate || "Recently"}
+                          </span>
+                          
+                          <button 
+                            type="button" 
+                            onClick={() => setSelectedJob(job)}
+                            className="inline-flex items-center gap-1 text-xs font-bold text-emerald-900 hover:text-emerald-950 uppercase tracking-wider group/btn"
+                          >
+                            View Details 
+                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </AnimatePresence>
+              </div>
+            </div>
+
+          </div>
+        )}
+      </div>
 
         {/* Modular Feature Sections */}
         <ProcessTimeline />
