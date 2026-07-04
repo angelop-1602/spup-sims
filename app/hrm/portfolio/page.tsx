@@ -10,7 +10,7 @@ export default function EmployeePortfolioPage() {
   const { data: profile, loading, error } = useApiQuery<EmployeeResponse>(
     "/api/hrms/me/profile",
   )
-  
+
   return (
     <div className="space-y-6">
       <div>
@@ -40,4 +40,3 @@ export default function EmployeePortfolioPage() {
     </div>
   )
 }
-

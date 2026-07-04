@@ -171,6 +171,7 @@ export default function ApplicantsPage() {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value)
+                setPage(1)
               }}
               placeholder="Search application no. or status"
               className="w-64 rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
@@ -217,19 +218,12 @@ export default function ApplicantsPage() {
               </thead>
               <tbody>
                 {applicants.map((applicant) => {
-                  const v = applicant.values ?? (applicant as unknown as ApplicantValues)
-                  const matchingProfile = profiles.find((p) => {
-                    const pv = p.values ?? (p as unknown as ProfileValues)
-                    return String(pv.Id ?? p.id) === String(v.ProfileId)
-                  })
-                  const profileValues = matchingProfile?.values ?? (matchingProfile as unknown as ProfileValues | undefined)
-                  const fullName = profileValues
-                    ? `${profileValues.FirstName} ${profileValues.LastName}`
-                    : "No linked profile"
+                  const v = applicant.values
+                  const fullName = "—"  // Profile names not loaded in this view
 
                   return (
                     <tr
-                      key={v.Id}
+                      key={applicant.id}
                       className="border-b last:border-0 hover:bg-muted/30"
                     >
                       <td className="px-4 py-3 font-medium">
@@ -289,8 +283,8 @@ export default function ApplicantsPage() {
             </button>
             <button
               type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
+              onClick={() => setPage((p) => Math.min(Number(totalPages), p + 1))}
+              disabled={page >= Number(totalPages)}
               className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
             >
               Next
