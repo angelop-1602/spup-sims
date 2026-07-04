@@ -8,7 +8,7 @@ type EmployeeResponse = components["schemas"]["EmployeeResponse"]
 
 export default function EmployeePortfolioPage() {
   const { data: profile, loading, error } = useApiQuery<EmployeeResponse>(
-    "/api/hrms/me/profile",
+    "/api/v1/hrms/me/profile",
   )
 
   return (
