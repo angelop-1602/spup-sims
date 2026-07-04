@@ -34,7 +34,7 @@ const inter = Inter({
 });
 
 export default function HrmPage() {
-  const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile' | 'faqs' >('explore');
   const [jobs] = useState<Job[]>(INITIAL_JOBS);
 
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
@@ -202,13 +202,32 @@ export default function HrmPage() {
             </div>
 
             <nav className="flex items-center gap-6 ml-auto">
-              <button onClick={() => setActiveTab('explore')} className={`text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'explore' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}>
+              <button 
+                onClick={() => {
+                  setActiveTab('explore');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }} 
+                className={`text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'explore' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+              >
                 Home
               </button>
-              <button onClick={() => setActiveTab('explore')} className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer">
+
+              <button 
+                onClick={() => {
+                  setActiveTab('explore');
+                  setTimeout(() => {
+                    document.getElementById('workspace-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }} 
+                className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+              >
                 Job Openings
               </button>
-              <button onClick={() => setActiveTab('applications')} className={`text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}>
+
+              <button 
+                onClick={() => setActiveTab('applications')} 
+                className={`text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+              >
                 Application Process
                 {applications.length > 0 && (
                   <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-bold leading-none text-neutral-50 bg-neutral-900 rounded-full">
@@ -216,11 +235,19 @@ export default function HrmPage() {
                   </span>
                 )}
               </button>
-              <button onClick={() => setActiveTab('profile')} className={`text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'profile' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}>
+
+              <button 
+                onClick={() => {
+                  setActiveTab('explore');
+                  setTimeout(() => {
+                    document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }} 
+                className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+              >
                 FAQs
               </button>
             </nav>
-
           </div>
         </div>
       </header>
@@ -253,11 +280,11 @@ export default function HrmPage() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <a href="#advanced-search-box" className="inline-flex items-center justify-center gap-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-xs transition-colors">
+                    <a href="#advanced-search-box" className="inline-flex items-center justify-center gap-2 border-1 border-emerald-900 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-xs transition-colors">
                       <Briefcase className="w-3.5 h-3.5" />
                       Browse Job Openings
                     </a>
-                    <button onClick={() => setActiveTab('profile')} className="inline-flex items-center justify-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold px-5 py-3 rounded-xl transition-colors cursor-pointer">
+                    <button onClick={() => setActiveTab('profile')} className="inline-flex items-center justify-center gap-2 border-1 border-neutral-300 bg-neutral-200 hover:bg-neutral-200 text-neutral-800 text-xs font-bold px-5 py-3 rounded-xl transition-colors cursor-pointer">
                       <FileText className="w-3.5 h-3.5" />
                       Setup Application Profile
                     </button>
