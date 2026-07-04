@@ -73,58 +73,96 @@ export default function ProcessTimeline() {
   return (
     <section className="bg-white border-t border-neutral-200 pt-12 pb-0 w-full rounded-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+  
         {/* Application Process Title Block */}
-        <div className="mb-12 text-left">
-          <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
-            Our Application Process
+        <div className="mb-8 text-left">
+          <h2 className={`${instrumentSerif.className} text-xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight lg:whitespace-nowrap [-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
+              Our Application Process
           </h2>
-          <p className="text-xs text-neutral-500 mt-1">
+          <p className={`${inter.className} text-sm text-neutral-500 mt-1`}>
             A simple four-step pathway to joining the SPUP academic and staff community.
           </p>
         </div>
 
-        {/* Application Process Steps Timeline */}
-        <div className="relative w-full mb-16">
-          <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-neutral-200 z-0" />
+        {/* Application Process Steps Timeline Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 w-full mb-16">
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs">1</div>
-              <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                <Search className="w-5 h-5" />
+          {/* Step 1 Card */}
+          <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
+            {/* Green Header Block */}
+            <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
+                <span className="font-mono text-amber-400 text-sm">01.</span>
+                <span>Choose a Position</span>
               </div>
-              <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">Choose a Position</h3>
-              <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">Browse openings and locate roles that match your expertise.</p>
             </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs">2</div>
-              <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                <FileText className="w-5 h-5" />
-              </div>
-              <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">Submit Application</h3>
-              <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">Upload your digital resume and complete the application profile.</p>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs">3</div>
-              <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                <User className="w-5 h-5" />
-              </div>
-              <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">HR Screening</h3>
-              <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">The Human Resource Management Office conducts an initial credentials audit.</p>
-            </div>
-
-            <div className="flex flex-col items-center text-center">
-              <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs">4</div>
-              <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                <UserCheck className="w-5 h-5" />
-              </div>
-              <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">Interview & Evaluation</h3>
-              <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">Qualified candidates meet with departmental committees for evaluations.</p>
+            {/* White Content Block */}
+            <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
+              <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify pr-6 z-10">
+                Browse openings and locate roles that match your expertise.
+              </p>
+              {/* Subtle watermark icon cut off from the side */}
+              <Search className="absolute -bottom-1 -right-1 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
             </div>
           </div>
+
+          {/* Step 2 Card */}
+          <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
+            {/* Green Header Block */}
+            <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
+                <span className="font-mono text-amber-400 text-sm">02.</span>
+                <span>Submit Application</span>
+              </div>
+            </div>
+            {/* White Content Block */}
+            <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
+              <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify pr-6 z-10">
+                Upload your digital resume and complete the application profile.
+              </p>
+              {/* Subtle watermark icon cut off from the side */}
+              <FileText className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
+            </div>
+          </div>
+
+          {/* Step 3 Card */}
+          <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
+            {/* Green Header Block */}
+            <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
+                <span className="font-mono text-amber-400 text-sm">03.</span>
+                <span>HR Screening</span>
+              </div>
+            </div>
+            {/* White Content Block */}
+            <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
+              <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify pr-6 z-10">
+                The Human Resource Management Office conducts an initial credentials audit.
+              </p>
+              {/* Subtle watermark icon cut off from the side */}
+              <User className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
+            </div>
+          </div>
+
+          {/* Step 4 Card */}
+          <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
+            {/* Green Header Block */}
+            <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
+                <span className="font-mono text-amber-400 text-sm">04.</span>
+                <span>Evaluation</span>
+              </div>
+            </div>
+            {/* White Content Block */}
+            <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
+              <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify pr-6 z-10">
+                Qualified candidates meet with departmental committees for evaluations.
+              </p>
+              {/* Subtle watermark icon cut off from the side */}
+              <UserCheck className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
+            </div>
+          </div>
+
         </div>
       </div>
 
