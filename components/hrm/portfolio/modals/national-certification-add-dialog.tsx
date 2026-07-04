@@ -14,33 +14,20 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
+import { readFileAsDataUrl } from "@/lib/utils"
 
-type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"]
-type EducationCredentialForm = components["schemas"]["EducationCredentialRequest"]
+type NationalBoardForm = components["schemas"]["NationalBoardRequest"]
 
-const EMPTY_FORM: EducationalBackgroundForm = {
-  educationId: null,
-  degreeLevel: "",
-  degree: "",
-  institution: "",
-  dateGraduated: null,
+const EMPTY_FORM: NationalBoardForm = {
+  certification: "",
+  rating: null,
+  licenseNumber: "",
+  validity: null,
+  remarks: null,
+  attachment: null,
 }
 
-const EMPTY_CREDENTIALS = {
-  diploma: "",
-  transcriptOfRecords: "",
-}
-
-function readFileAsDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(reader.result as string)
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
-}
-
-export function EducationalBackgroundAddDialog({
+export function NationalCertificationAddDialog({
   profileId,
   onCreated,
 }: {
@@ -48,8 +35,7 @@ export function EducationalBackgroundAddDialog({
   onCreated: () => void
 }) {
   const [open, setOpen] = React.useState(false)
-  const [form, setForm] = React.useState<EducationalBackgroundForm>(EMPTY_FORM)
-  const [credentials, setCredentials] = React.useState(EMPTY_CREDENTIALS)
+  const [form, setForm] = React.useState<NationalBoardForm>(EMPTY_FORM)
   const { headers } = useAuthorizedHeaders()
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
@@ -58,7 +44,6 @@ export function EducationalBackgroundAddDialog({
   // in this session picks up where you left off. Only Cancel discards it.
   const handleCancel = () => {
     setForm(EMPTY_FORM)
-    setCredentials(EMPTY_CREDENTIALS)
     setError(null)
     setOpen(false)
   }
@@ -69,27 +54,14 @@ export function EducationalBackgroundAddDialog({
     setError(null)
 
     try {
-      const created = await request<components["schemas"]["EducationalBackgroundResponse"]>(
-        `/api/v1/hrms/profiles/${profileId}/educational-backgrounds`,
+      await request(
+        `/api/v1/hrms/profiles/${profileId}/national-boards`,
         headers,
         { method: "POST", body: form },
       )
 
-      const credentialBody: EducationCredentialForm = {
-        educationalBackgroundId: created.id,
-        diploma: credentials.diploma || null,
-        transcriptOfRecords: credentials.transcriptOfRecords || null,
-      }
-
-      await request(
-        `/api/v1/hrms/profiles/${profileId}/education-credentials`,
-        headers,
-        { method: "POST", body: credentialBody },
-      )
-
       onCreated()
       setForm(EMPTY_FORM)
-      setCredentials(EMPTY_CREDENTIALS)
       setOpen(false)
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)))
@@ -109,79 +81,74 @@ export function EducationalBackgroundAddDialog({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New educational background</DialogTitle>
+          <DialogTitle>New national certification</DialogTitle>
           <DialogDescription>
-            Add a degree record for this employee.
+            Add a board certification record for this employee.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">Degree Level</label>
+            <label className="mb-2 block text-sm font-medium">Certification</label>
             <Input
-              value={form.degreeLevel}
+              value={form.certification}
               onChange={(event) =>
-                setForm((current) => ({ ...current, degreeLevel: event.target.value }))
+                setForm((current) => ({ ...current, certification: event.target.value }))
               }
-              placeholder="e.g. Bachelor's, Master's"
+              placeholder="e.g. Licensure Exam for Teachers"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Degree</label>
+            <label className="mb-2 block text-sm font-medium">License Number</label>
             <Input
-              value={form.degree}
+              value={form.licenseNumber}
               onChange={(event) =>
-                setForm((current) => ({ ...current, degree: event.target.value }))
+                setForm((current) => ({ ...current, licenseNumber: event.target.value }))
               }
-              placeholder="e.g. BS Computer Science"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Institution</label>
+            <label className="mb-2 block text-sm font-medium">Rating</label>
             <Input
-              value={form.institution}
+              value={form.rating ?? ""}
               onChange={(event) =>
-                setForm((current) => ({ ...current, institution: event.target.value }))
+                setForm((current) => ({ ...current, rating: event.target.value || null }))
               }
-              placeholder="School or university"
-              required
+              placeholder="Optional"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Date Graduated</label>
+            <label className="mb-2 block text-sm font-medium">Validity</label>
             <Input
               type="date"
-              value={form.dateGraduated ?? ""}
+              value={form.validity ?? ""}
               onChange={(event) =>
                 setForm((current) => ({
                   ...current,
-                  dateGraduated: event.target.value || null,
+                  validity: event.target.value || null,
                 }))
               }
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Diploma</label>
+            <label className="mb-2 block text-sm font-medium">Remarks</label>
             <Input
-              type="file"
-              accept="image/*,.pdf"
-              onChange={async (event) => {
-                const file = event.target.files?.[0]
-                if (!file) return
-                const dataUrl = await readFileAsDataUrl(file)
-                setCredentials((current) => ({ ...current, diploma: dataUrl }))
-              }}
+              value={form.remarks ?? ""}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, remarks: event.target.value || null }))
+              }
+              placeholder="Optional"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Transcript of Records</label>
+            <label className="mb-2 block text-sm font-medium">Attachment</label>
             <Input
               type="file"
               accept="image/*,.pdf"
@@ -189,7 +156,7 @@ export function EducationalBackgroundAddDialog({
                 const file = event.target.files?.[0]
                 if (!file) return
                 const dataUrl = await readFileAsDataUrl(file)
-                setCredentials((current) => ({ ...current, transcriptOfRecords: dataUrl }))
+                setForm((current) => ({ ...current, attachment: dataUrl }))
               }}
             />
           </div>

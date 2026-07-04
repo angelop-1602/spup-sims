@@ -15,20 +15,14 @@ import {
 import { Input } from "@/components/ui/input"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 
-type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"]
-type EducationCredentialForm = components["schemas"]["EducationCredentialRequest"]
+type WorkExperienceForm = components["schemas"]["WorkExperienceRequest"]
 
-const EMPTY_FORM: EducationalBackgroundForm = {
-  educationId: null,
-  degreeLevel: "",
-  degree: "",
+const EMPTY_FORM: WorkExperienceForm = {
+  jobTitle: "",
   institution: "",
-  dateGraduated: null,
-}
-
-const EMPTY_CREDENTIALS = {
-  diploma: "",
-  transcriptOfRecords: "",
+  startDate: "",
+  endDate: null,
+  attachment: null,
 }
 
 function readFileAsDataUrl(file: File): Promise<string> {
@@ -40,7 +34,7 @@ function readFileAsDataUrl(file: File): Promise<string> {
   })
 }
 
-export function EducationalBackgroundAddDialog({
+export function WorkExperienceAddDialog({
   profileId,
   onCreated,
 }: {
@@ -48,8 +42,7 @@ export function EducationalBackgroundAddDialog({
   onCreated: () => void
 }) {
   const [open, setOpen] = React.useState(false)
-  const [form, setForm] = React.useState<EducationalBackgroundForm>(EMPTY_FORM)
-  const [credentials, setCredentials] = React.useState(EMPTY_CREDENTIALS)
+  const [form, setForm] = React.useState<WorkExperienceForm>(EMPTY_FORM)
   const { headers } = useAuthorizedHeaders()
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
@@ -58,7 +51,6 @@ export function EducationalBackgroundAddDialog({
   // in this session picks up where you left off. Only Cancel discards it.
   const handleCancel = () => {
     setForm(EMPTY_FORM)
-    setCredentials(EMPTY_CREDENTIALS)
     setError(null)
     setOpen(false)
   }
@@ -69,27 +61,14 @@ export function EducationalBackgroundAddDialog({
     setError(null)
 
     try {
-      const created = await request<components["schemas"]["EducationalBackgroundResponse"]>(
-        `/api/v1/hrms/profiles/${profileId}/educational-backgrounds`,
+      await request(
+        `/api/v1/hrms/profiles/${profileId}/work-experiences`,
         headers,
         { method: "POST", body: form },
       )
 
-      const credentialBody: EducationCredentialForm = {
-        educationalBackgroundId: created.id,
-        diploma: credentials.diploma || null,
-        transcriptOfRecords: credentials.transcriptOfRecords || null,
-      }
-
-      await request(
-        `/api/v1/hrms/profiles/${profileId}/education-credentials`,
-        headers,
-        { method: "POST", body: credentialBody },
-      )
-
       onCreated()
       setForm(EMPTY_FORM)
-      setCredentials(EMPTY_CREDENTIALS)
       setOpen(false)
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)))
@@ -109,33 +88,21 @@ export function EducationalBackgroundAddDialog({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New educational background</DialogTitle>
+          <DialogTitle>New work experience</DialogTitle>
           <DialogDescription>
-            Add a degree record for this employee.
+            Add an employment record for this employee.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">Degree Level</label>
+            <label className="mb-2 block text-sm font-medium">Job Title</label>
             <Input
-              value={form.degreeLevel}
+              value={form.jobTitle}
               onChange={(event) =>
-                setForm((current) => ({ ...current, degreeLevel: event.target.value }))
+                setForm((current) => ({ ...current, jobTitle: event.target.value }))
               }
-              placeholder="e.g. Bachelor's, Master's"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium">Degree</label>
-            <Input
-              value={form.degree}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, degree: event.target.value }))
-              }
-              placeholder="e.g. BS Computer Science"
+              placeholder="e.g. Software Engineer"
               required
             />
           </div>
@@ -147,27 +114,39 @@ export function EducationalBackgroundAddDialog({
               onChange={(event) =>
                 setForm((current) => ({ ...current, institution: event.target.value }))
               }
-              placeholder="School or university"
+              placeholder="Company or organization"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Date Graduated</label>
+            <label className="mb-2 block text-sm font-medium">Start Date</label>
             <Input
               type="date"
-              value={form.dateGraduated ?? ""}
+              value={form.startDate}
+              onChange={(event) =>
+                setForm((current) => ({ ...current, startDate: event.target.value }))
+              }
+              required
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">End Date</label>
+            <Input
+              type="date"
+              value={form.endDate ?? ""}
               onChange={(event) =>
                 setForm((current) => ({
                   ...current,
-                  dateGraduated: event.target.value || null,
+                  endDate: event.target.value || null,
                 }))
               }
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Diploma</label>
+            <label className="mb-2 block text-sm font-medium">Attachment</label>
             <Input
               type="file"
               accept="image/*,.pdf"
@@ -175,21 +154,7 @@ export function EducationalBackgroundAddDialog({
                 const file = event.target.files?.[0]
                 if (!file) return
                 const dataUrl = await readFileAsDataUrl(file)
-                setCredentials((current) => ({ ...current, diploma: dataUrl }))
-              }}
-            />
-          </div>
-
-          <div>
-            <label className="mb-2 block text-sm font-medium">Transcript of Records</label>
-            <Input
-              type="file"
-              accept="image/*,.pdf"
-              onChange={async (event) => {
-                const file = event.target.files?.[0]
-                if (!file) return
-                const dataUrl = await readFileAsDataUrl(file)
-                setCredentials((current) => ({ ...current, transcriptOfRecords: dataUrl }))
+                setForm((current) => ({ ...current, attachment: dataUrl }))
               }}
             />
           </div>

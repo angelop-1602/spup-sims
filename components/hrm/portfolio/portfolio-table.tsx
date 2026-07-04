@@ -35,7 +35,7 @@ export function AttachmentCell({ href }: { href?: string | null }) {
 
 export type PortfolioTableColumn<TRow> = {
   header: string
-  render: (row: TRow, profileId: number | string) => React.ReactNode
+  render: (row: TRow, profileId: number | string, refresh: () => void) => React.ReactNode
 }
 
 type PagedRows<TRow> = {
@@ -124,7 +124,7 @@ export function PortfolioTable<TRow extends { id: number | string }>({
                     <tr key={row.id} className="border-b last:border-0 hover:bg-muted/30">
                       {columns.map((column) => (
                         <td key={column.header} className="px-4 py-3">
-                          {column.render(row, profileId)}
+                          {column.render(row, profileId, refresh)}
                         </td>
                       ))}
                     </tr>
