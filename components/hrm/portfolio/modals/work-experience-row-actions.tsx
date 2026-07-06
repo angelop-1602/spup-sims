@@ -166,7 +166,9 @@ export function WorkExperienceRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">End Date</label>
+              <label className="mb-2 block text-sm font-medium">
+                End Date <span className="text-destructive">*</span>
+              </label>
               <Input
                 type="date"
                 value={form.endDate ?? ""}
@@ -176,11 +178,14 @@ export function WorkExperienceRowActions({
                     endDate: event.target.value || null,
                   }))
                 }
+                required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Attachment</label>
+              <label className="mb-2 block text-sm font-medium">
+                Attachment <span className="text-destructive">*</span>
+              </label>
               {row.attachment && (
                 <p className="mb-2 truncate text-sm text-muted-foreground">
                   Current: {row.attachment.split("/").pop()}
@@ -192,6 +197,7 @@ export function WorkExperienceRowActions({
                 onChange={(event) => {
                   setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
+                required
               />
             </div>
 

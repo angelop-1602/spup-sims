@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus } from "lucide-react"
+import { Info, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,12 +13,24 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
+import { EDUCATIONAL_ATTAINMENT_OPTIONS } from "@/components/hrm/portfolio/educational-attainment-options"
 
-type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"]
+type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"] & {
+  educationalAttainment?: string | null
+}
 
 const EMPTY_FORM: EducationalBackgroundForm = {
   educationId: null,
+  educationalAttainment: "",
   degreeLevel: "",
   degree: "",
   institution: "",
@@ -101,6 +113,30 @@ export function EducationalBackgroundAddDialog({
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-2 block text-sm font-medium">
+              Educational Attainment <span className="text-destructive">*</span>
+            </label>
+            <Select
+              value={form.educationalAttainment ?? ""}
+              onValueChange={(value) =>
+                setForm((current) => ({ ...current, educationalAttainment: value }))
+              }
+              required
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select attainment" />
+              </SelectTrigger>
+              <SelectContent position="popper" side="bottom" avoidCollisions={false}>
+                {EDUCATIONAL_ATTAINMENT_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">
               Degree Level <span className="text-destructive">*</span>
             </label>
             <Input
@@ -128,21 +164,32 @@ export function EducationalBackgroundAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">
-              Institution <span className="text-destructive">*</span>
+            <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+              <span>Name of School/University</span>
+              <span className="text-destructive">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  Please do not abbreviate the name of the school/university.
+                </TooltipContent>
+              </Tooltip>
             </label>
             <Input
               value={form.institution}
               onChange={(event) =>
                 setForm((current) => ({ ...current, institution: event.target.value }))
               }
-              placeholder="School or university"
+              placeholder="Institution"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Date Graduated</label>
+            <label className="mb-2 block text-sm font-medium">
+              Date Graduated <span className="text-destructive">*</span>
+            </label>
             <Input
               type="date"
               value={form.dateGraduated ?? ""}
@@ -152,17 +199,21 @@ export function EducationalBackgroundAddDialog({
                   dateGraduated: event.target.value || null,
                 }))
               }
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Attachment</label>
+            <label className="mb-2 block text-sm font-medium">
+              Attachment <span className="text-destructive">*</span>
+            </label>
             <Input
               type="file"
               accept="image/*,.pdf"
               onChange={(event) => {
                 setAttachmentFile(event.target.files?.[0] ?? null)
               }}
+              required
             />
           </div>
 

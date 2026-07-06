@@ -141,7 +141,9 @@ export function WorkExperienceAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">End Date</label>
+            <label className="mb-2 block text-sm font-medium">
+              End Date <span className="text-destructive">*</span>
+            </label>
             <Input
               type="date"
               value={form.endDate ?? ""}
@@ -151,11 +153,14 @@ export function WorkExperienceAddDialog({
                   endDate: event.target.value || null,
                 }))
               }
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Attachment</label>
+            <label className="mb-2 block text-sm font-medium">
+              Attachment <span className="text-destructive">*</span>
+            </label>
             <Input
               type="file"
               accept="image/*,.pdf"

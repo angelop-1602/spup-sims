@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Edit3, Trash2 } from "lucide-react"
+import { Edit3, Info, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -24,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useApiMutation, type components } from "@/lib/api"
 
 type ResearchEngagement = components["schemas"]["ResearchEngagementResponse"]
@@ -138,21 +139,37 @@ export function ResearchEngagementRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Nature of Engagement <span className="text-destructive">*</span>
+              <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+                <span>Nature of Engagement</span>
+                <span className="text-destructive">*</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info size={14} className="shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent>Sole or Co-author</TooltipContent>
+                </Tooltip>
               </label>
               <Input
                 value={form.natureEngagement}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, natureEngagement: event.target.value }))
                 }
-                placeholder="e.g. Author, Co-author, Reviewer"
+                placeholder="e.g. Sole Author, Co-author"
                 required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Nature of Utilization</label>
+              <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+                <span>Nature of Utilization</span>
+                <span className="text-destructive">*</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info size={14} className="shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent>Published/Presented/Patented/Copyrighted - Provide details.</TooltipContent>
+                </Tooltip>
+              </label>
               <Input
                 value={form.natureUtilization ?? ""}
                 onChange={(event) =>
@@ -161,12 +178,15 @@ export function ResearchEngagementRowActions({
                     natureUtilization: event.target.value || null,
                   }))
                 }
-                placeholder="Optional"
+                placeholder="e.g. Published, Presented, Patented, Copyrighted"
+                required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Date Published</label>
+              <label className="mb-2 block text-sm font-medium">
+                Date Published <span className="text-destructive">*</span>
+              </label>
               <Input
                 type="date"
                 value={form.datePublished ?? ""}
@@ -176,11 +196,14 @@ export function ResearchEngagementRowActions({
                     datePublished: event.target.value || null,
                   }))
                 }
+                required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Attachment</label>
+              <label className="mb-2 block text-sm font-medium">
+                Attachment <span className="text-destructive">*</span>
+              </label>
               {row.attachment && (
                 <p className="mb-2 truncate text-sm text-muted-foreground">
                   Current: {row.attachment.split("/").pop()}
@@ -192,6 +215,7 @@ export function ResearchEngagementRowActions({
                 onChange={(event) => {
                   setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
+                required={!row.attachment}
               />
             </div>
 

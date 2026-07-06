@@ -140,13 +140,16 @@ export function AwardRecognitionAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Attachment</label>
+            <label className="mb-2 block text-sm font-medium">
+              Attachment <span className="text-destructive">*</span>
+            </label>
             <Input
               type="file"
               accept="image/*,.pdf"
               onChange={(event) => {
                 setAttachmentFile(event.target.files?.[0] ?? null)
               }}
+              required
             />
           </div>
 

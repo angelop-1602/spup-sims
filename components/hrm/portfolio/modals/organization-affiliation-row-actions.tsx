@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Edit3, Trash2 } from "lucide-react"
+import { Edit3, Info, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -24,6 +24,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useApiMutation, type components } from "@/lib/api"
 
 type ProfessionalOrganization = components["schemas"]["ProfessionalOrganizationResponse"]
@@ -138,7 +139,7 @@ export function OrganizationAffiliationRowActions({
 
             <div>
               <label className="mb-2 block text-sm font-medium">
-                Membership <span className="text-destructive">*</span>
+                Nature of Membership/Position Held <span className="text-destructive">*</span>
               </label>
               <Input
                 value={form.membership}
@@ -151,18 +152,31 @@ export function OrganizationAffiliationRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Remarks</label>
+              <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+                <span>Remarks</span>
+                <span className="text-destructive">*</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info size={14} className="shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent>Renewal every after a year.</TooltipContent>
+                </Tooltip>
+              </label>
               <Input
                 value={form.remarks ?? ""}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, remarks: event.target.value || null }))
                 }
-                placeholder="Optional"
+                placeholder="Remarks"
+                required
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Attachment</label>
+              <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+                <span>Attachment</span>
+                <span className="text-destructive">*</span>
+              </label>
               {row.attachment && (
                 <p className="mb-2 truncate text-sm text-muted-foreground">
                   Current: {row.attachment.split("/").pop()}
@@ -174,6 +188,7 @@ export function OrganizationAffiliationRowActions({
                 onChange={(event) => {
                   setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
+                required={!row.attachment}
               />
             </div>
 

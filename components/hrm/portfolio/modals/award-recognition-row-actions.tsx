@@ -165,7 +165,9 @@ export function AwardRecognitionRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">Attachment</label>
+              <label className="mb-2 block text-sm font-medium">
+                Attachment <span className="text-destructive">*</span>
+              </label>
               {row.attachment && (
                 <p className="mb-2 truncate text-sm text-muted-foreground">
                   Current: {row.attachment.split("/").pop()}
@@ -177,6 +179,7 @@ export function AwardRecognitionRowActions({
                 onChange={(event) => {
                   setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
+                required
               />
             </div>
 

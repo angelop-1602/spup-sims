@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus } from "lucide-react"
+import { Info, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 
 type NationalBoardForm = Omit<components["schemas"]["NationalBoardRequest"], "attachment">
@@ -122,23 +123,36 @@ export function NationalCertificationAddDialog({
               onChange={(event) =>
                 setForm((current) => ({ ...current, licenseNumber: event.target.value }))
               }
+              placeholder="License Number"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Rating</label>
+            <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+              <span>Rating</span>
+              <span className="text-destructive">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>Input NA if not applicable.</TooltipContent>
+              </Tooltip>
+            </label>
             <Input
               value={form.rating ?? ""}
               onChange={(event) =>
                 setForm((current) => ({ ...current, rating: event.target.value || null }))
               }
-              placeholder="Optional"
+              placeholder="Rating"
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Validity</label>
+            <label className="mb-2 block text-sm font-medium">
+              Validity <span className="text-destructive">*</span>
+            </label>
             <Input
               type="date"
               value={form.validity ?? ""}
@@ -148,28 +162,42 @@ export function NationalCertificationAddDialog({
                   validity: event.target.value || null,
                 }))
               }
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Remarks</label>
+            <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+              <span>Remarks</span>
+              <span className="text-destructive">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>Renewal every after 2 years.</TooltipContent>
+              </Tooltip>
+            </label>
             <Input
               value={form.remarks ?? ""}
               onChange={(event) =>
                 setForm((current) => ({ ...current, remarks: event.target.value || null }))
               }
-              placeholder="Optional"
+              placeholder="Remarks"
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Attachment</label>
+            <label className="mb-2 block text-sm font-medium">
+              Attachment <span className="text-destructive">*</span>
+            </label>
             <Input
               type="file"
               accept="image/*,.pdf"
               onChange={(event) => {
                 setAttachmentFile(event.target.files?.[0] ?? null)
               }}
+              required
             />
           </div>
 

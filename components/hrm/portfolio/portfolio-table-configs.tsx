@@ -40,6 +40,7 @@ export type PortfolioTableConfig<TRow> = {
 }
 
 type EducationalBackground = components["schemas"]["EducationalBackgroundResponse"] & {
+  educationalAttainment?: string | number | null
   attachment?: string | null
 }
 type WorkExperience = components["schemas"]["WorkExperienceResponse"]
@@ -54,6 +55,7 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
   endpoint: (profileId) => `/api/v1/hrms/profiles/${profileId}/educational-backgrounds`,
   loadingLabel: "educational background",
   columns: [
+    { header: "Educational Attainment", render: (row) => row.educationalAttainment ?? "—" },
     { header: "Degree Level", render: (row) => row.degreeLevel },
     { header: "Degree", render: (row) => row.degree },
     { header: "Institution", render: (row) => row.institution },

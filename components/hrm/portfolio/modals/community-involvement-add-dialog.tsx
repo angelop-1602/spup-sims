@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus } from "lucide-react"
+import { Info, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 
 type CommunityInvolvementForm = Omit<components["schemas"]["CommunityInvolvementRequest"], "attachment">
@@ -112,15 +113,22 @@ export function CommunityInvolvementAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">
-              Nature of Involvement <span className="text-destructive">*</span>
+            <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+              <span>Nature of Involvement</span>
+              <span className="text-destructive">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>Speaker/Facilitator/Participant/Donor</TooltipContent>
+              </Tooltip>
             </label>
             <Input
               value={form.natureInvolvement}
               onChange={(event) =>
                 setForm((current) => ({ ...current, natureInvolvement: event.target.value }))
               }
-              placeholder="e.g. Volunteer, Organizer"
+              placeholder="e.g. Speaker, Facilitator, Participant, Donor"
               required
             />
           </div>
@@ -140,13 +148,16 @@ export function CommunityInvolvementAddDialog({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Attachment</label>
+            <label className="mb-2 block text-sm font-medium">
+              Attachment <span className="text-destructive">*</span>
+            </label>
             <Input
               type="file"
               accept="image/*,.pdf"
               onChange={(event) => {
                 setAttachmentFile(event.target.files?.[0] ?? null)
               }}
+              required
             />
           </div>
 

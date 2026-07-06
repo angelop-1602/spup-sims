@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Plus } from "lucide-react"
+import { Info, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 
 type ProfessionalEngagementForm = Omit<components["schemas"]["ProfessionalEngagementRequest"], "attachment">
@@ -98,52 +99,79 @@ export function ProfessionalEngagementAddDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium">
-              Engagement Type <span className="text-destructive">*</span>
+            <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+              <span>Professional Engagement</span>
+              <span className="text-destructive">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>E.g. Trainer/Adviser/Facilitator/Participant </TooltipContent>
+              </Tooltip>
             </label>
             <Input
               value={form.engagementType}
               onChange={(event) =>
                 setForm((current) => ({ ...current, engagementType: event.target.value }))
               }
-              placeholder="e.g. Consultancy, Resource Speaker"
+              placeholder="e.g. Trainer, Adviser, Facilitator, Participant"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">
-              Engagement Name <span className="text-destructive">*</span>
+            <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+              <span>Name of Engagement</span>
+              <span className="text-destructive">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>Seminar on Risk Management, PACUCOA</TooltipContent>
+              </Tooltip>
             </label>
             <Input
               value={form.engagementName}
               onChange={(event) =>
                 setForm((current) => ({ ...current, engagementName: event.target.value }))
               }
-              placeholder="e.g. National HR Summit 2026"
+              placeholder="e.g. Seminar on Risk Management"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Remarks</label>
+            <label className="mb-2 flex items-center gap-1 text-sm font-medium">
+              <span>Remarks</span>
+              <span className="text-destructive">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent>Institutional/National/International</TooltipContent>
+              </Tooltip>
+            </label>
             <Input
               value={form.remarks ?? ""}
               onChange={(event) =>
                 setForm((current) => ({ ...current, remarks: event.target.value || null }))
               }
-              placeholder="Optional"
+              placeholder="e.g. Institutional, National, International"
+              required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium">Attachment</label>
+            <label className="mb-2 block text-sm font-medium">
+              Attachment <span className="text-destructive">*</span>
+            </label>
             <Input
               type="file"
               accept="image/*,.pdf"
               onChange={(event) => {
                 setAttachmentFile(event.target.files?.[0] ?? null)
               }}
+              required
             />
           </div>
 
