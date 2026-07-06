@@ -25,11 +25,16 @@ const faqData: Record<string, { id: string; question: string; answer: string }[]
     },
     {
       id: 'g2',
+      question: 'Can I apply for multiple positions?',
+      answer: 'Yes, you can apply for multiple positions that match your qualifications. However, please ensure that you submit a separate application for each role.'
+    },
+    {
+      id: 'g3',
       question: 'What file formats are accepted for document uploads?',
       answer: 'All required documents must be scanned and uploaded in PDF format. Please ensure that each individual file size does not exceed 5MB.'
     },
     {
-      id: 'g3',
+      id: 'g4',
       question: 'Is my personal information safe?',
       answer: 'Data privacy is a matter of paramount importance to us. In strict compliance with the Data Privacy Act of 2012 (R.A. 10173), all profile details and uploaded documents are securely processed to guarantee the absolute confidentiality and protection of your personal data.'
     }
@@ -50,12 +55,12 @@ const faqData: Record<string, { id: string; question: string; answer: string }[]
     {
       id: 'p1',
       question: 'How long does the initial screening process usually take?',
-      answer: 'The Human Resource Management Office typically reviews submissions within 14 calendar days. We appreciate your patience during this period, and you are welcome to monitor your application status directly through this portal.'
+      answer: 'The Human Resource Management Office typically reviews submissions within 7-14 calendar days. We appreciate your patience during this period, and you are welcome to monitor your application status directly through this portal.'
     },
     {
       id: 'p2',
       question: 'What are the next steps if my profile passes the initial HR evaluation?',
-      answer: 'If your credentials satisfy the core requirements of the position, our HR team will contact you directly to arrange an official interview with the respective departmental evaluation committee.'
+      answer: 'Our HR team will contact you through your provided contact information to arrange an official interview and discuss the next steps.'
     }
   ],
   'System Support': [
