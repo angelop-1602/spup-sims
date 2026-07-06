@@ -23,6 +23,12 @@ import { CommunityInvolvementRowActions } from "@/components/hrm/portfolio/modal
 import { AwardRecognitionAddDialog } from "@/components/hrm/portfolio/modals/award-recognition-add-dialog"
 import { AwardRecognitionRowActions } from "@/components/hrm/portfolio/modals/award-recognition-row-actions"
 
+// `row.attachment` is just a stored filename/path, not a fetchable URL — the
+// file lives behind the same endpoint the upload POSTed to.
+function attachmentHref(basePath: string, id: number | string, attachment?: string | null) {
+  return attachment ? `${basePath}/${id}/attachment` : null
+}
+
 export type PortfolioTableConfig<TRow> = {
   endpoint: (profileId: number | string) => string
   loadingLabel: string
@@ -52,7 +58,15 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
     { header: "Degree", render: (row) => row.degree },
     { header: "Institution", render: (row) => row.institution },
     { header: "Date Graduated", render: (row) => formatDate(row.dateGraduated) },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(educationalBackground.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
@@ -73,7 +87,15 @@ const workExperience: PortfolioTableConfig<WorkExperience> = {
     { header: "Institution", render: (row) => row.institution },
     { header: "From", render: (row) => formatDate(row.startDate) },
     { header: "To", render: (row) => formatDate(row.endDate) },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(workExperience.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
@@ -94,7 +116,15 @@ const nationalCertification: PortfolioTableConfig<NationalBoard> = {
     { header: "License Number", render: (row) => row.licenseNumber },
     { header: "Rating", render: (row) => row.rating ?? "—" },
     { header: "Validity", render: (row) => formatDate(row.validity) },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(nationalCertification.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
@@ -114,7 +144,15 @@ const organizationAffiliation: PortfolioTableConfig<ProfessionalOrganization> = 
     { header: "Affiliation", render: (row) => row.affiliation },
     { header: "Membership", render: (row) => row.membership },
     { header: "Remarks", render: (row) => row.remarks ?? "—" },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(organizationAffiliation.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
@@ -134,7 +172,15 @@ const professionalEngagement: PortfolioTableConfig<ProfessionalEngagement> = {
     { header: "Engagement Type", render: (row) => row.engagementType },
     { header: "Engagement Name", render: (row) => row.engagementName },
     { header: "Remarks", render: (row) => row.remarks ?? "—" },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(professionalEngagement.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
@@ -155,7 +201,15 @@ const researchEngagement: PortfolioTableConfig<ResearchEngagement> = {
     { header: "Nature of Engagement", render: (row) => row.natureEngagement },
     { header: "Nature of Utilization", render: (row) => row.natureUtilization ?? "—" },
     { header: "Date Published", render: (row) => formatDate(row.datePublished) },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(researchEngagement.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
@@ -175,7 +229,15 @@ const communityInvolvement: PortfolioTableConfig<CommunityInvolvement> = {
     { header: "Involvement", render: (row) => row.involvement },
     { header: "Nature of Involvement", render: (row) => row.natureInvolvement },
     { header: "Date of Activity", render: (row) => formatDate(row.dateActivity) },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(communityInvolvement.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (
@@ -195,7 +257,15 @@ const awardsRecognition: PortfolioTableConfig<AwardRecognition> = {
     { header: "Awarding Body", render: (row) => row.awardingBody },
     { header: "Nature of Award", render: (row) => row.natureAward },
     { header: "Date Received", render: (row) => formatDate(row.dateReceived) },
-    { header: "Attachments", render: (row) => <AttachmentCell href={row.attachment} /> },
+    {
+      header: "Attachments",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={attachmentHref(awardsRecognition.endpoint(profileId), row.id, row.attachment)}
+          mode="modal"
+        />
+      ),
+    },
     {
       header: "Actions",
       render: (row, profileId, refresh) => (

@@ -29,7 +29,9 @@ import { useApiMutation, type components } from "@/lib/api"
 type EducationalBackground = components["schemas"]["EducationalBackgroundResponse"] & {
   attachment?: string | null
 }
-type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"]
+type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"] & {
+  attachment?: string | null
+}
 
 function toForm(row: EducationalBackground): EducationalBackgroundForm {
   return {
@@ -38,6 +40,7 @@ function toForm(row: EducationalBackground): EducationalBackgroundForm {
     degree: row.degree,
     institution: row.institution,
     dateGraduated: row.dateGraduated,
+    attachment: row.attachment,
   }
 }
 

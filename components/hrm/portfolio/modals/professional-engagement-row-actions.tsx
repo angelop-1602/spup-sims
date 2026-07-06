@@ -27,13 +27,14 @@ import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
 
 type ProfessionalEngagement = components["schemas"]["ProfessionalEngagementResponse"]
-type ProfessionalEngagementForm = Omit<components["schemas"]["ProfessionalEngagementRequest"], "attachment">
+type ProfessionalEngagementForm = components["schemas"]["ProfessionalEngagementRequest"]
 
 function toForm(row: ProfessionalEngagement): ProfessionalEngagementForm {
   return {
     engagementType: row.engagementType,
     engagementName: row.engagementName,
     remarks: row.remarks,
+    attachment: row.attachment,
   }
 }
 

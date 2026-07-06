@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Camera, Loader2 } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -8,9 +9,9 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import type { components } from "@/lib/api"
+import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 import portfolioSections from "@/app/hrm/portfolio/data.json"
 import { PortfolioSectionNav } from "@/components/hrm/portfolio/portfolio-section-nav"
 import {
@@ -29,11 +30,46 @@ type ProfileFields = {
 
 type EmployeePortfolioDetailsProps = {
   profile: components["schemas"]["EmployeeResponse"]
+  onProfileUpdated?: () => void
 }
 
-export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsProps) {
+export function EmployeePortfolioDetails({ profile, onProfileUpdated }: EmployeePortfolioDetailsProps) {
   const [activeSectionId, setActiveSectionId] = React.useState(portfolioSections[0].id)
   const [headerActionsEl, setHeaderActionsEl] = React.useState<HTMLDivElement | null>(null)
+  const [uploadingPicture, setUploadingPicture] = React.useState(false)
+  const [pictureError, setPictureError] = React.useState<string | null>(null)
+  const pictureInputRef = React.useRef<HTMLInputElement>(null)
+  const { headers } = useAuthorizedHeaders()
+
+  const handlePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ""
+    if (!file) return
+
+    setUploadingPicture(true)
+    setPictureError(null)
+    try {
+      // ponytail: no file-storage endpoint exists yet — the profile PUT only
+      // takes JSON, so the picture goes over the wire as a base64 data URI.
+      // Swap for a real upload endpoint (returning a URL) if payload size becomes an issue.
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = () => reject(reader.error ?? new Error("Failed to read file"))
+        reader.readAsDataURL(file)
+      })
+
+      await request(`/api/v1/core/profiles/${profile.id}`, headers, {
+        method: "PUT",
+        body: { profilePicture: dataUrl },
+      })
+      onProfileUpdated?.()
+    } catch (err) {
+      setPictureError(err instanceof Error ? err.message : "Failed to update photo")
+    } finally {
+      setUploadingPicture(false)
+    }
+  }
   const activeSection = portfolioSections.find((section) => section.id === activeSectionId) ?? portfolioSections[0]
   const activeTableRenderer = isPortfolioSectionId(activeSectionId)
     ? PORTFOLIO_TABLE_RENDERERS[activeSectionId]
@@ -76,11 +112,39 @@ export function EmployeePortfolioDetails({ profile }: EmployeePortfolioDetailsPr
       <Card className="gap-0 overflow-hidden rounded-lg py-0">
         <div className="grid lg:grid-cols-[20rem_1fr] lg:divide-x">
           <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
-            <Avatar className="size-40">
-              <AvatarFallback className="text-6xl font-semibold">
-                {profile.fullName?.charAt(0) ?? "?"}
-              </AvatarFallback>
-            </Avatar>
+            <div className="group relative">
+              <Avatar className="size-40">
+                {profile.profilePicture && (
+                  <AvatarImage src={profile.profilePicture} alt={profile.fullName} />
+                )}
+                <AvatarFallback className="text-6xl font-semibold">
+                  {profile.fullName?.charAt(0) ?? "?"}
+                </AvatarFallback>
+              </Avatar>
+              <button
+                type="button"
+                onClick={() => pictureInputRef.current?.click()}
+                disabled={uploadingPicture}
+                aria-label="Change profile photo"
+                className="absolute bottom-1 right-1 flex size-9 items-center justify-center rounded-full border bg-background text-foreground shadow-xs transition-colors hover:bg-accent disabled:opacity-50"
+              >
+                {uploadingPicture ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Camera className="size-4" />
+                )}
+              </button>
+              <input
+                ref={pictureInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handlePictureChange}
+              />
+            </div>
+            {pictureError && (
+              <p className="text-xs text-destructive">{pictureError}</p>
+            )}
             <div>
               <CardTitle className="text-lg">{profile.fullName}</CardTitle>
               {profile.designation && (

@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
 
 type WorkExperience = components["schemas"]["WorkExperienceResponse"]
-type WorkExperienceForm = Omit<components["schemas"]["WorkExperienceRequest"], "attachment">
+type WorkExperienceForm = components["schemas"]["WorkExperienceRequest"]
 
 function toForm(row: WorkExperience): WorkExperienceForm {
   return {
@@ -35,6 +35,7 @@ function toForm(row: WorkExperience): WorkExperienceForm {
     institution: row.institution,
     startDate: row.startDate,
     endDate: row.endDate,
+    attachment: row.attachment,
   }
 }
 

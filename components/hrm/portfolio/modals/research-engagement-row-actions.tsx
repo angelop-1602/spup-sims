@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
 
 type ResearchEngagement = components["schemas"]["ResearchEngagementResponse"]
-type ResearchEngagementForm = Omit<components["schemas"]["ResearchEngagementRequest"], "attachment">
+type ResearchEngagementForm = components["schemas"]["ResearchEngagementRequest"]
 
 function toForm(row: ResearchEngagement): ResearchEngagementForm {
   return {
@@ -35,6 +35,7 @@ function toForm(row: ResearchEngagement): ResearchEngagementForm {
     natureEngagement: row.natureEngagement,
     natureUtilization: row.natureUtilization,
     datePublished: row.datePublished,
+    attachment: row.attachment,
   }
 }
 

@@ -7,7 +7,7 @@ import { useApiQuery, type components } from "@/lib/api"
 type EmployeeResponse = components["schemas"]["EmployeeResponse"]
 
 export default function EmployeePortfolioPage() {
-  const { data: profile, loading, error } = useApiQuery<EmployeeResponse>(
+  const { data: profile, loading, error, refresh } = useApiQuery<EmployeeResponse>(
     "/api/v1/hrms/me/profile",
   )
 
@@ -31,7 +31,7 @@ export default function EmployeePortfolioPage() {
           {error.message}
         </div>
       ) : profile ? (
-        <EmployeePortfolioDetails profile={profile} />
+        <EmployeePortfolioDetails profile={profile} onProfileUpdated={refresh} />
       ) : (
         <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
           No portfolio data found.

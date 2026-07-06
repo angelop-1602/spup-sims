@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input"
 import { useApiMutation, type components } from "@/lib/api"
 
 type NationalBoard = components["schemas"]["NationalBoardResponse"]
-type NationalBoardForm = Omit<components["schemas"]["NationalBoardRequest"], "attachment">
+type NationalBoardForm = components["schemas"]["NationalBoardRequest"]
 
 function toForm(row: NationalBoard): NationalBoardForm {
   return {
@@ -36,6 +36,7 @@ function toForm(row: NationalBoard): NationalBoardForm {
     licenseNumber: row.licenseNumber,
     validity: row.validity,
     remarks: row.remarks,
+    attachment: row.attachment,
   }
 }
 
