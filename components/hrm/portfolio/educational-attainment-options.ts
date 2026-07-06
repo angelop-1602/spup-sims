@@ -4,4 +4,5 @@ export const EDUCATIONAL_ATTAINMENT_OPTIONS = [
   "Vocational",
   "Tertiary",
   "Graduate",
+  "Postgraduate",
 ] as const
