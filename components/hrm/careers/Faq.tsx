@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { Instrument_Serif, Inter } from 'next/font/google';
+import { Instrument_Serif, Inter, Epilogue } from 'next/font/google';
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
@@ -15,6 +15,11 @@ const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500'],
 });
+
+const epilogue = Epilogue({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700']
+})
 
 const faqData: Record<string, { id: string; question: string; answer: string }[]> = {
   'General': [
@@ -92,7 +97,7 @@ export default function FaqSection() {
           <h2 className={`${instrumentSerif.className} text-3xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] sm:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
             Frequently Asked Questions
           </h2>
-          <p className={`${inter.className} text-sm text-neutral-600 mt-1`}>
+          <p className={`${epilogue.className} text-sm text-neutral-600 mt-1`}>
             We compiled a list of answers to address your most pressing questions regarding our job openings and application requirements.
           </p>
         </div>
@@ -107,7 +112,7 @@ export default function FaqSection() {
                   key={cat}
                   type="button"
                   onClick={() => handleTabChange(cat)}
-                  className={`${inter.className} text-xs font-semibold px-4 py-2.5 rounded-xl text-left whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer flex items-center justify-between gap-2 ${
+                  className={`${epilogue.className} text-xs font-semibold px-4 py-2.5 rounded-xl text-left whitespace-nowrap transition-all duration-200 shrink-0 cursor-pointer flex items-center justify-between gap-2 ${
                     isActive 
                       ? 'bg-neutral-100 text-neutral-900 font-bold' 
                       : 'text-neutral-500 hover:text-neutral-900 hover:bg-neutral-50'
@@ -150,7 +155,7 @@ export default function FaqSection() {
                     onClick={() => setOpenFaqId(isOpen ? null : item.id)}
                     className="w-full px-5 py-4 flex items-center justify-between text-left gap-4 group cursor-pointer relative bg-emerald-800"
                   >
-                    <span className="text-xs tracking-wide font-semibold text-white selection:bg-amber-400">
+                    <span className={`${epilogue.className} text-xs tracking-wide font-semibold text-white selection:bg-amber-400`}>
                       {item.question}
                     </span>
                     
@@ -172,7 +177,7 @@ export default function FaqSection() {
                         transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="bg-white"
                       >
-                        <p className={`${inter.className} text-xs text-neutral-700 text-justify px-5 pt-5 pb-5 pr-8 font-normal leading-relaxed`}>
+                        <p className={`${epilogue.className} text-xs text-neutral-700 text-justify px-5 pt-5 pb-5 pr-8 font-normal leading-relaxed`}>
                           {item.answer}
                         </p>
                       </motion.div>
@@ -188,14 +193,14 @@ export default function FaqSection() {
         <div className="pt-8 w-full">
           <div className="bg-neutral-50/60 border border-neutral-200/60 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h4 className="text-xs font-bold text-neutral-900 tracking-wide">Still have questions?</h4>
-              <p className={`${inter.className} text-[11px] text-neutral-400 mt-1 font-normal`}>
+              <h4 className={`${epilogue.className} text-xs font-bold text-neutral-900 tracking-wide`}>Still have questions?</h4>
+              <p className={`${epilogue.className} text-[11px] text-neutral-400 mt-1 font-normal`}>
                 Please connect with our system support team, we're happy to help!
               </p>
             </div>
             <Link
               href="mailto:support@spup.edu.ph"
-              className="inline-flex items-center justify-center bg-white border border-neutral-200 text-neutral-800 hover:bg-neutral-50 text-[11px] font-bold px-4 py-2.5 rounded-xl shadow-2xs transition-colors shrink-0 text-center"
+              className={`${epilogue.className} inline-flex items-center justify-center bg-white border border-neutral-200 text-neutral-800 hover:bg-neutral-50 text-[11px] font-bold px-4 py-2.5 rounded-xl shadow-2xs transition-colors shrink-0 text-center`}
             >
               Contact support
             </Link>
