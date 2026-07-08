@@ -78,6 +78,7 @@ export function EducationalBackgroundRowActions({
   const [error, setError] = React.useState<Error | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
+  const degreeLevelRequired = form.educationalAttainment === "Postgraduate"
 
   const handleEditOpenChange = (open: boolean) => {
     if (open) {
@@ -189,7 +190,7 @@ export function EducationalBackgroundRowActions({
 
             <div>
               <label className="mb-2 block text-sm font-medium">
-                Degree Level <span className="text-destructive">*</span>
+                Degree Level {degreeLevelRequired && <span className="text-destructive">*</span>}
               </label>
               <Input
                 value={form.degreeLevel}
@@ -197,7 +198,7 @@ export function EducationalBackgroundRowActions({
                   setForm((current) => ({ ...current, degreeLevel: event.target.value }))
                 }
                 placeholder="e.g. Bachelor's, Master's"
-                required
+                required={degreeLevelRequired}
               />
             </div>
 

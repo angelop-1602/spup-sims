@@ -55,6 +55,9 @@ export function EducationalBackgroundAddDialog({
   const { headers } = useAuthorizedHeaders()
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
+  const attachmentsRequired =
+    form.educationalAttainment === "Graduate" || form.educationalAttainment === "Postgraduate"
+  const degreeLevelRequired = form.educationalAttainment === "Postgraduate"
 
   // Dismissing via outside-click/Escape keeps the draft so reopening later
   // in this session picks up where you left off. Only Cancel discards it.
@@ -154,15 +157,15 @@ export function EducationalBackgroundAddDialog({
 
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Degree Level <span className="text-destructive">*</span>
+              Degree Level {degreeLevelRequired && <span className="text-destructive">*</span>}
             </label>
             <Input
               value={form.degreeLevel}
               onChange={(event) =>
                 setForm((current) => ({ ...current, degreeLevel: event.target.value }))
               }
-              placeholder="e.g. Bachelor's, Master's"
-              required
+              placeholder="e.g. Masters, Doctorate"
+              required={degreeLevelRequired}
             />
           </div>
 
@@ -249,7 +252,7 @@ export function EducationalBackgroundAddDialog({
 
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Diploma <span className="text-destructive">*</span>
+              Diploma {attachmentsRequired && <span className="text-destructive">*</span>}
             </label>
             <Input
               type="file"
@@ -257,13 +260,13 @@ export function EducationalBackgroundAddDialog({
               onChange={(event) => {
                 setDiplomaFile(event.target.files?.[0] ?? null)
               }}
-              required
+              required={attachmentsRequired}
             />
           </div>
 
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Transcript of Records (TOR) <span className="text-destructive">*</span>
+              Transcript of Records (TOR) {attachmentsRequired && <span className="text-destructive">*</span>}
             </label>
             <Input
               type="file"
@@ -271,7 +274,7 @@ export function EducationalBackgroundAddDialog({
               onChange={(event) => {
                 setTorFile(event.target.files?.[0] ?? null)
               }}
-              required
+              required={attachmentsRequired}
             />
           </div>
 
