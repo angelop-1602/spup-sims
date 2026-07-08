@@ -345,7 +345,6 @@ export default function HrmPage() {
           onToggleSave={handleToggleSave}
           onSelectJob={setSelectedJob}
         />
-        {/* Modular Feature Sections */}
         <ProcessTimeline />
         <FaqSection />
         <JobBoardCTA />
@@ -356,9 +355,9 @@ export default function HrmPage() {
       <footer className="bg-white border-t border-neutral-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-400">
           <div className="flex items-center gap-2">
-            <span className="text-neutral-900 font-extrabold uppercase">SPUP HRM Careers</span>
+            <span className={`${poppins.className} text-neutral-900 font-extrabold uppercase`}>SPUP HRM Careers</span>
             <span>•</span>
-            <span>© 2026 St. Paul University Philippines. All rights reserved.</span>
+            <span className={`${epilogue.className}`}>© 2026 St. Paul University Philippines. All rights reserved.</span>
           </div>
         </div>
       </footer>

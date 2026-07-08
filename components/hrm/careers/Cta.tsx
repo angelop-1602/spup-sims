@@ -3,7 +3,7 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-import { Instrument_Serif, Inter } from 'next/font/google';
+import { Instrument_Serif, Inter, Epilogue } from 'next/font/google';
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
@@ -15,6 +15,11 @@ const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500'],
 });
+
+const epilogue = Epilogue({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700']
+})
 
 export default function JobBoardCTA() {
   return (
@@ -44,17 +49,17 @@ export default function JobBoardCTA() {
               Ready to shape the <span className="italic">future</span> of education?
             </h2>
             
-            <p className={`${inter.className} text-xs sm:text-sm text-white/90 mt-4 font-normal max-w-xl leading-relaxed`}>
+            <p className={`${epilogue.className} text-xs sm:text-sm text-white/90 mt-4 font-normal max-w-xl leading-relaxed`}>
               Find your place in our academic and administrative community. Submit your application profile today and take the first step toward a purposeful career.
             </p>
             
             <div className="mt-8">
             <Link
-                href="#featured-jobs" 
-                className={`${inter.className} inline-flex items-center justify-center bg-amber-400 text-black font-bold text-xs px-7 py-3 rounded-full shadow-xs hover:shadow-md transition-all duration-200 gap-1.5 group cursor-pointer`}
+              href="#featured-jobs"
+              className={`${epilogue.className} group inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 font-bold text-xs px-7 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer`}
             >
-                <span>Get Started</span>
-                <ArrowUpRight className="w-4 h-4 text-black transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <span>Get Started</span>
+              <ArrowUpRight className="w-4 h-4 text-black transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
             </Link>
             </div>
           </div>
