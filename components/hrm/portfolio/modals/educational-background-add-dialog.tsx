@@ -50,7 +50,8 @@ export function EducationalBackgroundAddDialog({
 }) {
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState<EducationalBackgroundForm>(EMPTY_FORM)
-  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
+  const [diplomaFile, setDiplomaFile] = React.useState<File | null>(null)
+  const [torFile, setTorFile] = React.useState<File | null>(null)
   const { headers } = useAuthorizedHeaders()
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
@@ -59,7 +60,8 @@ export function EducationalBackgroundAddDialog({
   // in this session picks up where you left off. Only Cancel discards it.
   const handleCancel = () => {
     setForm(EMPTY_FORM)
-    setAttachmentFile(null)
+    setDiplomaFile(null)
+    setTorFile(null)
     setError(null)
     setOpen(false)
   }
@@ -76,11 +78,21 @@ export function EducationalBackgroundAddDialog({
         { method: "POST", body: form },
       )
 
-      if (attachmentFile) {
+      if (diplomaFile) {
         const formData = new FormData()
-        formData.append("file", attachmentFile)
+        formData.append("file", diplomaFile)
         await request(
-          `/api/v1/hrms/profiles/${profileId}/educational-backgrounds/${created.id}/attachment`,
+          `/api/v1/hrms/profiles/${profileId}/educational-backgrounds/${created.id}/diploma`,
+          headers,
+          { method: "POST", body: formData },
+        )
+      }
+
+      if (torFile) {
+        const formData = new FormData()
+        formData.append("file", torFile)
+        await request(
+          `/api/v1/hrms/profiles/${profileId}/educational-backgrounds/${created.id}/tor`,
           headers,
           { method: "POST", body: formData },
         )
@@ -88,7 +100,8 @@ export function EducationalBackgroundAddDialog({
 
       onCreated()
       setForm(EMPTY_FORM)
-      setAttachmentFile(null)
+      setDiplomaFile(null)
+      setTorFile(null)
       setOpen(false)
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)))
@@ -236,13 +249,27 @@ export function EducationalBackgroundAddDialog({
 
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Attachment <span className="text-destructive">*</span>
+              Diploma <span className="text-destructive">*</span>
             </label>
             <Input
               type="file"
               accept="image/*,.pdf"
               onChange={(event) => {
-                setAttachmentFile(event.target.files?.[0] ?? null)
+                setDiplomaFile(event.target.files?.[0] ?? null)
+              }}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium">
+              Transcript of Records (TOR) <span className="text-destructive">*</span>
+            </label>
+            <Input
+              type="file"
+              accept="image/*,.pdf"
+              onChange={(event) => {
+                setTorFile(event.target.files?.[0] ?? null)
               }}
               required
             />

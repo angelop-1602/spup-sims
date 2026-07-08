@@ -34,7 +34,13 @@ type EmployeePortfolioDetailsProps = {
 }
 
 export function EmployeePortfolioDetails({ profile, onProfileUpdated }: EmployeePortfolioDetailsProps) {
-  const [activeSectionId, setActiveSectionId] = React.useState(portfolioSections[0].id)
+  const [activeSectionId, setActiveSectionId] = React.useState(() => {
+    if (typeof window === "undefined") return portfolioSections[0].id
+    const fromUrl = new URLSearchParams(window.location.search).get("section")
+    return fromUrl && portfolioSections.some((section) => section.id === fromUrl)
+      ? fromUrl
+      : portfolioSections[0].id
+  })
   const [headerActionsEl, setHeaderActionsEl] = React.useState<HTMLDivElement | null>(null)
   const [uploadingPicture, setUploadingPicture] = React.useState(false)
   const [pictureError, setPictureError] = React.useState<string | null>(null)
@@ -67,13 +73,6 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
   const activeTableRenderer = isPortfolioSectionId(activeSectionId)
     ? PORTFOLIO_TABLE_RENDERERS[activeSectionId]
     : undefined
-
-  React.useEffect(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get("section")
-    if (fromUrl && portfolioSections.some((section) => section.id === fromUrl)) {
-      setActiveSectionId(fromUrl)
-    }
-  }, [])
 
   const handleSelectSection = (id: string) => {
     setActiveSectionId(id)
@@ -192,7 +191,7 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
             <div ref={setHeaderActionsEl} />
           </CardHeader>
 
-          <CardContent className="p-0">
+          <CardContent className="p-0" key={activeSectionId}>
             {activeTableRenderer?.(profile.id, headerActionsEl)}
           </CardContent>
         </Card>

@@ -35,7 +35,8 @@ export type PortfolioTableConfig<TRow> = {
 
 type EducationalBackground = components["schemas"]["EducationalBackgroundResponse"] & {
   educationalAttainment?: string | number | null
-  attachment?: string | null
+  diploma?: string | null
+  tor?: string | null
 }
 type WorkExperience = components["schemas"]["WorkExperienceResponse"]
 type NationalBoard = components["schemas"]["NationalBoardResponse"]
@@ -55,10 +56,19 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
     { header: "Institution", render: (row) => row.institution },
     { header: "Date Graduated", render: (row) => formatDate(row.dateGraduated) },
     {
-      header: "Attachments",
+      header: "Diploma",
       render: (row, profileId) => (
         <AttachmentCell
-          href={`${educationalBackground.endpoint(profileId)}/${row.id}/attachment`}
+          href={`${educationalBackground.endpoint(profileId)}/${row.id}/diploma`}
+          mode="modal"
+        />
+      ),
+    },
+    {
+      header: "TOR",
+      render: (row, profileId) => (
+        <AttachmentCell
+          href={`${educationalBackground.endpoint(profileId)}/${row.id}/tor`}
           mode="modal"
         />
       ),

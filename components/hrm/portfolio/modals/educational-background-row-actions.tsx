@@ -41,11 +41,11 @@ import { cn } from "@/lib/utils"
 
 type EducationalBackground = components["schemas"]["EducationalBackgroundResponse"] & {
   educationalAttainment?: string | number | null
-  attachment?: string | null
+  diploma?: string | null
+  tor?: string | null
 }
 type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"] & {
   educationalAttainment?: string | null
-  attachment?: string | null
 }
 
 function toForm(row: EducationalBackground): EducationalBackgroundForm {
@@ -59,7 +59,6 @@ function toForm(row: EducationalBackground): EducationalBackgroundForm {
     degree: row.degree,
     institution: row.institution,
     dateGraduated: row.dateGraduated,
-    attachment: row.attachment,
   }
 }
 
@@ -74,7 +73,8 @@ export function EducationalBackgroundRowActions({
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [form, setForm] = React.useState<EducationalBackgroundForm>(() => toForm(row))
-  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null)
+  const [diplomaFile, setDiplomaFile] = React.useState<File | null>(null)
+  const [torFile, setTorFile] = React.useState<File | null>(null)
   const [error, setError] = React.useState<Error | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
@@ -82,7 +82,8 @@ export function EducationalBackgroundRowActions({
   const handleEditOpenChange = (open: boolean) => {
     if (open) {
       setForm(toForm(row))
-      setAttachmentFile(null)
+      setDiplomaFile(null)
+      setTorFile(null)
       setError(null)
     }
     setEditOpen(open)
@@ -103,17 +104,32 @@ export function EducationalBackgroundRowActions({
       return
     }
 
-    if (attachmentFile) {
+    if (diplomaFile) {
       const formData = new FormData()
-      formData.append("file", attachmentFile)
+      formData.append("file", diplomaFile)
       const uploaded = await saveRow({
-        path: `/api/v1/hrms/profiles/${profileId}/educational-backgrounds/${row.id}/attachment`,
+        path: `/api/v1/hrms/profiles/${profileId}/educational-backgrounds/${row.id}/diploma`,
         method: "POST",
         body: formData,
       })
 
       if (!uploaded) {
-        setError(new Error("Unable to upload attachment"))
+        setError(new Error("Unable to upload diploma"))
+        return
+      }
+    }
+
+    if (torFile) {
+      const formData = new FormData()
+      formData.append("file", torFile)
+      const uploaded = await saveRow({
+        path: `/api/v1/hrms/profiles/${profileId}/educational-backgrounds/${row.id}/tor`,
+        method: "POST",
+        body: formData,
+      })
+
+      if (!uploaded) {
+        setError(new Error("Unable to upload transcript of records"))
         return
       }
     }
@@ -267,19 +283,33 @@ export function EducationalBackgroundRowActions({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Attachment <span className="text-destructive">*</span>
-              </label>
-              {row.attachment && (
+              <label className="mb-2 block text-sm font-medium">Diploma</label>
+              {row.diploma && (
                 <p className="mb-2 truncate text-sm text-muted-foreground">
-                  Current: {row.attachment.split("/").pop()}
+                  Current: {row.diploma.split("/").pop()}
                 </p>
               )}
               <Input
                 type="file"
                 accept="image/*,.pdf"
                 onChange={(event) => {
-                  setAttachmentFile(event.target.files?.[0] ?? null)
+                  setDiplomaFile(event.target.files?.[0] ?? null)
+                }}
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium">Transcript of Records (TOR)</label>
+              {row.tor && (
+                <p className="mb-2 truncate text-sm text-muted-foreground">
+                  Current: {row.tor.split("/").pop()}
+                </p>
+              )}
+              <Input
+                type="file"
+                accept="image/*,.pdf"
+                onChange={(event) => {
+                  setTorFile(event.target.files?.[0] ?? null)
                 }}
               />
             </div>
