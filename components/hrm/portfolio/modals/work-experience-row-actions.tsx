@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { CalendarIcon, Edit3, Trash2 } from "lucide-react"
-import { format } from "date-fns"
+import { addDays, format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -178,10 +178,14 @@ export function WorkExperienceRowActions({
                     mode="single"
                     selected={form.startDate ? new Date(form.startDate) : undefined}
                     onSelect={(date) =>
-                      setForm((current) => ({
-                        ...current,
-                        startDate: date ? format(date, "yyyy-MM-dd") : "",
-                      }))
+                      setForm((current) => {
+                        const startDate = date ? format(date, "yyyy-MM-dd") : ""
+                        const endDate =
+                          current.endDate && startDate && current.endDate <= startDate
+                            ? null
+                            : current.endDate
+                        return { ...current, startDate, endDate }
+                      })
                     }
                     captionLayout="dropdown"
                   />
@@ -225,6 +229,7 @@ export function WorkExperienceRowActions({
                         endDate: date ? format(date, "yyyy-MM-dd") : null,
                       }))
                     }
+                    disabled={form.startDate ? { before: addDays(new Date(form.startDate), 1) } : undefined}
                     captionLayout="dropdown"
                   />
                 </PopoverContent>
