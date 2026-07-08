@@ -59,7 +59,7 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
       header: "Diploma",
       render: (row, profileId) => (
         <AttachmentCell
-          href={`${educationalBackground.endpoint(profileId)}/${row.id}/diploma`}
+          href={row.diploma ? `${educationalBackground.endpoint(profileId)}/${row.id}/diploma` : null}
           mode="modal"
         />
       ),
@@ -68,7 +68,7 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
       header: "TOR",
       render: (row, profileId) => (
         <AttachmentCell
-          href={`${educationalBackground.endpoint(profileId)}/${row.id}/tor`}
+          href={row.tor ? `${educationalBackground.endpoint(profileId)}/${row.id}/tor` : null}
           mode="modal"
         />
       ),

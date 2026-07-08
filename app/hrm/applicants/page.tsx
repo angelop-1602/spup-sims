@@ -4,6 +4,8 @@ import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
 import { useApiQuery, type components } from "@/lib/api"
+import { Button } from "@/components/ui/button"
+import { ApplicantRowActions } from "@/components/hrm/applicants/applicant-row-actions"
 
 interface Applicant {
   id: number | string
@@ -75,6 +77,7 @@ export default function ApplicantsPage() {
     data: applicantsPayload,
     loading: isLoading,
     error,
+    refresh: refreshApplicants,
   } = useApiQuery<ApplicantsPayload>("/api/v1/recruitment/employee-applicants", {
     Page: page,
     PageSize: PAGE_SIZE,
@@ -94,7 +97,6 @@ export default function ApplicantsPage() {
 
   const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
   const profiles = profilesPayload?.data ?? []
-
 
   const totalPages = Number(applicantsPayload?.totalPages ?? 1)
   const totalRecords = Number(applicantsPayload?.totalRecords ?? 0)
@@ -232,13 +234,18 @@ export default function ApplicantsPage() {
                         {formatDate(applicant.updatedAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => router.push(`/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`)}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-secondary/50 px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-all hover:bg-secondary focus-visible:outline-none"
-                        >
-                          <Eye className="h-3.5 w-3.5 opacity-70" />
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon-sm"
+                            className="active:translate-y-0!"
+                            onClick={() => router.push(`/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`)}
+                            aria-label="View applicant"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                          <ApplicantRowActions applicant={applicant} onChanged={refreshApplicants} />
+                        </div>
                       </td>
                     </tr>
                   )

@@ -33,7 +33,12 @@ export function AttachmentCell({
 }) {
   if (!href) {
     return (
-      <Button variant="outline" size="sm" disabled>
+      <Button
+        variant="ghost"
+        size="sm"
+        disabled
+        className="text-muted-foreground opacity-100"
+      >
         <Paperclip className="h-3.5 w-3.5" />
         Files
       </Button>

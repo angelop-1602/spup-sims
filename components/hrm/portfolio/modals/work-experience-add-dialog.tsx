@@ -229,6 +229,7 @@ export function WorkExperienceAddDialog({
               onChange={(event) => {
                 setAttachmentFile(event.target.files?.[0] ?? null)
               }}
+              required
             />
           </div>
 
