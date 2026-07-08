@@ -49,19 +49,12 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
     setUploadingPicture(true)
     setPictureError(null)
     try {
-      // ponytail: no file-storage endpoint exists yet — the profile PUT only
-      // takes JSON, so the picture goes over the wire as a base64 data URI.
-      // Swap for a real upload endpoint (returning a URL) if payload size becomes an issue.
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onload = () => resolve(reader.result as string)
-        reader.onerror = () => reject(reader.error ?? new Error("Failed to read file"))
-        reader.readAsDataURL(file)
-      })
+      const body = new FormData()
+      body.append("file", file)
 
-      await request(`/api/v1/core/profiles/${profile.id}`, headers, {
-        method: "PUT",
-        body: { profilePicture: dataUrl },
+      await request("/api/v1/hrms/me/profile/avatar", headers, {
+        method: "POST",
+        body,
       })
       onProfileUpdated?.()
     } catch (err) {

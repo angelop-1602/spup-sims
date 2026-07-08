@@ -23,12 +23,6 @@ import { CommunityInvolvementRowActions } from "@/components/hrm/portfolio/modal
 import { AwardRecognitionAddDialog } from "@/components/hrm/portfolio/modals/award-recognition-add-dialog"
 import { AwardRecognitionRowActions } from "@/components/hrm/portfolio/modals/award-recognition-row-actions"
 
-// `row.attachment` is just a stored filename/path, not a fetchable URL — the
-// file lives behind the same endpoint the upload POSTed to.
-function attachmentHref(basePath: string, id: number | string, attachment?: string | null) {
-  return attachment ? `${basePath}/${id}/attachment` : null
-}
-
 export type PortfolioTableConfig<TRow> = {
   endpoint: (profileId: number | string) => string
   loadingLabel: string
@@ -64,7 +58,7 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(educationalBackground.endpoint(profileId), row.id, row.attachment)}
+          href={`${educationalBackground.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),
@@ -93,7 +87,7 @@ const workExperience: PortfolioTableConfig<WorkExperience> = {
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(workExperience.endpoint(profileId), row.id, row.attachment)}
+          href={`${workExperience.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),
@@ -122,7 +116,7 @@ const nationalCertification: PortfolioTableConfig<NationalBoard> = {
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(nationalCertification.endpoint(profileId), row.id, row.attachment)}
+          href={`${nationalCertification.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),
@@ -150,7 +144,7 @@ const organizationAffiliation: PortfolioTableConfig<ProfessionalOrganization> = 
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(organizationAffiliation.endpoint(profileId), row.id, row.attachment)}
+          href={`${organizationAffiliation.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),
@@ -178,7 +172,7 @@ const professionalEngagement: PortfolioTableConfig<ProfessionalEngagement> = {
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(professionalEngagement.endpoint(profileId), row.id, row.attachment)}
+          href={`${professionalEngagement.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),
@@ -207,7 +201,7 @@ const researchEngagement: PortfolioTableConfig<ResearchEngagement> = {
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(researchEngagement.endpoint(profileId), row.id, row.attachment)}
+          href={`${researchEngagement.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),
@@ -235,7 +229,7 @@ const communityInvolvement: PortfolioTableConfig<CommunityInvolvement> = {
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(communityInvolvement.endpoint(profileId), row.id, row.attachment)}
+          href={`${communityInvolvement.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),
@@ -263,7 +257,7 @@ const awardsRecognition: PortfolioTableConfig<AwardRecognition> = {
       header: "Attachments",
       render: (row, profileId) => (
         <AttachmentCell
-          href={attachmentHref(awardsRecognition.endpoint(profileId), row.id, row.attachment)}
+          href={`${awardsRecognition.endpoint(profileId)}/${row.id}/attachment`}
           mode="modal"
         />
       ),

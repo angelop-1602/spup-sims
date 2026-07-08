@@ -51,16 +51,14 @@ export function AttachmentCell({
     )
   }
 
-  const isPdf = href.toLowerCase().endsWith(".pdf")
-
-  return <AttachmentModal href={href} isPdf={isPdf} />
+  return <AttachmentModal href={href} />
 }
 
-// The attachment endpoint requires a bearer token, which an <iframe>/<img> src
-// can't send — fetch it as an authorized blob and render that instead.
-function AttachmentModal({ href, isPdf }: { href: string; isPdf: boolean }) {
+
+function AttachmentModal({ href }: { href: string }) {
   const { headers } = useAuthorizedHeaders()
   const [blobUrl, setBlobUrl] = React.useState<string | null>(null)
+  const [isPdf, setIsPdf] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
 
   const load = React.useCallback(async () => {
@@ -69,6 +67,8 @@ function AttachmentModal({ href, isPdf }: { href: string; isPdf: boolean }) {
       const response = await fetch(href, { headers: await headers() })
       if (!response.ok) throw new Error(`Failed to load attachment (${response.status})`)
       const blob = await response.blob()
+
+      setIsPdf(blob.type.includes("pdf"))
       setBlobUrl(URL.createObjectURL(blob))
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load attachment")
@@ -92,21 +92,22 @@ function AttachmentModal({ href, isPdf }: { href: string; isPdf: boolean }) {
           Files
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="sm:max-w-4xl">
         <DialogHeader>
           <DialogTitle>Attachment</DialogTitle>
         </DialogHeader>
         {error ? (
-          <div className="flex h-[75vh] items-center justify-center text-sm text-destructive">{error}</div>
+          <div className="flex h-[45vh] items-center justify-center text-sm text-destructive">{error}</div>
         ) : !blobUrl ? (
-          <div className="flex h-[75vh] items-center justify-center">
+          <div className="flex h-[45vh] items-center justify-center">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
         ) : isPdf ? (
-          <iframe src={blobUrl} className="h-[75vh] w-full rounded-md border" />
+          <iframe src={blobUrl} className="h-[45vh] w-full rounded-md border" />
         ) : (
-          // eslint-disable-next-line @next/next/no-img-element -- blob URL, no next.config remotePatterns to configure
-          <img src={blobUrl} alt="Attachment" className="max-h-[75vh] w-full rounded-md border object-contain" />
+          <div className="flex h-[45vh] items-center justify-center">
+            <img src={blobUrl} alt="Attachment" className="h-full w-auto rounded-md border object-contain" />
+          </div>
         )}
       </DialogContent>
     </Dialog>
