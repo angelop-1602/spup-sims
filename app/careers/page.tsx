@@ -15,17 +15,27 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Job, UserProfile, Application, INITIAL_JOBS } from '@/components/hrm/types';
-import JobCard from '@/components/hrm/careers/JobCard';
+import FeaturedJobs from '@/components/hrm/careers/FeaturedJobs';
 import JobDetailsModal from '@/components/hrm/careers/JobDetailsModal';
 import ProcessTimeline from '@/components/hrm/careers/ApplicationProcess';
 import FaqSection from '@/components/hrm/careers/Faq';
 import JobBoardCTA from '@/components/hrm/careers/Cta';
-import { Instrument_Serif, Inter } from 'next/font/google';
+import { Instrument_Serif, Poppins, Epilogue, Inter } from 'next/font/google';
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: ['400'],
   style: ['normal', 'italic'],
+});
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
+const epilogue = Epilogue({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
 });
 
 const inter = Inter({
@@ -263,133 +273,78 @@ export default function HrmPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.35 }}
-              className="relative w-full h-[460px] md:h-[480px] overflow-hidden shadow-xs flex items-center bg-neutral-900 bg-cover bg-center bg-no-repeat mb-8"
-              style={{ backgroundImage: "url('/img/bg-auth.png')", backgroundPosition: 'center center' }} 
+              className="relative w-full h-[560px] md:h-[600px] overflow-hidden shadow-xs flex items-center bg-white mb-8"
             >
-              <div className="absolute inset-0 bg-neutral-950/40 z-0 pointer-events-none" />
+              {/* Grid pattern */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_80%)]" />
+
+              {/* Blobs */}
+              <div className="absolute -top-24 -left-24 w-80 h-80 bg-emerald-200/40 rounded-full blur-3xl pointer-events-none" /> {/* Top left green blob */}
+              <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Top left green circle outline */}
+
+              <div className="absolute -bottom-28 -right-16 w-80 h-80 bg-emerald-200/35 rounded-full blur-3xl pointer-events-none" /> {/* Bottom right green blob */}
+              <div className="absolute -bottom-28 -right-16 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Bottom right green circle outline*/}
+              
+              <div className="absolute top-2 right-2 sm:top-6 sm:right-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-200/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Top right yellow blob */}
+              <div className="absolute bottom-2 left-2 sm:bottom-6 sm:left-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Bottom left yellow blob */}
+
+              <div className="absolute top-1 left-1/3 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-56 sm:h-56 md:w-[300px] md:h-[300px] bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Top left yellow blob */}
+              <div className="absolute bottom-1 right-1/3 w-36 h-36 sm:w-52 sm:h-52 md:w-72 md:h-72 bg-emerald-200/30 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Bottom right green blob */}
+
+              <div className="hidden sm:block absolute top-32 sm:top-50 left-1/4 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-[100px] sm:h-[100px] rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Left green circle outline */}
+              <div className="hidden sm:block absolute top-40 sm:top-60 left-1/5 -translate-x-1/10 -translate-y-1/2 w-12 h-12 sm:w-[80px] sm:h-[80px] rounded-full bg-amber-400/30 pointer-events-none" /> {/* Left yellow circle */}
+
+              <div className="hidden md:block absolute -top-1 right-[22%] -translate-x-1/20 -translate-y-1/5 w-[40px] h-[40px] rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Top right green circle */}
+              <div className="absolute top-0 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[60px] h-[60px] rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Top right bigger yellow circle outline */}
+              <div className="absolute top-12 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[24px] h-[24px] rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Top right smaller yellow circle outline */}
+
+              <div className="hidden sm:block absolute bottom-14 sm:bottom-20 right-[30%] w-24 h-24 sm:w-40 sm:h-40 rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Bottom right yellow circle outline */}
+              <div className="hidden sm:block absolute bottom-32 sm:bottom-50 right-[29%] w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Bottom right green circle */}
+              <div className="hidden md:block absolute bottom-22 right-[65%] w-20 h-20 rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Bottom left green bar */}
 
               <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="w-full max-w-xl bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-10 border-2 border-emerald-900 shadow-xl flex flex-col space-y-5 [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
+                <div className="relative w-full max-w-2xl mx-auto text-center bg-white border-2 border-emerald-950 rounded-2xl p-8 md:p-10 shadow-[6px_6px_0px_0px_#022c22]">
+                  <div className={`${epilogue.className} absolute -top-6 -right-6 bg-amber-400 border-2 border-amber-900 rounded-full w-16 h-16 flex items-center justify-center rotate-12 shadow-[3px_3px_0px_0px_#78350f] text-[10px] font-black text-neutral-900 text-center uppercase leading-tight`}>
+                    Apply Today!
+                  </div>
                   <div className="space-y-3">
-                    <h1 className={`${instrumentSerif.className} text-4xl sm:text-5xl lg:text-6xl font-normal text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] md:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
+                    <h1 className={`${poppins.className} text-5xl text-center sm:text-4xl lg:text-6xl font-bold text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] md:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
                       Build Your Career with SPUP
                     </h1>
-                    <p className={`${inter.className} text-sm text-neutral-600 text-justify font-normal leading-relaxed`}>
+                    <p className={`${epilogue.className} text-sm text-black text-center font-normal leading-relaxed`}>
                       Join a mission-driven academic community committed to service, excellence, and transformative education. Discover where your passion aligns with systemic impact.
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <a href="#advanced-search-box" className="inline-flex items-center justify-center gap-2 border-1 border-emerald-900 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-xs transition-colors">
+                  <div className="flex flex-col sm:flex-row gap-3 pt-5 justify-center">
+                    <a 
+                      href="#advanced-search-box" 
+                      className={`${epilogue.className} inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none`}
+                    >
                       <Briefcase className="w-3.5 h-3.5" />
                       Browse Job Openings
                     </a>
-                    <button onClick={() => setActiveTab('profile')} className="inline-flex items-center justify-center gap-2 border-1 border-neutral-300 bg-neutral-200 hover:bg-neutral-200 text-neutral-800 text-xs font-bold px-5 py-3 rounded-xl transition-colors cursor-pointer">
+                    <button 
+                      onClick={() => setActiveTab('profile')} 
+                      className={`${epilogue.className} inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer`}
+                    >
                       <FileText className="w-3.5 h-3.5" />
                       Setup Application Profile
                     </button>
                   </div>
+
                 </div>
               </div>
             </motion.section>
           )}
         </AnimatePresence>
-
-        <div id="workspace-layout" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-        {activeTab === 'explore' && (
-          <div className="space-y-6">
-            
-            {/* Featured Jobs Header*/}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div>
-                <h2 className={`${instrumentSerif.className} text-3xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] sm:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
-                  Featured Job Openings
-                </h2>
-              <p className={`${inter.className} text-sm text-neutral-500 mt-1`}>
-                Explore premier pathways currently accepting applications.
-              </p>
-            </div>
-              <Link 
-                href="#" 
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border-1 border-emerald-950 bg-emerald-800 text-white hover:bg-emerald-900 text-xs font-bold rounded-xl transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
-              >
-                View all openings
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            {/* Featured Jobs Grid Display */}
-            <div id="vacancies" className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <AnimatePresence mode="popLayout">
-                  {jobs.slice(0, 3).map((job) => (
-                    <div 
-                      key={job.id}
-                      className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-visible [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]"
-                    >
-                      <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
-                        <div className="flex flex-col">
-                          <span className="font-instrument text-[16px] font-medium text-white tracking-wide leading-tight">
-                            {job.title}
-                          </span>
-                          <span className="font-inter text-[10px] font-bold uppercase tracking-wider text-amber-400 mt-0.5">
-                            {job.department || "Academic Unit"}
-                          </span>
-                        </div>
-                        
-                        {/* Save/Bookmark Button */}
-                        <button 
-                          type="button" 
-                          onClick={(e) => handleToggleSave(job.id, e)}
-                          className="text-amber-300 hover:text-amber-400 transition-colors shrink-0 z-10"
-                        >
-                          <Bookmark className={`w-4 h-4 ${savedJobIds.includes(job.id) ? 'fill-amber-400 text-amber-400' : ''}`} />
-                        </button>
-                      </div>
-
-                      <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] font-inter">
-                        <div>
-                          {/* Job Details Meta Row */}
-                          <div className="flex flex-wrap gap-2 mb-3">
-                            <span className="text-[10px] font-semibold bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded border border-neutral-200">
-                              {job.type || "Full-time"}
-                            </span>
-                            <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
-                              {job.location || "Main Campus"}
-                            </span>
-                          </div>
-
-                          <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify line-clamp-3">
-                            {job.description}
-                          </p>
-                        </div>
-                        
-                        {/* Action Footer */}
-                        <div className="mt-5 pt-4 border-t border-neutral-100 flex items-center justify-between">
-                          <span className="text-[10px] text-neutral-400 font-medium">
-                            Posted {job.postedDate || "Recently"}
-                          </span>
-                          
-                          <button 
-                            type="button" 
-                            onClick={() => setSelectedJob(job)}
-                            className="inline-flex items-center gap-1 text-xs font-bold text-emerald-900 hover:text-emerald-950 uppercase tracking-wider group/btn"
-                          >
-                            View Details 
-                            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </AnimatePresence>
-              </div>
-            </div>
-
-          </div>
-        )}
-      </div>
-
+        <FeaturedJobs
+          activeTab={activeTab}
+          jobs={jobs}
+          savedJobIds={savedJobIds}
+          onToggleSave={handleToggleSave}
+          onSelectJob={setSelectedJob}
+        />
         {/* Modular Feature Sections */}
         <ProcessTimeline />
         <FaqSection />
