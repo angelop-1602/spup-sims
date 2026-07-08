@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Info, Plus } from "lucide-react"
+import { CalendarIcon, Info, Plus } from "lucide-react"
+import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
@@ -13,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
   Select,
@@ -21,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 import { EDUCATIONAL_ATTAINMENT_OPTIONS } from "@/components/hrm/portfolio/educational-attainment-options"
 
@@ -190,16 +194,43 @@ export function EducationalBackgroundAddDialog({
             <label className="mb-2 block text-sm font-medium">
               Date Graduated <span className="text-destructive">*</span>
             </label>
-            <Input
-              type="date"
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start font-normal",
+                    !form.dateGraduated && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 size-4" />
+                  {form.dateGraduated
+                    ? format(new Date(form.dateGraduated), "PPP")
+                    : "Select date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={form.dateGraduated ? new Date(form.dateGraduated) : undefined}
+                  onSelect={(date) =>
+                    setForm((current) => ({
+                      ...current,
+                      dateGraduated: date ? format(date, "yyyy-MM-dd") : null,
+                    }))
+                  }
+                  captionLayout="dropdown"
+                />
+              </PopoverContent>
+            </Popover>
+            <input
+              type="text"
               value={form.dateGraduated ?? ""}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  dateGraduated: event.target.value || null,
-                }))
-              }
+              onChange={() => {}}
               required
+              className="sr-only"
+              tabIndex={-1}
             />
           </div>
 

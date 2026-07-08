@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Info, Plus } from "lucide-react"
+import { CalendarIcon, Info, Plus } from "lucide-react"
+import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   Dialog,
   DialogContent,
@@ -13,8 +15,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
+import { cn } from "@/lib/utils"
 
 type NationalBoardForm = Omit<components["schemas"]["NationalBoardRequest"], "attachment">
 
@@ -153,16 +157,41 @@ export function NationalCertificationAddDialog({
             <label className="mb-2 block text-sm font-medium">
               Validity <span className="text-destructive">*</span>
             </label>
-            <Input
-              type="date"
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start font-normal",
+                    !form.validity && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 size-4" />
+                  {form.validity ? format(new Date(form.validity), "PPP") : "Select date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={form.validity ? new Date(form.validity) : undefined}
+                  onSelect={(date) =>
+                    setForm((current) => ({
+                      ...current,
+                      validity: date ? format(date, "yyyy-MM-dd") : null,
+                    }))
+                  }
+                  captionLayout="dropdown"
+                />
+              </PopoverContent>
+            </Popover>
+            <input
+              type="text"
               value={form.validity ?? ""}
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  validity: event.target.value || null,
-                }))
-              }
+              onChange={() => {}}
               required
+              className="sr-only"
+              tabIndex={-1}
             />
           </div>
 

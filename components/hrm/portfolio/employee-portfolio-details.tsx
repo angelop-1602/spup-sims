@@ -107,9 +107,10 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
           <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
             <div className="group relative">
               <Avatar className="size-40">
-                {profile.profilePicture && (
-                  <AvatarImage src={profile.profilePicture} alt={profile.fullName} />
-                )}
+                <AvatarImage
+                  src={`/api/v1/public/avatars/${profile.id}?v=${encodeURIComponent(profile.profilePicture ?? "")}`}
+                  alt={profile.fullName}
+                />
                 <AvatarFallback className="text-6xl font-semibold">
                   {profile.fullName?.charAt(0) ?? "?"}
                 </AvatarFallback>

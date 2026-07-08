@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Edit3, Trash2 } from "lucide-react"
+import { CalendarIcon, Edit3, Trash2 } from "lucide-react"
+import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,7 +26,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { useApiMutation, type components } from "@/lib/api"
+import { cn } from "@/lib/utils"
 
 type AwardRecognition = components["schemas"]["AwardRecognitionResponse"]
 type AwardRecognitionForm = components["schemas"]["AwardRecognitionRequest"]
@@ -154,13 +158,41 @@ export function AwardRecognitionRowActions({
               <label className="mb-2 block text-sm font-medium">
                 Date Received <span className="text-destructive">*</span>
               </label>
-              <Input
-                type="date"
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start font-normal",
+                      !form.dateReceived && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 size-4" />
+                    {form.dateReceived ? format(new Date(form.dateReceived), "PPP") : "Select date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={form.dateReceived ? new Date(form.dateReceived) : undefined}
+                    onSelect={(date) =>
+                      setForm((current) => ({
+                        ...current,
+                        dateReceived: date ? format(date, "yyyy-MM-dd") : "",
+                      }))
+                    }
+                    captionLayout="dropdown"
+                  />
+                </PopoverContent>
+              </Popover>
+              <input
+                type="text"
                 value={form.dateReceived}
-                onChange={(event) =>
-                  setForm((current) => ({ ...current, dateReceived: event.target.value }))
-                }
+                onChange={() => {}}
                 required
+                className="sr-only"
+                tabIndex={-1}
               />
             </div>
 
