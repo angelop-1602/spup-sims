@@ -40,5 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# ai agents
+# ai
 CLAUDE.md
+.playwright-mcp
+.agents
+.mcp.json
+skills-lock.json

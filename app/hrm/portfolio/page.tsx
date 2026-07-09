@@ -1,16 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { EmployeePortfolioDetails } from "@/components/hrm/employee-portfolio-details"
+import { EmployeePortfolioDetails } from "@/components/hrm/portfolio/employee-portfolio-details"
 import { useApiQuery, type components } from "@/lib/api"
 
 type EmployeeResponse = components["schemas"]["EmployeeResponse"]
 
 export default function EmployeePortfolioPage() {
-  const { data: profile, loading, error } = useApiQuery<EmployeeResponse>(
-    "/api/hrms/me/profile",
+  const { data: profile, loading, error, refresh } = useApiQuery<EmployeeResponse>(
+    "/api/v1/hrms/me/profile",
   )
-  
+
   return (
     <div className="space-y-6">
       <div>
@@ -31,7 +31,7 @@ export default function EmployeePortfolioPage() {
           {error.message}
         </div>
       ) : profile ? (
-        <EmployeePortfolioDetails profile={profile} />
+        <EmployeePortfolioDetails profile={profile} onProfileUpdated={refresh} />
       ) : (
         <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
           No portfolio data found.
@@ -40,4 +40,3 @@ export default function EmployeePortfolioPage() {
     </div>
   )
 }
-

@@ -99,13 +99,19 @@ export async function request<T>(
   }
 
   const headers = await authorize()
+  const isFormData = body instanceof FormData
+
+  if (isFormData) {
+    // Let fetch set its own Content-Type with the multipart boundary.
+    delete headers["Content-Type"]
+  }
 
   const response = await fetch(url.toString(), {
     method,
     headers,
     cache: "no-store",
     signal,
-    body: body === undefined ? undefined : JSON.stringify(body),
+    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
   })
 
   let payload: ApiEnvelope | null = null
