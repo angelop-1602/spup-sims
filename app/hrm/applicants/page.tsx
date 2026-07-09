@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
-import { useApiQuery, type components } from "@/lib/api"
+import { useApiQuery } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { ApplicantRowActions } from "@/components/hrm/applicants/applicant-row-actions"
 
@@ -22,10 +22,19 @@ interface Profile {
   lastName: string
 }
 
-type ApplicantsPayload = Omit<components["schemas"]["PagedResponseOfEntityRecord"], "data"> & {
+type PagedResponseBase = {
+  page: number | string
+  pageSize: number | string
+  totalRecords: number | string
+  totalPages: number | string
+  success?: boolean
+  message?: string
+}
+
+type ApplicantsPayload = PagedResponseBase & {
   data: Applicant[]
 }
-type ProfilesPayload = Omit<components["schemas"]["PagedResponseOfEntityRecord"], "data"> & {
+type ProfilesPayload = PagedResponseBase & {
   data: Profile[]
 }
 

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useApiQuery, type components } from "@/lib/api"
+import { useApiQuery } from "@/lib/api"
 import {
   ArrowUpRight,
   CalendarClock,
@@ -51,10 +51,16 @@ const actions = [
   { item: "Validate employee portfolio updates", owner: "Records", due: "Friday" },
 ] as const
 
+type DashboardMetricResponse = {
+  key: string
+  label: string
+  value: number | string
+  unit: string | null
+  description: string | null
+}
+
 export default function HrmDashboardPage() {
-  const { data: employeeMetric, loading } = useApiQuery<
-    components["schemas"]["DashboardMetricResponse"]
-  >("/api/v1/hrms/dashboard/cards/employees-total")
+  const { data: employeeMetric, loading } = useApiQuery<DashboardMetricResponse>("/api/v1/hrms/dashboard/cards/employees-total")
 
   const employeeCount = loading
     ? "..."

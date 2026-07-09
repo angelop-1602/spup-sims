@@ -28,8 +28,8 @@ import { cn } from "@/lib/utils"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 import { EDUCATIONAL_ATTAINMENT_OPTIONS } from "@/components/hrm/portfolio/educational-attainment-options"
 
-type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"] & {
-  educationalAttainment?: string | null
+type EducationalBackgroundForm = Omit<components["schemas"]["EducationalBackgroundRequest"], "educationalAttainment"> & {
+  educationalAttainment: string | null
 }
 
 const EMPTY_FORM: EducationalBackgroundForm = {
@@ -39,6 +39,8 @@ const EMPTY_FORM: EducationalBackgroundForm = {
   degree: "",
   institution: "",
   dateGraduated: null,
+  diploma: null,
+  tor: null,
 }
 
 export function EducationalBackgroundAddDialog({

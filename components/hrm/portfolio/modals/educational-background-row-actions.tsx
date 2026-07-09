@@ -44,8 +44,8 @@ type EducationalBackground = components["schemas"]["EducationalBackgroundRespons
   diploma?: string | null
   tor?: string | null
 }
-type EducationalBackgroundForm = components["schemas"]["EducationalBackgroundRequest"] & {
-  educationalAttainment?: string | null
+type EducationalBackgroundForm = Omit<components["schemas"]["EducationalBackgroundRequest"], "educationalAttainment"> & {
+  educationalAttainment: string | null
 }
 
 function toForm(row: EducationalBackground): EducationalBackgroundForm {
@@ -59,6 +59,8 @@ function toForm(row: EducationalBackground): EducationalBackgroundForm {
     degree: row.degree,
     institution: row.institution,
     dateGraduated: row.dateGraduated,
+    diploma: row.diploma ?? null,
+    tor: row.tor ?? null,
   }
 }
 

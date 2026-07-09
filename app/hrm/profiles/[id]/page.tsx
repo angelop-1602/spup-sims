@@ -52,7 +52,7 @@ interface InterviewSchedule {
 }
 
 type PagedRecords<TRecord> = Omit<
-  components["schemas"]["PagedResponseOfEntityRecord"],
+  components["schemas"]["PagedResponseOfAcademicTermResponse"],
   "data"
 > & {
   data: TRecord[]
