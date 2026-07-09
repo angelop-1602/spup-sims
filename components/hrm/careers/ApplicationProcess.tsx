@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Search, FileText, User, UserCheck, HelpCircle } from 'lucide-react';
-import { Instrument_Serif, Inter } from 'next/font/google';
+import { Instrument_Serif, Poppins, Inter, Epilogue } from 'next/font/google';
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
@@ -14,6 +14,17 @@ const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500'],
 });
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
+const epilogue = Epilogue({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
 
 // Temporary data for application requirements
 const applicationRequirements = [
@@ -28,7 +39,7 @@ const applicationRequirements = [
     description: "Formal cover letter addressed to the University President through the Director of Human Resource detailing your intent.",
     status: "Required",
     statusColor: "bg-red-800 text-white border-red-800",
-    tooltip: "Application letter should be addressed to Sr. Merceditas Ang, SPC, University President, through Dr. Juana Rivera, Director of Human Resources. It should also be signed by the applicant."
+    tooltip: "Application letter should be addressed to Sr. Merceditas Ang, SPC, University President, through Dr. Juana Rivera, Director of Human Resources."
   },
   {
     title: "Transcript of Records (TOR)",
@@ -79,7 +90,7 @@ export default function ProcessTimeline() {
           <h2 className={`${instrumentSerif.className} text-3xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] sm:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
             Our Application Process
           </h2>
-          <p className={`${inter.className} text-sm text-neutral-500 mt-1`}>
+          <p className={`${epilogue.className} text-sm text-neutral-500 mt-1`}>
             A simple four-step pathway to joining the SPUP academic and staff community.
           </p>
         </div>
@@ -90,64 +101,64 @@ export default function ProcessTimeline() {
           {/* Step 1 */}
           <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
             <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
-                <span className="font-mono text-amber-400 text-sm">01.</span>
-                <span>Choose a Position</span>
+              <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wider">
+                <span className={`${epilogue.className} text-sm`}>01.</span>
+                <span className={`${epilogue.className} text-sm`}>Choose a Position</span>
               </div>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
-              <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify z-10">
+              <p className={`${epilogue.className} text-xs text-neutral-600 leading-relaxed font-normal text-justify z-10`}>
                 Browse current openings and locate roles that match your expertise.
               </p>
-              <Search className="absolute -bottom-1 -right-1 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
+              <Search className="absolute -bottom-2 -right-1 w-25 h-25 text-amber-100/80 pointer-events-none transform -rotate-12 z-0" />
             </div>
           </div>
 
           {/* Step 2 */}
           <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
             <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
-                <span className="font-mono text-amber-400 text-sm">02.</span>
-                <span>Submit Application</span>
+              <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wider">
+                <span className={`${epilogue.className} text-sm`}>02.</span>
+                <span className={`${epilogue.className} text-sm`}>Submit Application</span>
               </div>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
-              <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify z-10">
+              <p className={`${epilogue.className} text-xs text-neutral-600 leading-relaxed font-normal text-justify z-10`}>
                 Complete your application profile and upload required documents.
               </p>
-              <FileText className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
+              <FileText className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/80 pointer-events-none transform -rotate-12 z-0" />
             </div>
           </div>
 
           {/* Step 3 */}
           <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
             <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
-                <span className="font-mono text-amber-400 text-sm">03.</span>
-                <span>HR Screening</span>
+              <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wider">
+                <span className={`${epilogue.className} text-sm`}>03.</span>
+                <span className={`${epilogue.className} text-sm`}>HR Screening</span>
               </div>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
-              <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify z-10">
+              <p className={`${epilogue.className} text-xs text-neutral-600 leading-relaxed font-normal text-justify z-10`}>
                 The Human Resource Management Office conducts an initial credentials review.
               </p>
-              <User className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
+              <User className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/80 pointer-events-none transform -rotate-12 z-0" />
             </div>
           </div>
 
           {/* Step 4 */}
           <div className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-hidden [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]">
             <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
-                <span className="font-mono text-amber-400 text-sm">04.</span>
-                <span>Evaluation</span>
+              <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wider">
+                <span className={`${epilogue.className} text-sm`}>04.</span>
+                <span className={`${epilogue.className} text-sm`}>Evaluation</span>
               </div>
             </div>
             <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px] relative min-h-[140px]">
               <p className="text-xs text-neutral-600 leading-relaxed font-normal text-justify z-10">
-                Qualified candidates undergo departmental evaluations. Most roles require an interview, while teaching applicants must also perform a demonstration.
+                Qualified candidates undergo an in-person interview. For teaching applicants, they must also perform a demonstration.
               </p>
-              <UserCheck className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/70 pointer-events-none transform -rotate-12 z-0" />
+              <UserCheck className="absolute -bottom-4 -right-2 w-25 h-25 text-amber-100/80 pointer-events-none transform -rotate-12 z-0" />
             </div>
           </div>
 
@@ -162,7 +173,7 @@ export default function ProcessTimeline() {
           <h2 className={`${instrumentSerif.className} text-3xl sm:text-4xl lg:text-5xl font-normal text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] sm:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
             Application Requirements
           </h2>
-          <p className={`${inter.className} text-sm text-neutral-500 mt-1`}>
+          <p className={`${epilogue.className} text-sm text-neutral-500 mt-1`}>
             Please prepare the following valid credentials and documentation for your submission.
           </p>
         </div>
@@ -175,9 +186,9 @@ export default function ProcessTimeline() {
             className="bg-white border-2 border-emerald-950 rounded-xl flex flex-col justify-between group relative overflow-visible [box-shadow:4px_4px_0px_0px_#facc15,5px_5px_0px_0px_#022c22]"
           >
             <div className="bg-emerald-800 px-5 py-4 border-b-2 border-emerald-950 rounded-t-[10px] flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs font-bold text-white uppercase tracking-wider">
+              <div className="flex items-center gap-2 text-xs font-bold text-white tracking-wider">
                 <FileText className="w-4 h-4 text-white shrink-0" />
-                <span>{req.title}</span>
+                <span className={`${epilogue.className} text-sm`}>{req.title}</span>
               </div>
               
               {req.tooltip && (
@@ -197,7 +208,7 @@ export default function ProcessTimeline() {
             
             {/* White Content Block */}
             <div className="p-5 flex-1 flex flex-col justify-between bg-white rounded-b-[10px]">
-              <p className="text-xs text-neutral-600 leading-normal font-normal text-justify">
+              <p className={`${epilogue.className} text-xs text-neutral-600 leading-normal font-normal text-justify`}>
                 {req.description}
               </p>
               
