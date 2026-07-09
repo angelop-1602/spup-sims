@@ -10,6 +10,9 @@ import {
   FilePen,
   Building,
   Pin,
+  UserRoundCog,
+  UserLock,
+  FileSliders,
 } from "lucide-react"
 
 import {
@@ -71,9 +74,24 @@ const hrMenuItems = [
     url: "#",
     //requiredPermission: "hrms.designations.view",
   },
+]
+
+const hrSettingsItems = [
+  {
+    title: "Leave Settings",
+    icon: FileSliders,
+    url: "/hrm/leave-settings",
+    requiredPermission: "",
+  },
+  {
+    title: "User Management",
+    icon: UserRoundCog,
+    url: "#",
+    requiredPermission: "",
+  },
   {
     title: "Roles & Permissions",
-    icon: Pin,
+    icon: UserLock,
     url: "/hrm/roles-permissions",
     requiredPermission: "",
   },
@@ -115,11 +133,35 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        {/* Human Resource Management Tabs */}
         <SidebarGroup>
           <SidebarGroupLabel>Human Resource Management</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {hrMenuItems
+                .filter(
+                  (item) =>
+                    !item.requiredPermission || hasPermission(item.requiredPermission)
+                )
+                .map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <Link href={item.url}>
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        {/* Human Resource Management Settings */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Settings</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {hrSettingsItems
                 .filter(
                   (item) =>
                     !item.requiredPermission || hasPermission(item.requiredPermission)

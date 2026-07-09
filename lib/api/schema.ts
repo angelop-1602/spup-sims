@@ -4,6 +4,316 @@
  */
 
 export interface paths {
+    "/api/v1/applicant/register": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register a new applicant account */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ApplicantRegisterRequest"];
+                    "text/json": components["schemas"]["ApplicantRegisterRequest"];
+                    "application/*+json": components["schemas"]["ApplicantRegisterRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Login to applicant portal */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ApplicantLoginRequest"];
+                    "text/json": components["schemas"]["ApplicantLoginRequest"];
+                    "application/*+json": components["schemas"]["ApplicantLoginRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/verify-email": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Verify email address */
+        get: {
+            parameters: {
+                query?: {
+                    token?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Request password reset */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ForgotPasswordRequest"];
+                    "text/json": components["schemas"]["ForgotPasswordRequest"];
+                    "application/*+json": components["schemas"]["ForgotPasswordRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/reset-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset password with token */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ResetPasswordRequest"];
+                    "text/json": components["schemas"]["ResetPasswordRequest"];
+                    "application/*+json": components["schemas"]["ResetPasswordRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get current applicant's application details */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update own profile */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateApplicantProfileRequest"];
+                    "text/json": components["schemas"]["UpdateApplicantProfileRequest"];
+                    "application/*+json": components["schemas"]["UpdateApplicantProfileRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload document (placeholder - needs file upload implementation) */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UploadApplicantDocumentRequest"];
+                    "text/json": components["schemas"]["UploadApplicantDocumentRequest"];
+                    "application/*+json": components["schemas"]["UploadApplicantDocumentRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hrms/me/profile": {
         parameters: {
             query?: never;
@@ -2952,6 +3262,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hrms/profiles/{profileId}/educational-backgrounds/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfEducationalBackgroundResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEducationalBackgroundResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEducationalBackgroundResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hrms/profiles/{profileId}/education-credentials/{educationalBackgroundId}": {
         parameters: {
             query?: never;
@@ -3106,6 +3463,100 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hrms/profiles/{profileId}/education-credentials/{id}/diploma": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfEducationCredentialResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEducationCredentialResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEducationCredentialResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/profiles/{profileId}/education-credentials/{id}/transcript": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfEducationCredentialResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEducationCredentialResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEducationCredentialResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hrms/profiles/{profileId}/work-experiences": {
         parameters: {
             query?: never;
@@ -3240,6 +3691,53 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/profiles/{profileId}/work-experiences/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfWorkExperienceResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfWorkExperienceResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfWorkExperienceResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3382,6 +3880,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hrms/profiles/{profileId}/national-boards/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfNationalBoardResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfNationalBoardResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfNationalBoardResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hrms/profiles/{profileId}/award-recognitions": {
         parameters: {
             query?: never;
@@ -3514,6 +4059,53 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/profiles/{profileId}/award-recognitions/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfAwardRecognitionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfAwardRecognitionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfAwardRecognitionResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3656,6 +4248,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hrms/profiles/{profileId}/community-involvements/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfCommunityInvolvementResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCommunityInvolvementResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCommunityInvolvementResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hrms/profiles/{profileId}/professional-organizations": {
         parameters: {
             query?: never;
@@ -3788,6 +4427,53 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/profiles/{profileId}/professional-organizations/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfProfessionalOrganizationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProfessionalOrganizationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProfessionalOrganizationResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3930,6 +4616,53 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hrms/profiles/{profileId}/professional-engagements/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfProfessionalEngagementResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProfessionalEngagementResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProfessionalEngagementResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hrms/profiles/{profileId}/research-engagements": {
         parameters: {
             query?: never;
@@ -4062,6 +4795,53 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/profiles/{profileId}/research-engagements/{id}/attachment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfResearchEngagementResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfResearchEngagementResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfResearchEngagementResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -4244,6 +5024,1475 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hrms/leave-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all leave applications (HR view with filters). */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    EmployeeId?: number | string;
+                    DepartmentId?: number | string;
+                    LeaveTypeId?: number | string;
+                    Status?: components["schemas"]["LeaveApplicationStatus"];
+                    StartDateFrom?: string;
+                    StartDateTo?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Submit a new leave application. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SubmitLeaveApplicationRequest"];
+                    "text/json": components["schemas"]["SubmitLeaveApplicationRequest"];
+                    "application/*+json": components["schemas"]["SubmitLeaveApplicationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get my leave applications. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Status?: components["schemas"]["LeaveApplicationStatus"];
+                    StartDateFrom?: string;
+                    StartDateTo?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/me/balance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get my leave balances. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfListOfLeaveBalanceResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfListOfLeaveBalanceResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfListOfLeaveBalanceResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a specific leave application detail. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel my own leave application. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CancelLeaveApplicationRequest"];
+                    "text/json": components["schemas"]["CancelLeaveApplicationRequest"];
+                    "application/*+json": components["schemas"]["CancelLeaveApplicationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/pending-dept-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get pending leave applications for department head approval. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    EmployeeId?: number | string;
+                    LeaveTypeId?: number | string;
+                    StartDateFrom?: string;
+                    StartDateTo?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/{id}/dept-approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve leave application as department head. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ApproveLeaveRequest"];
+                    "text/json": components["schemas"]["ApproveLeaveRequest"];
+                    "application/*+json": components["schemas"]["ApproveLeaveRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/{id}/dept-reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject leave application as department head. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RejectLeaveRequest"];
+                    "text/json": components["schemas"]["RejectLeaveRequest"];
+                    "application/*+json": components["schemas"]["RejectLeaveRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/pending-hr-approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get pending leave applications for HR approval. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    EmployeeId?: number | string;
+                    DepartmentId?: number | string;
+                    LeaveTypeId?: number | string;
+                    StartDateFrom?: string;
+                    StartDateTo?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfLeaveApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/{id}/hr-approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve leave application as HR. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ApproveLeaveRequest"];
+                    "text/json": components["schemas"]["ApproveLeaveRequest"];
+                    "application/*+json": components["schemas"]["ApproveLeaveRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-applications/{id}/hr-reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject leave application as HR. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["RejectLeaveRequest"];
+                    "text/json": components["schemas"]["RejectLeaveRequest"];
+                    "application/*+json": components["schemas"]["RejectLeaveRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveApplicationDetailResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-balances/initialize": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Initialize leave balances for all employees for a school year (HR only). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["InitializeLeaveBalancesRequest"];
+                    "text/json": components["schemas"]["InitializeLeaveBalancesRequest"];
+                    "application/*+json": components["schemas"]["InitializeLeaveBalancesRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfObject"];
+                        "application/json": components["schemas"]["ApiResponseOfObject"];
+                        "text/json": components["schemas"]["ApiResponseOfObject"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-balances/adjust": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Adjust leave balance for a specific employee (HR only). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AdjustLeaveBalanceRequest"];
+                    "text/json": components["schemas"]["AdjustLeaveBalanceRequest"];
+                    "application/*+json": components["schemas"]["AdjustLeaveBalanceRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveBalanceResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveBalanceResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveBalanceResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-balances/employee/{employeeId}/school-year/{schoolYearId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get leave balances for a specific employee and school year (HR only). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    employeeId: number | string;
+                    schoolYearId: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfListOfLeaveBalanceResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfListOfLeaveBalanceResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfListOfLeaveBalanceResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get all active leave types (available to all employees). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfListOfLeaveTypeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfListOfLeaveTypeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfListOfLeaveTypeResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a new leave type (HR only). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateLeaveTypeRequest"];
+                    "text/json": components["schemas"]["CreateLeaveTypeRequest"];
+                    "application/*+json": components["schemas"]["CreateLeaveTypeRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/leave-types/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a specific leave type by ID. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        /** Update an existing leave type (HR only). */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateLeaveTypeRequest"];
+                    "text/json": components["schemas"]["UpdateLeaveTypeRequest"];
+                    "application/*+json": components["schemas"]["UpdateLeaveTypeRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfLeaveTypeResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** Delete a leave type (HR only). */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number | string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfObject"];
+                        "application/json": components["schemas"]["ApiResponseOfObject"];
+                        "text/json": components["schemas"]["ApiResponseOfObject"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiErrorResponse"];
+                        "application/json": components["schemas"]["ApiErrorResponse"];
+                        "text/json": components["schemas"]["ApiErrorResponse"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/platform/resources": {
         parameters: {
             query?: never;
@@ -4359,9 +6608,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -4388,9 +6637,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -4425,9 +6674,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -4455,9 +6704,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5674,9 +7923,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5703,9 +7952,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5740,9 +7989,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5770,9 +8019,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5837,9 +8086,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5866,9 +8115,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5903,9 +8152,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -5933,9 +8182,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6000,9 +8249,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6029,9 +8278,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6066,9 +8315,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6096,9 +8345,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6163,9 +8412,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6192,9 +8441,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6229,9 +8478,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6259,9 +8508,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -6326,9 +8575,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantResponse"];
                     };
                 };
             };
@@ -6343,9 +8592,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateStudentApplicantRequest"];
+                    "text/json": components["schemas"]["CreateStudentApplicantRequest"];
+                    "application/*+json": components["schemas"]["CreateStudentApplicantRequest"];
                 };
             };
             responses: {
@@ -6355,9 +8604,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
                     };
                 };
             };
@@ -6392,9 +8641,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
                     };
                 };
             };
@@ -6410,9 +8659,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateStudentApplicantRequest"];
+                    "text/json": components["schemas"]["UpdateStudentApplicantRequest"];
+                    "application/*+json": components["schemas"]["UpdateStudentApplicantRequest"];
                 };
             };
             responses: {
@@ -6422,9 +8671,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantResponse"];
                     };
                 };
             };
@@ -6441,16 +8690,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -6489,9 +8734,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantRequirementResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantRequirementResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantRequirementResponse"];
                     };
                 };
             };
@@ -6506,9 +8751,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateStudentApplicantRequirementRequest"];
+                    "text/json": components["schemas"]["CreateStudentApplicantRequirementRequest"];
+                    "application/*+json": components["schemas"]["CreateStudentApplicantRequirementRequest"];
                 };
             };
             responses: {
@@ -6518,9 +8763,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
                     };
                 };
             };
@@ -6555,9 +8800,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
                     };
                 };
             };
@@ -6573,9 +8818,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateStudentApplicantRequirementRequest"];
+                    "text/json": components["schemas"]["UpdateStudentApplicantRequirementRequest"];
+                    "application/*+json": components["schemas"]["UpdateStudentApplicantRequirementRequest"];
                 };
             };
             responses: {
@@ -6585,9 +8830,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantRequirementResponse"];
                     };
                 };
             };
@@ -6604,16 +8849,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -6652,9 +8893,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantGuardianResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantGuardianResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantGuardianResponse"];
                     };
                 };
             };
@@ -6669,9 +8910,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateStudentApplicantGuardianRequest"];
+                    "text/json": components["schemas"]["CreateStudentApplicantGuardianRequest"];
+                    "application/*+json": components["schemas"]["CreateStudentApplicantGuardianRequest"];
                 };
             };
             responses: {
@@ -6681,9 +8922,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
                     };
                 };
             };
@@ -6718,9 +8959,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
                     };
                 };
             };
@@ -6736,9 +8977,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateStudentApplicantGuardianRequest"];
+                    "text/json": components["schemas"]["UpdateStudentApplicantGuardianRequest"];
+                    "application/*+json": components["schemas"]["UpdateStudentApplicantGuardianRequest"];
                 };
             };
             responses: {
@@ -6748,9 +8989,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantGuardianResponse"];
                     };
                 };
             };
@@ -6767,16 +9008,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -6815,9 +9052,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantStatusHistoryResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantStatusHistoryResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentApplicantStatusHistoryResponse"];
                     };
                 };
             };
@@ -6832,9 +9069,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateStudentApplicantStatusHistoryRequest"];
+                    "text/json": components["schemas"]["CreateStudentApplicantStatusHistoryRequest"];
+                    "application/*+json": components["schemas"]["CreateStudentApplicantStatusHistoryRequest"];
                 };
             };
             responses: {
@@ -6844,9 +9081,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantStatusHistoryResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantStatusHistoryResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantStatusHistoryResponse"];
                     };
                 };
             };
@@ -6881,43 +9118,14 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfStudentApplicantStatusHistoryResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfStudentApplicantStatusHistoryResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfStudentApplicantStatusHistoryResponse"];
                     };
                 };
             };
         };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
+        put?: never;
         post?: never;
         delete: {
             parameters: {
@@ -6930,16 +9138,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -6978,9 +9182,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfSchoolYearResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfSchoolYearResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSchoolYearResponse"];
                     };
                 };
             };
@@ -6995,9 +9199,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateSchoolYearRequest"];
+                    "text/json": components["schemas"]["CreateSchoolYearRequest"];
+                    "application/*+json": components["schemas"]["CreateSchoolYearRequest"];
                 };
             };
             responses: {
@@ -7007,9 +9211,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
                     };
                 };
             };
@@ -7044,9 +9248,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
                     };
                 };
             };
@@ -7062,9 +9266,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateSchoolYearRequest"];
+                    "text/json": components["schemas"]["UpdateSchoolYearRequest"];
+                    "application/*+json": components["schemas"]["UpdateSchoolYearRequest"];
                 };
             };
             responses: {
@@ -7074,9 +9278,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
                     };
                 };
             };
@@ -7093,505 +9297,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sis/guardians": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sis/guardians/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sis/student-guardians": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sis/student-guardians/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/school-years": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/school-years/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -7630,9 +9341,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
                     };
                 };
             };
@@ -7647,9 +9358,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateAcademicTermRequest"];
+                    "text/json": components["schemas"]["CreateAcademicTermRequest"];
+                    "application/*+json": components["schemas"]["CreateAcademicTermRequest"];
                 };
             };
             responses: {
@@ -7659,9 +9370,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
                     };
                 };
             };
@@ -7696,9 +9407,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
                     };
                 };
             };
@@ -7714,9 +9425,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateAcademicTermRequest"];
+                    "text/json": components["schemas"]["UpdateAcademicTermRequest"];
+                    "application/*+json": components["schemas"]["UpdateAcademicTermRequest"];
                 };
             };
             responses: {
@@ -7726,9 +9437,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
                     };
                 };
             };
@@ -7745,16 +9456,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -7793,9 +9500,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
                     };
                 };
             };
@@ -7810,9 +9517,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateProgramRequest"];
+                    "text/json": components["schemas"]["CreateProgramRequest"];
+                    "application/*+json": components["schemas"]["CreateProgramRequest"];
                 };
             };
             responses: {
@@ -7822,9 +9529,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
                     };
                 };
             };
@@ -7859,9 +9566,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
                     };
                 };
             };
@@ -7877,9 +9584,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateProgramRequest"];
+                    "text/json": components["schemas"]["UpdateProgramRequest"];
+                    "application/*+json": components["schemas"]["UpdateProgramRequest"];
                 };
             };
             responses: {
@@ -7889,9 +9596,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
                     };
                 };
             };
@@ -7908,16 +9615,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -7956,9 +9659,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
                     };
                 };
             };
@@ -7973,9 +9676,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateCurriculumRequest"];
+                    "text/json": components["schemas"]["CreateCurriculumRequest"];
+                    "application/*+json": components["schemas"]["CreateCurriculumRequest"];
                 };
             };
             responses: {
@@ -7985,9 +9688,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
                     };
                 };
             };
@@ -8022,9 +9725,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
                     };
                 };
             };
@@ -8040,9 +9743,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateCurriculumRequest"];
+                    "text/json": components["schemas"]["UpdateCurriculumRequest"];
+                    "application/*+json": components["schemas"]["UpdateCurriculumRequest"];
                 };
             };
             responses: {
@@ -8052,9 +9755,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
                     };
                 };
             };
@@ -8071,16 +9774,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -8119,9 +9818,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
                     };
                 };
             };
@@ -8136,9 +9835,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateSubjectRequest"];
+                    "text/json": components["schemas"]["CreateSubjectRequest"];
+                    "application/*+json": components["schemas"]["CreateSubjectRequest"];
                 };
             };
             responses: {
@@ -8148,9 +9847,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
                     };
                 };
             };
@@ -8185,9 +9884,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
                     };
                 };
             };
@@ -8203,9 +9902,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateSubjectRequest"];
+                    "text/json": components["schemas"]["UpdateSubjectRequest"];
+                    "application/*+json": components["schemas"]["UpdateSubjectRequest"];
                 };
             };
             responses: {
@@ -8215,9 +9914,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
                     };
                 };
             };
@@ -8234,16 +9933,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -8282,9 +9977,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
                     };
                 };
             };
@@ -8299,9 +9994,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateCurriculumSubjectRequest"];
+                    "text/json": components["schemas"]["CreateCurriculumSubjectRequest"];
+                    "application/*+json": components["schemas"]["CreateCurriculumSubjectRequest"];
                 };
             };
             responses: {
@@ -8311,9 +10006,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
                     };
                 };
             };
@@ -8348,9 +10043,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
                     };
                 };
             };
@@ -8366,9 +10061,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateCurriculumSubjectRequest"];
+                    "text/json": components["schemas"]["UpdateCurriculumSubjectRequest"];
+                    "application/*+json": components["schemas"]["UpdateCurriculumSubjectRequest"];
                 };
             };
             responses: {
@@ -8378,9 +10073,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
                     };
                 };
             };
@@ -8397,16 +10092,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -8445,9 +10136,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
                     };
                 };
             };
@@ -8462,9 +10153,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateSectionRequest"];
+                    "text/json": components["schemas"]["CreateSectionRequest"];
+                    "application/*+json": components["schemas"]["CreateSectionRequest"];
                 };
             };
             responses: {
@@ -8474,9 +10165,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
                     };
                 };
             };
@@ -8511,9 +10202,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
                     };
                 };
             };
@@ -8529,9 +10220,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateSectionRequest"];
+                    "text/json": components["schemas"]["UpdateSectionRequest"];
+                    "application/*+json": components["schemas"]["UpdateSectionRequest"];
                 };
             };
             responses: {
@@ -8541,9 +10232,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
                     };
                 };
             };
@@ -8560,16 +10251,12 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
+                    content?: never;
                 };
             };
         };
@@ -8608,9 +10295,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8637,9 +10324,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8674,9 +10361,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8704,9 +10391,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8771,9 +10458,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8800,9 +10487,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8837,9 +10524,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8867,9 +10554,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8934,9 +10621,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -8963,9 +10650,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9000,9 +10687,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9030,9 +10717,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9097,9 +10784,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9126,9 +10813,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9163,9 +10850,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9193,9 +10880,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9260,9 +10947,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9289,9 +10976,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9326,9 +11013,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9356,9 +11043,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9423,9 +11110,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9452,9 +11139,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9489,9 +11176,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9519,9 +11206,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
@@ -9556,24 +11243,17 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/lms/courses": {
+    "/api/v1/academic/school-years/current": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
+        /** Gets the current school year, or 404 if none is set. */
         get: {
             parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
+                query?: never;
                 header?: never;
                 path?: never;
                 cookie?: never;
@@ -9586,62 +11266,21 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "application/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
+                        "text/json": components["schemas"]["ApiResponseOfDynamicEntityDto"];
                     };
                 };
             };
         };
         put?: never;
-        post: {
+        post?: never;
+        /** Clears the current school year pointer. */
+        delete: {
             parameters: {
                 query?: never;
                 header?: never;
                 path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/courses/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
                 cookie?: never;
             };
             requestBody?: never;
@@ -9652,45 +11291,28 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
+                        "text/plain": components["schemas"]["ApiResponseOfObject"];
+                        "application/json": components["schemas"]["ApiResponseOfObject"];
+                        "text/json": components["schemas"]["ApiResponseOfObject"];
                     };
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/academic/school-years/{id}/current": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Sets the given school year as the current one, replacing any previously-current year. */
         put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
             parameters: {
                 query?: never;
                 header?: never;
@@ -9714,1473 +11336,8 @@ export interface paths {
                 };
             };
         };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/course-modules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/course-modules/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
         post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/lessons": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/lessons/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/assignments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/assignments/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/assignment-submissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/assignment-submissions/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quizzes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quizzes/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quiz-questions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quiz-questions/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quiz-choices": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quiz-choices/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quiz-attempts": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/quiz-attempts/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/announcements": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/lms/announcements/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "application/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                        "text/json": components["schemas"]["ApiResponseOfEntityRecord"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfObject"];
-                        "application/json": components["schemas"]["ApiResponseOfObject"];
-                        "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-            };
-        };
         options?: never;
         head?: never;
         patch?: never;
@@ -11190,6 +11347,55 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AcademicTermResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            schoolYearId?: number | string;
+            name: string;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            endDate?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+        };
+        AdjustLeaveBalanceRequest: {
+            /** Format: int64 */
+            employeeId: number | string;
+            /** Format: int64 */
+            leaveTypeId: number | string;
+            /** Format: int64 */
+            schoolYearId: number | string;
+            /** Format: double */
+            totalDays?: number | string;
+            reason: string;
+        };
+        ApiErrorResponse: {
+            success: boolean;
+            message: string;
+            errors?: null | {
+                [key: string]: string[];
+            };
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+        };
+        ApiResponseOfAcademicTermResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["AcademicTermResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfAttendanceReportResponse: {
             success: boolean;
             message: string;
@@ -11267,6 +11473,28 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfCurriculumResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["CurriculumResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfCurriculumSubjectResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["CurriculumSubjectResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfDashboardBreakdownResponse: {
             success: boolean;
             message: string;
@@ -11326,6 +11554,21 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["DocumentReportResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfDynamicEntityDto: {
+            success: boolean;
+            message: string;
+            /**
+             * @description Flat DTO that holds all entity properties (base + entity-specific) in a single dictionary.
+             *     Serializes as a flat JSON object without nesting.
+             */
+            data: null | Record<string, never>;
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11421,17 +11664,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfEntityRecord: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["EntityRecord"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfHrDashboardResponse: {
             success: boolean;
             message: string;
@@ -11476,6 +11708,61 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfLeaveApplicationDetailResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["LeaveApplicationDetailResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfLeaveBalanceResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["LeaveBalanceResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfLeaveTypeResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["LeaveTypeResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfListOfLeaveBalanceResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["LeaveBalanceResponse"][];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfListOfLeaveTypeResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["LeaveTypeResponse"][];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfNationalBoardResponse: {
             success: boolean;
             message: string;
@@ -11491,6 +11778,17 @@ export interface components {
             success: boolean;
             message: string;
             data: unknown;
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfAcademicTermResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfAcademicTermResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11542,6 +11840,28 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPagedResponseOfCurriculumResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfCurriculumResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfCurriculumSubjectResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfCurriculumSubjectResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfPagedResponseOfDepartmentResponse: {
             success: boolean;
             message: string;
@@ -11557,6 +11877,17 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfDesignationResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfDynamicEntityDto: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfDynamicEntityDto"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11641,10 +11972,10 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfEntityRecord: {
+        ApiResponseOfPagedResponseOfLeaveApplicationResponse: {
             success: boolean;
             message: string;
-            data: null | components["schemas"]["PagedResponseOfEntityRecord"];
+            data: null | components["schemas"]["PagedResponseOfLeaveApplicationResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11696,6 +12027,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPagedResponseOfProgramResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfProgramResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfPagedResponseOfResearchEngagementResponse: {
             success: boolean;
             message: string;
@@ -11711,6 +12053,83 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfRoleResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfSchoolYearResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfSchoolYearResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfSectionResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfSectionResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfStudentApplicantGuardianResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfStudentApplicantGuardianResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfStudentApplicantRequirementResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfStudentApplicantRequirementResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfStudentApplicantResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfStudentApplicantResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfStudentApplicantStatusHistoryResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfStudentApplicantStatusHistoryResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfSubjectResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfSubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11773,6 +12192,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfProgramResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["ProgramResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfResearchEngagementResponse: {
             success: boolean;
             message: string;
@@ -11799,6 +12229,83 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["RoleResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfSchoolYearResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["SchoolYearResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfSectionResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["SectionResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfStudentApplicantGuardianResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["StudentApplicantGuardianResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfStudentApplicantRequirementResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["StudentApplicantRequirementResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfStudentApplicantResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["StudentApplicantResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfStudentApplicantStatusHistoryResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["StudentApplicantStatusHistoryResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfSubjectResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["SubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -11838,6 +12345,20 @@ export interface components {
             /** Format: date-time */
             timestamp?: string;
             errors?: null | string[];
+        };
+        ApplicantLoginRequest: {
+            email: string;
+            password: string;
+        };
+        ApplicantRegisterRequest: {
+            email: string;
+            password: string;
+            confirmPassword: string;
+            profile: components["schemas"]["ProfileRequest"];
+        };
+        ApplicantStatus: number;
+        ApproveLeaveRequest: {
+            remarks?: null | string;
         };
         AttendanceReportResponse: {
             /** Format: int32 */
@@ -11914,6 +12435,9 @@ export interface components {
             dateReceived: string;
             attachment: null | string;
         };
+        CancelLeaveApplicationRequest: {
+            reason: string;
+        };
         CheckInRequest: {
             /** Format: int64 */
             employeeId: number | string;
@@ -11956,6 +12480,15 @@ export interface components {
             dateActivity: string;
             attachment: null | string;
         };
+        CreateAcademicTermRequest: {
+            /** Format: int64 */
+            schoolYearId?: number | string;
+            name: string;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            endDate?: string;
+        };
         CreateAttendanceRequest: {
             /** Format: int64 */
             employeeId: number | string;
@@ -11973,6 +12506,25 @@ export interface components {
             name: string;
             code: string;
             isActive?: boolean;
+        };
+        CreateCurriculumRequest: {
+            code: string;
+            name: string;
+            /** Format: int64 */
+            programId?: number | string;
+            /** Format: int32 */
+            effectiveYear?: number | string;
+        };
+        CreateCurriculumSubjectRequest: {
+            /** Format: int64 */
+            curriculumId?: number | string;
+            /** Format: int64 */
+            subjectId?: number | string;
+            /** Format: int32 */
+            yearLevel?: number | string;
+            /** Format: int32 */
+            termSequence?: number | string;
+            isRequired?: boolean;
         };
         CreateDepartmentRequest: {
             name: string;
@@ -11998,23 +12550,7 @@ export interface components {
         };
         CreateEmployeeRequest: {
             employeeNumber: string;
-            firstName: string;
-            middleName?: null | string;
-            lastName: string;
-            suffix?: null | string;
-            gender?: components["schemas"]["Gender"];
-            /** Format: date */
-            birthDate?: null | string;
-            civilStatus?: components["schemas"]["CivilStatus"];
-            email: string;
-            mobileNumber?: null | string;
-            phoneNumber?: null | string;
-            /** Format: int32 */
-            age?: null | number | string;
-            religion?: null | string;
-            address?: null | string;
-            qualifier?: null | string;
-            profilePicture?: null | string;
+            profile: components["schemas"]["ProfileRequest"];
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
@@ -12075,16 +12611,90 @@ export interface components {
             name: string;
             description: null | string;
         };
+        CreateLeaveTypeRequest: {
+            name: string;
+            code: string;
+            /** Format: int32 */
+            maxDaysPerYear?: number | string;
+            requiresMedicalCertificate?: boolean;
+            isPaid?: boolean;
+        };
         CreatePermissionRequest: {
             name: string;
             description?: null | string;
             module: string;
             action: string;
         };
+        CreateProgramRequest: {
+            code: string;
+            name: string;
+            educationLevel?: components["schemas"]["EducationLevel"];
+            /** Format: int64 */
+            departmentId?: number | string;
+        };
         CreateRoleRequest: {
             name: string;
             description?: null | string;
+            departmentIds?: (number | string)[];
             isActive?: boolean;
+        };
+        CreateSchoolYearRequest: {
+            name: string;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            endDate?: string;
+            isActive?: boolean;
+        };
+        CreateSectionRequest: {
+            code: string;
+            /** Format: int64 */
+            programId?: number | string;
+            /** Format: int64 */
+            termId?: number | string;
+            /** Format: int32 */
+            yearLevel?: number | string;
+            /** Format: int32 */
+            capacity?: number | string;
+            isOpen?: boolean;
+        };
+        CreateStudentApplicantGuardianRequest: {
+            /** Format: int64 */
+            studentApplicantId?: number | string;
+            /** Format: int64 */
+            profileId?: number | string;
+            relationship: string;
+            isPrimary?: boolean;
+        };
+        CreateStudentApplicantRequest: {
+            /** Format: int64 */
+            profileId?: number | string;
+            /** Format: int64 */
+            programId?: number | string;
+            /** Format: int64 */
+            schoolYearId?: number | string;
+            applicationNumber: string;
+            status?: components["schemas"]["ApplicantStatus"];
+        };
+        CreateStudentApplicantRequirementRequest: {
+            /** Format: int64 */
+            studentApplicantId?: number | string;
+            requirementName: string;
+            isSubmitted?: boolean;
+            fileName?: null | string;
+            storagePath?: null | string;
+        };
+        CreateStudentApplicantStatusHistoryRequest: {
+            /** Format: int64 */
+            studentApplicantId?: number | string;
+            status?: components["schemas"]["ApplicantStatus"];
+            remarks?: null | string;
+        };
+        CreateSubjectRequest: {
+            code: string;
+            title: string;
+            /** Format: double */
+            units?: number | string;
         };
         CreateUserRequest: {
             username: string;
@@ -12104,7 +12714,35 @@ export interface components {
             azureId: null | string;
             roles: string[];
             permissions: string[];
+            departments: components["schemas"]["RoleDepartmentResponse"][];
             isSuperAdmin: boolean;
+        };
+        CurriculumResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            code: string;
+            name: string;
+            /** Format: int64 */
+            programId?: number | string;
+            /** Format: int32 */
+            effectiveYear?: number | string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+        };
+        CurriculumSubjectResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            curriculumId?: number | string;
+            /** Format: int64 */
+            subjectId?: number | string;
+            /** Format: int32 */
+            yearLevel?: number | string;
+            /** Format: int32 */
+            termSequence?: number | string;
+            isRequired?: boolean;
         };
         DashboardBreakdownItemResponse: {
             key: string;
@@ -12169,13 +12807,16 @@ export interface components {
             /** Format: int32 */
             expiringSoon: number | string;
         };
+        EducationalAttainment: number;
         EducationalBackgroundRequest: {
             /** Format: int64 */
             educationId: null | number | string;
+            educationalAttainment: components["schemas"]["EducationalAttainment"];
             degreeLevel: string;
             dateGraduated: null | string;
             degree: string;
             institution: string;
+            attachment: null | string;
         };
         EducationalBackgroundResponse: {
             /** Format: int64 */
@@ -12185,10 +12826,12 @@ export interface components {
             /** Format: int64 */
             educationId: null | number | string;
             education: null | string;
+            educationalAttainment: components["schemas"]["EducationalAttainment"];
             degreeLevel: string;
             dateGraduated: null | string;
             degree: string;
             institution: string;
+            attachment: null | string;
         };
         EducationCredentialRequest: {
             /** Format: int64 */
@@ -12204,6 +12847,7 @@ export interface components {
             diploma: null | string;
             transcriptOfRecords: null | string;
         };
+        EducationLevel: number;
         EmployeeDocumentResponse: {
             /** Format: int64 */
             id: number | string;
@@ -12342,11 +12986,8 @@ export interface components {
             displayName: string;
             searchableProperties?: null | string[];
         };
-        EntityRecord: {
-            entity: string;
-            /** Format: int64 */
-            id: number | string;
-            values: Record<string, never>;
+        ForgotPasswordRequest: {
+            email: string;
         };
         Gender: number;
         HrDashboardResponse: {
@@ -12364,6 +13005,97 @@ export interface components {
             attendanceToday: number | string;
             /** Format: int32 */
             lateEmployeesToday: number | string;
+        };
+        InitializeLeaveBalancesRequest: {
+            /** Format: int64 */
+            schoolYearId: number | string;
+            leaveTypeDefaults: {
+                [key: string]: number | string;
+            };
+        };
+        LeaveApplicationDetailResponse: {
+            /** Format: int64 */
+            id: number | string;
+            /** Format: int64 */
+            employeeId: number | string;
+            employeeName: string;
+            departmentName: null | string;
+            /** Format: int64 */
+            leaveTypeId: number | string;
+            leaveTypeName: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            /** Format: double */
+            totalDays: number | string;
+            reason: string;
+            status: string;
+            /** Format: date-time */
+            submittedAtUtc: string;
+            /** Format: date-time */
+            cancelledAtUtc: null | string;
+            cancellationReason: null | string;
+            attachmentUrl: null | string;
+            approvals: components["schemas"]["LeaveApprovalResponse"][];
+        };
+        LeaveApplicationResponse: {
+            /** Format: int64 */
+            id: number | string;
+            /** Format: int64 */
+            employeeId: number | string;
+            employeeName: string;
+            departmentName: null | string;
+            /** Format: int64 */
+            leaveTypeId: number | string;
+            leaveTypeName: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            /** Format: double */
+            totalDays: number | string;
+            reason: string;
+            status: string;
+            /** Format: date-time */
+            submittedAtUtc: string;
+            attachmentUrl: null | string;
+        };
+        LeaveApplicationStatus: number;
+        LeaveApprovalResponse: {
+            approverLevel: string;
+            /** Format: int64 */
+            approverId: null | number | string;
+            approverName: null | string;
+            status: string;
+            remarks: null | string;
+            /** Format: date-time */
+            reviewedAtUtc: null | string;
+        };
+        LeaveBalanceResponse: {
+            /** Format: int64 */
+            leaveTypeId: number | string;
+            leaveTypeName: string;
+            leaveTypeCode: string;
+            /** Format: double */
+            totalDays: number | string;
+            /** Format: double */
+            usedDays: number | string;
+            /** Format: double */
+            pendingDays: number | string;
+            /** Format: double */
+            remainingDays: number | string;
+        };
+        LeaveTypeResponse: {
+            /** Format: int64 */
+            id: number | string;
+            name: string;
+            code: string;
+            /** Format: int32 */
+            maxDaysPerYear: number | string;
+            requiresMedicalCertificate: boolean;
+            isPaid: boolean;
+            isActive: boolean;
         };
         NationalBoardRequest: {
             certification: string;
@@ -12386,6 +13118,19 @@ export interface components {
             validity: null | string;
             remarks: null | string;
             attachment: null | string;
+        };
+        PagedResponseOfAcademicTermResponse: {
+            data: components["schemas"]["AcademicTermResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
         };
         PagedResponseOfAttendanceResponse: {
             data: components["schemas"]["AttendanceResponse"][];
@@ -12439,6 +13184,32 @@ export interface components {
             success?: boolean;
             message?: string;
         };
+        PagedResponseOfCurriculumResponse: {
+            data: components["schemas"]["CurriculumResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfCurriculumSubjectResponse: {
+            data: components["schemas"]["CurriculumSubjectResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
         PagedResponseOfDepartmentResponse: {
             data: components["schemas"]["DepartmentResponse"][];
             /** Format: int32 */
@@ -12454,6 +13225,19 @@ export interface components {
         };
         PagedResponseOfDesignationResponse: {
             data: components["schemas"]["DesignationResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfDynamicEntityDto: {
+            data: Record<string, never>[];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -12556,8 +13340,8 @@ export interface components {
             success?: boolean;
             message?: string;
         };
-        PagedResponseOfEntityRecord: {
-            data: components["schemas"]["EntityRecord"][];
+        PagedResponseOfLeaveApplicationResponse: {
+            data: components["schemas"]["LeaveApplicationResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -12621,6 +13405,19 @@ export interface components {
             success?: boolean;
             message?: string;
         };
+        PagedResponseOfProgramResponse: {
+            data: components["schemas"]["ProgramResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
         PagedResponseOfResearchEngagementResponse: {
             data: components["schemas"]["ResearchEngagementResponse"][];
             /** Format: int32 */
@@ -12636,6 +13433,97 @@ export interface components {
         };
         PagedResponseOfRoleResponse: {
             data: components["schemas"]["RoleResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfSchoolYearResponse: {
+            data: components["schemas"]["SchoolYearResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfSectionResponse: {
+            data: components["schemas"]["SectionResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfStudentApplicantGuardianResponse: {
+            data: components["schemas"]["StudentApplicantGuardianResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfStudentApplicantRequirementResponse: {
+            data: components["schemas"]["StudentApplicantRequirementResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfStudentApplicantResponse: {
+            data: components["schemas"]["StudentApplicantResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfStudentApplicantStatusHistoryResponse: {
+            data: components["schemas"]["StudentApplicantStatusHistoryResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfSubjectResponse: {
+            data: components["schemas"]["SubjectResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -12721,12 +13609,48 @@ export interface components {
             remarks: null | string;
             attachment: null | string;
         };
+        /** @description Shared profile request DTO used across Employee, EmployeeApplicant, StudentApplicant, and Guardian entities. */
+        ProfileRequest: {
+            firstName?: null | string;
+            middleName?: null | string;
+            lastName?: null | string;
+            suffix?: null | string;
+            gender?: null | components["schemas"]["Gender"];
+            /** Format: date */
+            birthDate?: null | string;
+            civilStatus?: null | components["schemas"]["CivilStatus"];
+            personalEmail?: null | string;
+            phoneNumber?: null | string;
+            mobileNumber?: null | string;
+            /** Format: int32 */
+            age?: null | number | string;
+            religion?: null | string;
+            address?: null | string;
+            qualifier?: null | string;
+            profilePicture?: null | string;
+        };
+        ProgramResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            code: string;
+            name: string;
+            educationLevel?: components["schemas"]["EducationLevel"];
+            /** Format: int64 */
+            departmentId?: number | string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+        };
         RegularizeEmployeeRequest: {
             /** Format: date */
             dateRegularized: string;
         };
         RejectDocumentRequest: {
             reason: string;
+        };
+        RejectLeaveRequest: {
+            remarks: string;
         };
         ResearchEngagementRequest: {
             researchTitle: string;
@@ -12748,6 +13672,17 @@ export interface components {
             datePublished: null | string;
             attachment: null | string;
         };
+        ResetPasswordRequest: {
+            token: string;
+            newPassword: string;
+            confirmPassword: string;
+        };
+        RoleDepartmentResponse: {
+            /** Format: int64 */
+            id: number | string;
+            code: string;
+            name: string;
+        };
         RolePermissionsResponse: {
             /** Format: int64 */
             roleId: number | string;
@@ -12760,6 +13695,39 @@ export interface components {
             name: string;
             description: null | string;
             isActive: boolean;
+            departments: components["schemas"]["RoleDepartmentResponse"][];
+        };
+        SchoolYearResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            name: string;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            endDate?: string;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+        };
+        SectionResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            code: string;
+            /** Format: int64 */
+            programId?: number | string;
+            /** Format: int64 */
+            termId?: number | string;
+            /** Format: int32 */
+            yearLevel?: number | string;
+            /** Format: int32 */
+            capacity?: number | string;
+            isOpen?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
         };
         SelfAttendancePunchRequest: {
             /** Format: date */
@@ -12767,10 +13735,120 @@ export interface components {
             /** Format: time */
             time?: null | string;
         };
+        StudentApplicantGuardianResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            studentApplicantId?: number | string;
+            /** Format: int64 */
+            profileId?: number | string;
+            relationship: string;
+            isPrimary?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+            guardianName?: string;
+            guardianEmail?: null | string;
+            applicationNumber?: string;
+        };
+        StudentApplicantRequirementResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            studentApplicantId?: number | string;
+            requirementName: string;
+            isSubmitted?: boolean;
+            fileName?: null | string;
+            storagePath?: null | string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+            applicationNumber?: string;
+        };
+        StudentApplicantResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            profileId?: number | string;
+            /** Format: int64 */
+            programId?: number | string;
+            /** Format: int64 */
+            schoolYearId?: number | string;
+            applicationNumber: string;
+            status?: components["schemas"]["ApplicantStatus"];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+            applicantName?: string;
+            programName?: string;
+            schoolYearName?: string;
+        };
+        StudentApplicantStatusHistoryResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            studentApplicantId?: number | string;
+            status?: components["schemas"]["ApplicantStatus"];
+            remarks?: null | string;
+            /** Format: date-time */
+            createdAt?: string;
+            applicationNumber?: string;
+        };
+        SubjectResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            code: string;
+            title: string;
+            /** Format: double */
+            units?: number | string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+        };
+        SubmitLeaveApplicationRequest: {
+            /** Format: int64 */
+            leaveTypeId: number | string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            reason: string;
+            attachmentUrl?: null | string;
+        };
         TerminateEmployeeRequest: {
             /** Format: date */
             dateSeparated: string;
             reason: null | string;
+        };
+        UpdateAcademicTermRequest: {
+            /** Format: int64 */
+            schoolYearId?: null | number | string;
+            name?: null | string;
+            /** Format: date */
+            startDate?: null | string;
+            /** Format: date */
+            endDate?: null | string;
+        };
+        UpdateApplicantProfileRequest: {
+            firstName?: null | string;
+            middleName?: null | string;
+            lastName?: null | string;
+            suffix?: null | string;
+            gender?: null | components["schemas"]["Gender"];
+            /** Format: date */
+            birthDate?: null | string;
+            civilStatus?: null | components["schemas"]["CivilStatus"];
+            phoneNumber?: null | string;
+            mobileNumber?: null | string;
+            /** Format: int32 */
+            age?: null | number | string;
+            religion?: null | string;
+            address?: null | string;
+            qualifier?: null | string;
         };
         UpdateAttendanceRequest: {
             /** Format: date */
@@ -12787,6 +13865,25 @@ export interface components {
             name: string;
             code: string;
             isActive?: boolean;
+        };
+        UpdateCurriculumRequest: {
+            code?: null | string;
+            name?: null | string;
+            /** Format: int64 */
+            programId?: null | number | string;
+            /** Format: int32 */
+            effectiveYear?: null | number | string;
+        };
+        UpdateCurriculumSubjectRequest: {
+            /** Format: int64 */
+            curriculumId?: null | number | string;
+            /** Format: int64 */
+            subjectId?: null | number | string;
+            /** Format: int32 */
+            yearLevel?: null | number | string;
+            /** Format: int32 */
+            termSequence?: null | number | string;
+            isRequired?: null | boolean;
         };
         UpdateDepartmentRequest: {
             name: string;
@@ -12812,23 +13909,7 @@ export interface components {
         UpdateEmployeeRequest: {
             isActive?: boolean;
             employeeNumber: string;
-            firstName: string;
-            middleName?: null | string;
-            lastName: string;
-            suffix?: null | string;
-            gender?: components["schemas"]["Gender"];
-            /** Format: date */
-            birthDate?: null | string;
-            civilStatus?: components["schemas"]["CivilStatus"];
-            email: string;
-            mobileNumber?: null | string;
-            phoneNumber?: null | string;
-            /** Format: int32 */
-            age?: null | number | string;
-            religion?: null | string;
-            address?: null | string;
-            qualifier?: null | string;
-            profilePicture?: null | string;
+            profile: components["schemas"]["ProfileRequest"];
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
@@ -12880,16 +13961,85 @@ export interface components {
             name: string;
             description: null | string;
         };
+        UpdateLeaveTypeRequest: {
+            isActive?: boolean;
+            name: string;
+            code: string;
+            /** Format: int32 */
+            maxDaysPerYear?: number | string;
+            requiresMedicalCertificate?: boolean;
+            isPaid?: boolean;
+        };
         UpdatePermissionRequest: {
             name: string;
             description?: null | string;
             module: string;
             action: string;
         };
+        UpdateProgramRequest: {
+            code?: null | string;
+            name?: null | string;
+            educationLevel?: null | components["schemas"]["EducationLevel"];
+            /** Format: int64 */
+            departmentId?: null | number | string;
+        };
         UpdateRoleRequest: {
             name: string;
             description?: null | string;
+            departmentIds?: (number | string)[];
             isActive?: boolean;
+        };
+        UpdateSchoolYearRequest: {
+            name?: null | string;
+            /** Format: date */
+            startDate?: null | string;
+            /** Format: date */
+            endDate?: null | string;
+            isActive?: null | boolean;
+        };
+        UpdateSectionRequest: {
+            code?: null | string;
+            /** Format: int64 */
+            programId?: null | number | string;
+            /** Format: int64 */
+            termId?: null | number | string;
+            /** Format: int32 */
+            yearLevel?: null | number | string;
+            /** Format: int32 */
+            capacity?: null | number | string;
+            isOpen?: null | boolean;
+        };
+        UpdateStudentApplicantGuardianRequest: {
+            /** Format: int64 */
+            studentApplicantId?: null | number | string;
+            /** Format: int64 */
+            profileId?: null | number | string;
+            relationship?: null | string;
+            isPrimary?: null | boolean;
+        };
+        UpdateStudentApplicantRequest: {
+            /** Format: int64 */
+            profileId?: null | number | string;
+            /** Format: int64 */
+            programId?: null | number | string;
+            /** Format: int64 */
+            schoolYearId?: null | number | string;
+            applicationNumber?: null | string;
+            status?: null | components["schemas"]["ApplicantStatus"];
+        };
+        UpdateStudentApplicantRequirementRequest: {
+            /** Format: int64 */
+            studentApplicantId?: null | number | string;
+            requirementName?: null | string;
+            isSubmitted?: null | boolean;
+            fileName?: null | string;
+            storagePath?: null | string;
+        };
+        UpdateSubjectRequest: {
+            code?: null | string;
+            title?: null | string;
+            /** Format: double */
+            units?: null | number | string;
         };
         UpdateUserRequest: {
             username: string;
@@ -12899,6 +14049,11 @@ export interface components {
             /** Format: int64 */
             profileId: number | string;
             isActive?: boolean;
+        };
+        UploadApplicantDocumentRequest: {
+            requirementName: string;
+            fileName: string;
+            storagePath: string;
         };
         UserResponse: {
             /** Format: int64 */
