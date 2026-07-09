@@ -4,25 +4,47 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowUpRight,
-  Search,
-  Bookmark,
-  FileText,
   Briefcase,
-  RefreshCw,
+  FileText,
   TrendingUp,
   X,
-  GraduationCap,
-  BookmarkCheck,
   User,
-  ShieldCheck
+  ShieldCheck,
+  Bookmark,
+  ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { Job, UserProfile, Application, INITIAL_JOBS } from '@/components/hrm/types';
-import JobCard from '@/components/hrm/landing/JobCard';
-import JobDetailsModal from '@/components/hrm/landing/JobDetailsModal';
+import FeaturedJobs from '@/components/hrm/careers/FeaturedJobs';
+import JobDetailsModal from '@/components/hrm/careers/JobDetailsModal';
+import ProcessTimeline from '@/components/hrm/careers/ApplicationProcess';
+import FaqSection from '@/components/hrm/careers/Faq';
+import JobBoardCTA from '@/components/hrm/careers/Cta';
+import { Instrument_Serif, Poppins, Epilogue, Inter } from 'next/font/google';
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: ['400'],
+  style: ['normal', 'italic'],
+});
+
+const poppins = Poppins({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
+const epilogue = Epilogue({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+});
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+});
 
 export default function HrmPage() {
-  const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile' | 'faqs' >('explore');
   const [jobs] = useState<Job[]>(INITIAL_JOBS);
 
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
@@ -190,13 +212,32 @@ export default function HrmPage() {
             </div>
 
             <nav className="flex items-center gap-6 ml-auto">
-              <button onClick={() => setActiveTab('explore')} className={`text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'explore' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}>
+              <button 
+                onClick={() => {
+                  setActiveTab('explore');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }} 
+                className={`text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'explore' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+              >
                 Home
               </button>
-              <button onClick={() => setActiveTab('explore')} className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer">
+
+              <button 
+                onClick={() => {
+                  setActiveTab('explore');
+                  setTimeout(() => {
+                    document.getElementById('workspace-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }} 
+                className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+              >
                 Job Openings
               </button>
-              <button onClick={() => setActiveTab('applications')} className={`text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}>
+
+              <button 
+                onClick={() => setActiveTab('applications')} 
+                className={`text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+              >
                 Application Process
                 {applications.length > 0 && (
                   <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-bold leading-none text-neutral-50 bg-neutral-900 rounded-full">
@@ -204,17 +245,25 @@ export default function HrmPage() {
                   </span>
                 )}
               </button>
-              <button onClick={() => setActiveTab('profile')} className={`text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'profile' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}>
+
+              <button 
+                onClick={() => {
+                  setActiveTab('explore');
+                  setTimeout(() => {
+                    document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }} 
+                className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+              >
                 FAQs
               </button>
             </nav>
-
           </div>
         </div>
       </header>
 
       {/* Main Content body */}
-      <main className="flex-1 w-full mx-auto space-y-8">
+      <main className="flex-1 w-full mx-auto pb-12">
         
         {/* HERO BANNER SECTION */}
         <AnimatePresence mode="popLayout">
@@ -224,244 +273,91 @@ export default function HrmPage() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.35 }}
-              className="relative w-full h-[400px] md:h-[480px] overflow-hidden shadow-xs flex items-center bg-neutral-900 bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: "url('/img/bg-auth.png')", backgroundPosition: 'center center' }} 
+              className="relative w-full h-[560px] md:h-[600px] overflow-hidden shadow-xs flex items-center bg-white mb-8"
             >
-              <div className="absolute inset-0 bg-neutral-950/40 z-0 pointer-events-none" />
+              {/* Grid pattern */}
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_80%)]" />
 
-              {/* Added responsive maximum width alignment wrapper */}
+              {/* Blobs */}
+              <div className="absolute -top-24 -left-24 w-80 h-80 bg-emerald-200/40 rounded-full blur-3xl pointer-events-none" /> {/* Top left green blob */}
+              <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Top left green circle outline */}
+
+              <div className="absolute -bottom-28 -right-16 w-80 h-80 bg-emerald-200/35 rounded-full blur-3xl pointer-events-none" /> {/* Bottom right green blob */}
+              <div className="absolute -bottom-28 -right-16 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Bottom right green circle outline*/}
+              
+              <div className="absolute top-2 right-2 sm:top-6 sm:right-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-200/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Top right yellow blob */}
+              <div className="absolute bottom-2 left-2 sm:bottom-6 sm:left-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Bottom left yellow blob */}
+
+              <div className="absolute top-1 left-1/3 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-56 sm:h-56 md:w-[300px] md:h-[300px] bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Top left yellow blob */}
+              <div className="absolute bottom-1 right-1/3 w-36 h-36 sm:w-52 sm:h-52 md:w-72 md:h-72 bg-emerald-200/30 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Bottom right green blob */}
+
+              <div className="hidden sm:block absolute top-32 sm:top-50 left-1/4 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-[100px] sm:h-[100px] rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Left green circle outline */}
+              <div className="hidden sm:block absolute top-40 sm:top-60 left-1/5 -translate-x-1/10 -translate-y-1/2 w-12 h-12 sm:w-[80px] sm:h-[80px] rounded-full bg-amber-400/30 pointer-events-none" /> {/* Left yellow circle */}
+
+              <div className="hidden md:block absolute -top-1 right-[22%] -translate-x-1/20 -translate-y-1/5 w-[40px] h-[40px] rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Top right green circle */}
+              <div className="absolute top-0 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[60px] h-[60px] rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Top right bigger yellow circle outline */}
+              <div className="absolute top-12 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[24px] h-[24px] rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Top right smaller yellow circle outline */}
+
+              <div className="hidden sm:block absolute bottom-14 sm:bottom-20 right-[30%] w-24 h-24 sm:w-40 sm:h-40 rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Bottom right yellow circle outline */}
+              <div className="hidden sm:block absolute bottom-32 sm:bottom-50 right-[29%] w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Bottom right green circle */}
+              <div className="hidden md:block absolute bottom-22 right-[65%] w-20 h-20 rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Bottom left green bar */}
+
               <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div className="w-full max-w-lg bg-white/95 backdrop-blur-md rounded-2xl p-6 md:p-10 border border-white/20 shadow-xl flex flex-col space-y-5">
+                <div className="relative w-full max-w-2xl mx-auto text-center bg-white border-2 border-emerald-950 rounded-2xl p-8 md:p-10 shadow-[6px_6px_0px_0px_#022c22]">
+                  <div className={`${epilogue.className} absolute -top-6 -right-6 bg-amber-400 border-2 border-amber-900 rounded-full w-16 h-16 flex items-center justify-center rotate-12 shadow-[3px_3px_0px_0px_#78350f] text-[10px] font-black text-neutral-900 text-center uppercase leading-tight`}>
+                    Apply Today!
+                  </div>
                   <div className="space-y-3">
-                    <h1 className="text-2xl md:text-3xl font-extrabold text-neutral-950 tracking-tight leading-tight">
+                    <h1 className={`${poppins.className} text-5xl text-center sm:text-4xl lg:text-6xl font-bold text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] md:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
                       Build Your Career with SPUP
                     </h1>
-                    <p className="text-xs md:text-sm text-neutral-600 font-normal leading-relaxed">
+                    <p className={`${epilogue.className} text-sm text-black text-center font-normal leading-relaxed`}>
                       Join a mission-driven academic community committed to service, excellence, and transformative education. Discover where your passion aligns with systemic impact.
                     </p>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                    <a href="#advanced-search-box" className="inline-flex items-center justify-center gap-2 bg-neutral-950 hover:bg-neutral-800 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-xs transition-colors">
+                  <div className="flex flex-col sm:flex-row gap-3 pt-5 justify-center">
+                    <a 
+                      href="#advanced-search-box" 
+                      className={`${epilogue.className} inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none`}
+                    >
                       <Briefcase className="w-3.5 h-3.5" />
                       Browse Job Openings
                     </a>
-                    <button onClick={() => setActiveTab('profile')} className="inline-flex items-center justify-center gap-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-xs font-bold px-5 py-3 rounded-xl transition-colors cursor-pointer">
+                    <button 
+                      onClick={() => setActiveTab('profile')} 
+                      className={`${epilogue.className} inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer`}
+                    >
                       <FileText className="w-3.5 h-3.5" />
                       Setup Application Profile
                     </button>
                   </div>
+
                 </div>
               </div>
             </motion.section>
           )}
         </AnimatePresence>
+        <FeaturedJobs
+          activeTab={activeTab}
+          jobs={jobs}
+          savedJobIds={savedJobIds}
+          onToggleSave={handleToggleSave}
+          onSelectJob={setSelectedJob}
+        />
+        <ProcessTimeline />
+        <FaqSection />
+        <JobBoardCTA />
 
-        <div id="workspace-layout" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {activeTab === 'explore' && (
-            <div className="space-y-6">
-              
-              {/* Featured Jobs Header*/}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-                <div>
-                  <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
-                    Featured Job Openings
-                  </h2>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    Explore premier pathways currently accepting applications.
-                  </p>
-                </div>
-                <Link 
-                  href="#" 
-                  className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-neutral-900 bg-neutral-950 text-white hover:bg-neutral-800 text-xs font-bold rounded-xl transition-colors shadow-sm cursor-pointer"
-                >
-                  View all openings
-                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </Link>
-              </div>
-
-              {/* Featured Jobs Grid Display */}
-              <div id="vacancies" className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <AnimatePresence mode="popLayout">
-                    {jobs.slice(0, 3).map((job) => (
-                      <JobCard
-                        key={job.id}
-                        job={job}
-                        isSaved={savedJobIds.includes(job.id)}
-                        onToggleSave={(e) => handleToggleSave(job.id, e)}
-                        onViewDetails={() => setSelectedJob(job)}
-                      />
-                    ))}
-                  </AnimatePresence>
-                </div>
-              </div>
-
-            </div>
-          )}
-
-          {activeTab === 'applications' && (
-            <div className="space-y-6">
-              <div className="p-4 bg-white border border-neutral-200 rounded-2xl flex items-start gap-3 shadow-sm">
-                <div className="p-2 bg-neutral-50 rounded-lg border border-neutral-100 text-neutral-950 flex-shrink-0">
-                  <TrendingUp className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-neutral-900 text-sm">Post-Submission Roster Guideline</h3>
-                  <p className="text-xs text-neutral-500 mt-0.5 leading-relaxed">Search committees typically review incoming academic and staff portfolios within 14 calendar days. Ensure your One-Click CV dossier remains accurate. Any updates are automatically reflected for pending reviews.</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'profile' && (
-            <div className="space-y-6">
-              {/* Clean fallback template replacing ProfileBuilder */}
-              <div className="bg-white border border-neutral-200 rounded-2xl p-8 text-center shadow-sm max-w-2xl mx-auto flex flex-col items-center justify-center space-y-4">
-                <div className="w-12 h-12 rounded-full bg-neutral-50 border border-neutral-200 text-neutral-800 flex items-center justify-center shadow-2xs">
-                  <User className="w-5 h-5" />
-                </div>
-                <div className="space-y-1">
-                  <h3 className="font-bold text-neutral-900 text-base">Application Profile Manager</h3>
-                  <p className="text-xs text-neutral-500 max-w-sm leading-relaxed">
-                    The interactive profile and curriculum vitae builder interface is temporarily disconnected for system tuning.
-                  </p>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200/60 rounded-full text-[10px] font-medium tracking-wide">
-                  <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
-                  Your local caching and security frameworks remain active
-                </div>
-              </div>
-
-              <div className="bg-white border border-neutral-200 rounded-2xl p-6 shadow-sm">
-                <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest mb-4">Why Use One-Click Apply?</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono border border-neutral-200">1</span>
-                      Instant Verification
-                    </div>
-                    <p className="text-xs text-neutral-500 leading-relaxed font-normal">Your educational degrees, reference details, and publications list are compiled into a streamlined academic dossier payload.</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono border border-neutral-200">2</span>
-                      Dynamic Synced Updates
-                    </div>
-                    <p className="text-xs text-neutral-500 leading-relaxed font-normal">Search committees query your snapshot directly. Editing your details here keeps your application fresh before the final audit begins.</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold text-neutral-800 flex items-center gap-1.5">
-                      <span className="w-5 h-5 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-mono border border-neutral-200">3</span>
-                      Privacy Protected
-                    </div>
-                    <p className="text-xs text-neutral-500 leading-relaxed font-normal">Dossier parameters are kept completely local inside your sandboxed browser environment, respecting strict regulatory requirements.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* APPLICATION PROCESS SECTION */}
-        <section className="bg-white border border-neutral-200 rounded-2xl p-6 md:p-10 shadow-xs mt-12 w-full">
-          <div className="max-w-5xl mx-auto">
-            <div className="mb-12 text-left">
-              <h2 className="text-xl font-extrabold text-neutral-900 tracking-tight uppercase">
-                Our Application Process
-              </h2>
-              <p className="text-xs text-neutral-500 mt-1">
-                A simple four-step pathway to joining the SPUP academic and staff community.
-              </p>
-            </div>
-
-            <div className="relative w-full">
-              <div className="hidden md:block absolute top-5 left-[12.5%] right-[12.5%] border-t-2 border-dashed border-neutral-200 z-0" />
-              
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative z-10">
-                {/* Step 1 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    1
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <Search className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    Choose a Position
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    Browse available job openings and locate roles that match your expertise.
-                  </p>
-                </div>
-
-                {/* Step 2 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    2
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    Submit Application
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    Upload your digital curriculum vitae and complete the application form.
-                  </p>
-                </div>
-
-                {/* Step 3 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    3
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <User className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    HR Screening
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    The Human Resource Management Office conducts an initial credentials verification evaluation.
-                  </p>
-                </div>
-
-                {/* Step 4 */}
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-10 h-10 rounded-full bg-neutral-950 text-white font-bold text-sm flex items-center justify-center border border-neutral-800 shadow-xs bg-clip-padding">
-                    4
-                  </div>
-                  <div className="my-4 p-2.5 bg-neutral-50 rounded-xl border border-neutral-200 text-neutral-800">
-                    <GraduationCap className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
-                    Interview & Evaluation
-                  </h3>
-                  <p className="text-xs text-neutral-500 mt-1.5 max-w-[180px] leading-relaxed">
-                    Qualified candidates meet with departmental committees for final evaluations.
-                  </p>
-                </div>
-
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-neutral-200 py-8 mt-12">
+      <footer className="bg-white border-t border-neutral-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-400">
           <div className="flex items-center gap-2">
-            <span className="text-neutral-900 font-extrabold uppercase">SPUP HRM Careers</span>
+            <span className={`${poppins.className} text-neutral-900 font-extrabold uppercase`}>SPUP HRM Careers</span>
             <span>•</span>
-            <span>© 2026 St. Paul University Philippines. All rights reserved.</span>
-          </div>
-          <div className="flex items-center gap-6 text-[11px]">
-            <span className="text-neutral-400 hover:text-neutral-900 cursor-pointer">Terms and Conditions</span>
-            <span className="text-neutral-400 hover:text-neutral-900 cursor-pointer">Privacy Policy</span>
+            <span className={`${epilogue.className}`}>© 2026 St. Paul University Philippines. All rights reserved.</span>
           </div>
         </div>
       </footer>
