@@ -105,7 +105,7 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
         <div className="grid lg:grid-cols-[20rem_1fr] lg:divide-x">
           <div className="flex h-full flex-col items-center justify-center gap-3 p-6 text-center">
             <div className="group relative">
-              <Avatar className="size-40">
+              <Avatar className="size-50">
                 <AvatarImage
                   src={`/api/v1/public/avatars/${profile.id}?v=${encodeURIComponent(profile.profilePicture ?? "")}`}
                   alt={profile.fullName}
@@ -119,7 +119,7 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
                 onClick={() => pictureInputRef.current?.click()}
                 disabled={uploadingPicture}
                 aria-label="Change profile photo"
-                className="absolute bottom-1 right-1 flex size-9 items-center justify-center rounded-full border bg-background text-foreground shadow-xs transition-colors hover:bg-accent disabled:opacity-50"
+                className="absolute bottom-1 right-1 flex size-10.5 items-center justify-center rounded-full border bg-background text-foreground shadow-xs transition-colors hover:bg-accent disabled:opacity-50"
               >
                 {uploadingPicture ? (
                   <Loader2 className="size-4 animate-spin" />
