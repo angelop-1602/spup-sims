@@ -3,46 +3,30 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { Loader2, Search, UserSearch, Eye } from "lucide-react"
-import { useApiClient, type components } from "@/lib/api"
-
-interface ApplicantValues {
-  Id: number | string
-  ProfileId: number | string
-  ApplicationNumber: string
-  Status: string
-  CreatedAt: string
-  UpdatedAt: string | null
-  DeletedAt: string | null
-  CreatedBy: string | null
-  UpdatedBy: string | null
-  DeletedBy: string | null
-  IsDeleted: boolean
-}
+import { useApiQuery, type components } from "@/lib/api"
+import { Button } from "@/components/ui/button"
+import { ApplicantRowActions } from "@/components/hrm/applicants/applicant-row-actions"
 
 interface Applicant {
-  entity: string
   id: number | string
-  values: ApplicantValues
-}
-
-interface ProfileValues {
-  FirstName: string
-  LastName: string
-  [key: string]: unknown
+  profileId: number | string
+  applicationNumber: string
+  status: string
+  createdAt: string
+  updatedAt: string | null
 }
 
 interface Profile {
   id: number | string
-  values: ProfileValues
+  firstName: string
+  lastName: string
 }
 
-type PagedEntityRecords<TValues> = Omit<
-  components["schemas"]["PagedResponseOfEntityRecord"],
-  "data"
-> & {
-  data: Array<Omit<components["schemas"]["EntityRecord"], "values"> & {
-    values: TValues
-  }>
+type ApplicantsPayload = Omit<components["schemas"]["PagedResponseOfEntityRecord"], "data"> & {
+  data: Applicant[]
+}
+type ProfilesPayload = Omit<components["schemas"]["PagedResponseOfEntityRecord"], "data"> & {
+  data: Profile[]
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -93,6 +77,7 @@ export default function ApplicantsPage() {
     data: applicantsPayload,
     loading: isLoading,
     error,
+    refresh: refreshApplicants,
   } = useApiQuery<ApplicantsPayload>("/api/v1/recruitment/employee-applicants", {
     Page: page,
     PageSize: PAGE_SIZE,
@@ -105,69 +90,16 @@ export default function ApplicantsPage() {
     Status: "",
   })
 
-      try {
-        const trimmedSearch = search.trim()
-        const params = {
-          Page: page,
-          PageSize: pageSize,
-          Search: trimmedSearch || undefined,
-          DateFrom: dateFrom || undefined,
-          DateTo: dateTo || undefined,
-          SortBy: "",
-          Descending: true,
-          SchoolYearId: 1,
-          Status: "",
-        }
+  const { data: profilesPayload } = useApiQuery<ProfilesPayload>("/api/v1/core/profiles", {
+    Page: 1,
+    PageSize: 100,
+  })
 
-        const [applicantsPayload, profilesPayload] = await Promise.all([
-          query<PagedEntityRecords<ApplicantValues>>(
-            "/api/v1/recruitment/employee-applicants",
-            params,
-          ),
-          query<PagedEntityRecords<ProfileValues>>("/api/v1/core/profiles", {
-            Page: 1,
-            PageSize: 100,
-          }),
-        ])
+  const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
+  const profiles = profilesPayload?.data ?? []
 
-        setApplicants(applicantsPayload?.data ?? [])
-        setTotalPages(Number(applicantsPayload?.totalPages ?? 1))
-        setTotalRecords(Number(applicantsPayload?.totalRecords ?? 0))
-
-        setProfiles(profilesPayload?.data ?? [])
-      } catch (error) {
-        console.error("Failed to fetch data:", error)
-        setApplicants([])
-        setProfiles([])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchApplicants()
-  }, [query, account, page, pageSize, search, dateFrom, dateTo])
-
-    let cancelled = false
-
-    if (term) {
-      const matchingProfile = profiles.find((p) => String(p.id) === String(ProfileId))
-      const fullName = matchingProfile
-        ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`.toLowerCase()
-        : ""
-      const matchesSearch =
-        ApplicationNumber.toLowerCase().includes(term) ||
-        Status.toLowerCase().includes(term) ||
-        fullName.includes(term)
-      if (!matchesSearch) return false
-    }
-
-    return () => {
-      cancelled = true
-    }
-  }, [applicants, query])
-
-  const totalPages = applicantsPayload?.totalPages ?? 1
-  const totalRecords = applicantsPayload?.totalRecords ?? 0
+  const totalPages = Number(applicantsPayload?.totalPages ?? 1)
+  const totalRecords = Number(applicantsPayload?.totalRecords ?? 0)
   const hasActiveFilters = Boolean(search || dateFrom || dateTo)
 
   return (
@@ -267,10 +199,11 @@ export default function ApplicantsPage() {
               </thead>
               <tbody>
                 {applicants.map((applicant) => {
-                  const v = applicant.values
-                  const matchingProfile = profiles.find((p) => String(p.id) === String(v.ProfileId))
+                  const matchingProfile = profiles.find(
+                    (p) => String(p.id) === String(applicant.profileId),
+                  )
                   const fullName = matchingProfile
-                    ? `${matchingProfile.values.FirstName} ${matchingProfile.values.LastName}`
+                    ? `${matchingProfile.firstName} ${matchingProfile.lastName}`
                     : "No linked profile"
 
                   return (
@@ -279,7 +212,7 @@ export default function ApplicantsPage() {
                       className="border-b last:border-0 hover:bg-muted/30"
                     >
                       <td className="px-4 py-3 font-medium">
-                        {v.ApplicationNumber}
+                        {applicant.applicationNumber}
                       </td>
                       <td className="px-4 py-3">
                         {fullName}
@@ -288,26 +221,31 @@ export default function ApplicantsPage() {
                         <span
                           className={
                             "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " +
-                            getStatusStyle(v.Status)
+                            getStatusStyle(applicant.status)
                           }
                         >
-                          {v.Status}
+                          {applicant.status}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {formatDate(v.CreatedAt)}
+                        {formatDate(applicant.createdAt)}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">
-                        {formatDate(v.UpdatedAt)}
+                        {formatDate(applicant.updatedAt)}
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => router.push(`/hrm/profiles/${v.ProfileId}?status=${encodeURIComponent(v.Status)}&applicantId=${v.Id}`)}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-secondary/50 px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-all hover:bg-secondary focus-visible:outline-none"
-                        >
-                          <Eye className="h-3.5 w-3.5 opacity-70" />
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon-sm"
+                            className="active:translate-y-0!"
+                            onClick={() => router.push(`/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`)}
+                            aria-label="View applicant"
+                          >
+                            <Eye className="h-3.5 w-3.5" />
+                          </Button>
+                          <ApplicantRowActions applicant={applicant} onChanged={refreshApplicants} />
+                        </div>
                       </td>
                     </tr>
                   )
@@ -335,8 +273,8 @@ export default function ApplicantsPage() {
             </button>
             <button
               type="button"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={page >= totalPages}
+              onClick={() => setPage((p) => Math.min(Number(totalPages), p + 1))}
+              disabled={page >= Number(totalPages)}
               className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
             >
               Next

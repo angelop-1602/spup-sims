@@ -13,97 +13,55 @@ import { Card, CardContent } from "@/components/ui/card"
 // ─── Interfaces ────────────────────────────────────────────────
 
 interface ProfileValues {
-  Id: number | string
-  FirstName: string
-  MiddleName: string | null
-  LastName: string
-  Suffix: string | null
-  Gender: string
-  BirthDate: string | null
-  CivilStatus: string
-  PersonalEmail: string
-  PhoneNumber: string | null
-  MobileNumber: string | null
-  Age: number | null
-  Religion: string | null
-  Address: string | null
-  Qualifier: string | null
-  ProfilePicture: string | null
-  IsActive: boolean
-  CreatedAt: string
-  UpdatedAt: string | null
-  DeletedAt: string | null
-  IsDeleted: boolean
-}
-
-interface DocumentValues {
-  Id: number | string
-  EmployeeApplicantId: number | string
-  RequirementName: string | null
-  FileName: string | null
-  StoragePath: string | null
-  CreatedAt: string
-  UpdatedAt: string | null
+  id: number | string
+  firstName: string
+  middleName: string | null
+  lastName: string
+  suffix: string | null
+  birthDate: string | null
+  personalEmail: string
+  phoneNumber: string | null
+  mobileNumber: string | null
+  age: number | null
+  religion: string | null
+  address: string | null
+  qualifier: string | null
+  profilePicture: string | null
+  createdAt: string
 }
 
 interface ApplicantDocument {
-  entity: string
   id: number | string
-  values: DocumentValues
-}
-
-interface StatusHistoryValues {
-  Id: number | string
-  EmployeeApplicantId: number | string
-  Status: string
-  Remarks: string | null
-  CreatedAt: string
-  UpdatedAt: string | null
-  CreatedBy: string | null
-  IsDeleted: boolean
+  requirementName: string | null
+  storagePath: string | null
 }
 
 interface StatusHistoryEntry {
-  entity: string
   id: number | string
-  values: StatusHistoryValues
-}
-
-interface InterviewScheduleValues {
-  Id: number | string
-  EmployeeApplicantId: number | string
-  ScheduledAt: string
-  Venue: string | null
-  Notes: string | null
-  CreatedAt: string
-  UpdatedAt: string | null
-  IsDeleted: boolean
+  status: string
+  remarks: string | null
+  createdAt: string
 }
 
 interface InterviewSchedule {
-  entity: string
   id: number | string
-  values: InterviewScheduleValues
+  scheduledAt: string
+  venue: string | null
+  notes: string | null
+  createdAt: string
 }
 
-type EntityRecordWithValues<TValues> = Omit<
-  components["schemas"]["EntityRecord"],
-  "values"
-> & {
-  values: TValues
-}
-
-type PagedEntityRecords<TValues> = Omit<
+type PagedRecords<TRecord> = Omit<
   components["schemas"]["PagedResponseOfEntityRecord"],
   "data"
 > & {
-  data: Array<EntityRecordWithValues<TValues>>
+  data: TRecord[]
 }
 
-type ProfileRecord = EntityRecordWithValues<ProfileValues>
-type ApplicantDocuments = PagedEntityRecords<DocumentValues>
-type ApplicantStatusHistory = PagedEntityRecords<StatusHistoryValues>
-type ApplicantInterviews = PagedEntityRecords<InterviewScheduleValues>
+type ProfileRecord = ProfileValues
+type ApplicantDocuments = PagedRecords<ApplicantDocument>
+type ApplicantStatusHistory = PagedRecords<StatusHistoryEntry>
+type ApplicantInterviews = PagedRecords<InterviewSchedule>
 
 // ─── Constants ─────────────────────────────────────────────────
 
@@ -238,26 +196,10 @@ export default function ProfileDetailPage() {
           interviewsRequest,
         ])
 
-        setProfile(
-          profileResult.status === "fulfilled"
-            ? profileResult.value.values
-            : null,
-        )
-        setDocuments(
-          documentsResult.status === "fulfilled"
-            ? documentsResult.value?.data ?? []
-            : [],
-        )
-        setStatusHistory(
-          historyResult.status === "fulfilled"
-            ? historyResult.value?.data ?? []
-            : [],
-        )
-        setInterviews(
-          interviewsResult.status === "fulfilled"
-            ? interviewsResult.value?.data ?? []
-            : [],
-        )
+        setProfile(profileResult.status === "fulfilled" ? profileResult.value : null)
+        setDocuments(documentsResult.status === "fulfilled" ? documentsResult.value?.data ?? [] : [])
+        setStatusHistory(historyResult.status === "fulfilled" ? historyResult.value?.data ?? [] : [])
+        setInterviews(interviewsResult.status === "fulfilled" ? interviewsResult.value?.data ?? [] : [])
       } catch {
         setProfile(null)
         setDocuments([])
@@ -272,21 +214,21 @@ export default function ProfileDetailPage() {
   }, [query, account, id, applicantId])
 
   const fullName = profile
-    ? [profile.FirstName, profile.MiddleName, profile.LastName, profile.Suffix].filter(Boolean).join(" ")
+    ? [profile.firstName, profile.middleName, profile.lastName, profile.suffix].filter(Boolean).join(" ")
     : ""
 
   const initials = profile
-    ? `${profile.FirstName?.[0] ?? ""}${profile.LastName?.[0] ?? ""}`.toUpperCase()
+    ? `${profile.firstName?.[0] ?? ""}${profile.lastName?.[0] ?? ""}`.toUpperCase()
     : ""
 
-  const resumeDoc = documents.find((d) => d.values.RequirementName === "Resume" && d.values.StoragePath)
+  const resumeDoc = documents.find((d) => d.requirementName === "Resume" && d.storagePath)
 
   const sortedHistory = [...statusHistory].sort(
-    (a, b) => new Date(b.values.CreatedAt).getTime() - new Date(a.values.CreatedAt).getTime()
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   )
 
   const sortedInterviews = [...interviews].sort(
-    (a, b) => new Date(a.values.ScheduledAt).getTime() - new Date(b.values.ScheduledAt).getTime()
+    (a, b) => new Date(a.scheduledAt).getTime() - new Date(b.scheduledAt).getTime()
   )
 
   return (
@@ -318,8 +260,8 @@ export default function ProfileDetailPage() {
             <CardContent className="py-5">
               <div className="flex items-start gap-5">
                 <Avatar className="size-20 shrink-0">
-                  {profile.ProfilePicture && (
-                    <AvatarImage src={profile.ProfilePicture} alt={fullName} />
+                  {profile.profilePicture && (
+                    <AvatarImage src={profile.profilePicture} alt={fullName} />
                   )}
                   <AvatarFallback className="bg-zinc-700 text-2xl font-semibold text-white">
                     {initials}
@@ -328,7 +270,7 @@ export default function ProfileDetailPage() {
 
                 <div className="min-w-0 flex-1">
                   <h1 className="text-xl font-semibold leading-tight">{fullName}</h1>
-                  <p className="mt-0.5 text-sm text-muted-foreground">{profile.PersonalEmail}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{profile.personalEmail}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     {applicantStatus && (
                       <Badge variant="outline" className={STATUS_STYLES[applicantStatus] ?? ""}>
@@ -337,10 +279,10 @@ export default function ProfileDetailPage() {
                     )}
                   </div>
                   <p className="mt-3 text-xs text-muted-foreground">
-                    Profile #{profile.Id}
+                    Profile #{profile.id}
                     {" · "}
-                    Created {formatDate(profile.CreatedAt)}
-                    {profile.Qualifier && ` · ${profile.Qualifier}`}
+                    Created {formatDate(profile.createdAt)}
+                    {profile.qualifier && ` · ${profile.qualifier}`}
                   </p>
                 </div>
 
@@ -353,7 +295,7 @@ export default function ProfileDetailPage() {
                     </Button>
                   ) : resumeDoc ? (
                     <Button variant="outline" size="sm" asChild>
-                      <a href={resumeDoc.values.StoragePath!} target="_blank" rel="noopener noreferrer">
+                      <a href={resumeDoc.storagePath!} target="_blank" rel="noopener noreferrer">
                         <FileText className="h-3.5 w-3.5" />
                         Resume
                       </a>
@@ -375,22 +317,22 @@ export default function ProfileDetailPage() {
             {/* Left — Personal + Contact merged */}
             <InfoPanel>
               <SectionDivider label="Personal" />
-              <Row label="First Name" value={profile.FirstName} />
-              <Row label="Middle Name" value={profile.MiddleName} />
-              <Row label="Last Name" value={profile.LastName} />
-              {profile.Suffix && <Row label="Suffix" value={profile.Suffix} />}
-              <Row label="Date of Birth" value={formatDate(profile.BirthDate)} />
+              <Row label="First Name" value={profile.firstName} />
+              <Row label="Middle Name" value={profile.middleName} />
+              <Row label="Last Name" value={profile.lastName} />
+              {profile.suffix && <Row label="Suffix" value={profile.suffix} />}
+              <Row label="Date of Birth" value={formatDate(profile.birthDate)} />
               <Row
                 label="Age"
-                value={profile.Age != null ? `${profile.Age} years old` : null}
+                value={profile.age != null ? `${profile.age} years old` : null}
               />
-              <Row label="Religion" value={profile.Religion} />
+              <Row label="Religion" value={profile.religion} />
 
               <SectionDivider label="Contact" />
-              <Row label="Email" value={profile.PersonalEmail} />
-              <Row label="Phone" value={profile.PhoneNumber} />
-              <Row label="Mobile" value={profile.MobileNumber} />
-              <Row label="Address" value={profile.Address} />
+              <Row label="Email" value={profile.personalEmail} />
+              <Row label="Phone" value={profile.phoneNumber} />
+              <Row label="Mobile" value={profile.mobileNumber} />
+              <Row label="Address" value={profile.address} />
             </InfoPanel>
 
             {/* Right — Status history + Interviews */}
@@ -404,27 +346,26 @@ export default function ProfileDetailPage() {
                 ) : (
                   <div className="px-5 py-4">
                     {sortedHistory.map((entry, index) => {
-                      const v = entry.values
                       const isLast = index === sortedHistory.length - 1
                       return (
                         <div key={entry.id} className="flex gap-3">
                           <div className="flex flex-col items-center">
                             <div
-                              className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_DOT[v.Status] ?? "bg-muted-foreground"}`}
+                              className={`mt-1 h-2.5 w-2.5 shrink-0 rounded-full ${STATUS_DOT[entry.status] ?? "bg-muted-foreground"}`}
                             />
                             {!isLast && <div className="mt-1.5 w-px flex-1 bg-border" />}
                           </div>
                           <div className={!isLast ? "pb-5" : ""}>
                             <div className="flex flex-wrap items-center gap-2">
-                              <Badge variant="outline" className={STATUS_STYLES[v.Status] ?? ""}>
-                                {v.Status}
+                              <Badge variant="outline" className={STATUS_STYLES[entry.status] ?? ""}>
+                                {entry.status}
                               </Badge>
                               <span className="text-xs text-muted-foreground">
-                                {formatDate(v.CreatedAt)}
+                                {formatDate(entry.createdAt)}
                               </span>
                             </div>
-                            {v.Remarks && (
-                              <p className="mt-1 text-sm text-muted-foreground">{v.Remarks}</p>
+                            {entry.remarks && (
+                              <p className="mt-1 text-sm text-muted-foreground">{entry.remarks}</p>
                             )}
                           </div>
                         </div>
@@ -442,22 +383,21 @@ export default function ProfileDetailPage() {
                   </p>
                 ) : (
                   sortedInterviews.map((interview) => {
-                    const v = interview.values
                     return (
                       <div key={interview.id} className="border-b px-5 py-4 last:border-0">
                         <div className="flex items-start justify-between gap-4">
                           <div>
-                            <p className="text-sm font-medium">{formatDateTime(v.ScheduledAt)}</p>
-                            {v.Venue && (
-                              <p className="mt-0.5 text-sm text-muted-foreground">{v.Venue}</p>
+                            <p className="text-sm font-medium">{formatDateTime(interview.scheduledAt)}</p>
+                            {interview.venue && (
+                              <p className="mt-0.5 text-sm text-muted-foreground">{interview.venue}</p>
                             )}
                           </div>
                           <span className="shrink-0 text-xs text-muted-foreground">
-                            Added {formatDate(v.CreatedAt)}
+                            Added {formatDate(interview.createdAt)}
                           </span>
                         </div>
-                        {v.Notes && (
-                          <p className="mt-2 text-sm text-muted-foreground">{v.Notes}</p>
+                        {interview.notes && (
+                          <p className="mt-2 text-sm text-muted-foreground">{interview.notes}</p>
                         )}
                       </div>
                     )
