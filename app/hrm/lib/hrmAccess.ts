@@ -5,7 +5,7 @@ import type {
 
 import { loginRequest } from "@/lib/authConfig"
 
-const HRM_ACCESS_CACHE_KEY = "spup:sims:hrm-access"
+const HRM_ACCESS_CACHE_KEY = "spup:hrm:access"
 
 export type CurrentUser = {
   userId: number | string | null

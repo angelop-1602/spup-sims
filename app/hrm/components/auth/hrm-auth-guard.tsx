@@ -46,12 +46,11 @@ export function HrmAuthGuard({ children }: { children: React.ReactNode }) {
   const account = accounts[0]
   const isCheckingSession = inProgress !== InteractionStatus.None
   const signInPath = `/login?returnTo=${encodeURIComponent(pathname)}`
-  const cachedUser = readCachedHrmAccess(account)
 
   const [currentUser, setCurrentUser] =
-    React.useState<CurrentUser | null>(cachedUser)
+    React.useState<CurrentUser | null>(null)
   const [hasDatabaseAccess, setHasDatabaseAccess] =
-    React.useState<boolean | null>(cachedUser ? true : null)
+    React.useState<boolean | null>(null)
   const [accessError, setAccessError] = React.useState<string | null>(null)
 
   React.useEffect(() => {

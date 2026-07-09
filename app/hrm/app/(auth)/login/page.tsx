@@ -12,7 +12,7 @@ import {
 import { loginRequest } from "@/lib/authConfig"
 import { clearCachedHrmAccess, verifyHrmAccess } from "@/lib/hrmAccess"
 
-const LOGIN_PENDING_KEY = "spup:sims:login-pending"
+const LOGIN_PENDING_KEY = "spup:hrm:login-pending"
 
 function readPendingLogin() {
   if (typeof window === "undefined") {
@@ -69,13 +69,20 @@ function LoginContent() {
   const { accounts, inProgress, instance } = useMsal()
   const isAuthenticated = useIsAuthenticated()
   const [errorMessage, setErrorMessage] = React.useState("")
-  const [hasPendingLogin, setHasPendingLogin] =
-    React.useState(readPendingLogin)
+  const [hasPendingLogin, setHasPendingLogin] = React.useState(false)
   const [isSigningIn, setIsSigningIn] = React.useState(false)
   const [isVerifying, setIsVerifying] = React.useState(false)
   const account = accounts[0]
   const returnTo = getSafeReturnPath(searchParams.get("returnTo"))
   const isAuthBusy = inProgress !== InteractionStatus.None
+
+  React.useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setHasPendingLogin(readPendingLogin())
+    }, 0)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [])
 
   React.useEffect(() => {
     if (account && !instance.getActiveAccount()) {

@@ -33,9 +33,9 @@ export default function Home() {
               SP
             </div>
             <div>
-              <p className="text-sm font-semibold leading-none">SPUP SIMS</p>
+              <p className="text-sm font-semibold leading-none">SPUP HRM</p>
               <p className="mt-1 text-sm text-muted-foreground">
-                Module Portal
+                Human Resource Management
               </p>
             </div>
           </div>
@@ -48,14 +48,14 @@ export default function Home() {
         <div className="grid flex-1 items-center gap-10 py-12 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="max-w-xl">
             <Badge variant="secondary" className="mb-4 rounded-md px-3">
-              Systems Portal
+              HRM Portal
             </Badge>
             <h1 className="text-4xl font-semibold tracking-normal text-balance sm:text-5xl">
-              SPUP Student Information Management System
+              SPUP Human Resource Management
             </h1>
             <p className="mt-5 max-w-lg text-base leading-7 text-muted-foreground">
-              Select an available module to continue to the school operations
-              workspace.
+              Continue to the Human Resource Management workspace for employee
+              records, applicants, and personnel workflows.
             </p>
           </div>
 

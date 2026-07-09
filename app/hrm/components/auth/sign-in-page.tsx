@@ -95,10 +95,10 @@ export function SignInPage({
           <div className="space-y-5">
             <div className="space-y-1.5">
               <h1 className="text-2xl font-medium leading-tight">
-                Log in to SPUP SIMS
+                Log in to SPUP HRM
               </h1>
               <p className="text-sm text-zinc-500">
-                Your school portal starts here
+                Access the Human Resource Management portal
               </p>
             </div>
 

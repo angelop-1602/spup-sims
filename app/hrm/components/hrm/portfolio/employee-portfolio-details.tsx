@@ -33,20 +33,45 @@ type EmployeePortfolioDetailsProps = {
   onProfileUpdated?: () => void
 }
 
+const defaultPortfolioSectionId = portfolioSections[0].id
+const portfolioSectionChangeEvent = "spup:portfolio-section-change"
+
+function getPortfolioSectionFromUrl() {
+  if (typeof window === "undefined") {
+    return defaultPortfolioSectionId
+  }
+
+  const fromUrl = new URLSearchParams(window.location.search).get("section")
+
+  return fromUrl && portfolioSections.some((section) => section.id === fromUrl)
+    ? fromUrl
+    : defaultPortfolioSectionId
+}
+
+function subscribeToPortfolioSection(onStoreChange: () => void) {
+  if (typeof window === "undefined") {
+    return () => {}
+  }
+
+  window.addEventListener("popstate", onStoreChange)
+  window.addEventListener(portfolioSectionChangeEvent, onStoreChange)
+  return () => {
+    window.removeEventListener("popstate", onStoreChange)
+    window.removeEventListener(portfolioSectionChangeEvent, onStoreChange)
+  }
+}
+
 export function EmployeePortfolioDetails({ profile, onProfileUpdated }: EmployeePortfolioDetailsProps) {
-  const [activeSectionId, setActiveSectionId] = React.useState(() => {
-    if (typeof window === "undefined") return portfolioSections[0].id
-    const fromUrl = new URLSearchParams(window.location.search).get("section")
-    return fromUrl && portfolioSections.some((section) => section.id === fromUrl)
-      ? fromUrl
-      : portfolioSections[0].id
-  })
+  const activeSectionId = React.useSyncExternalStore(
+    subscribeToPortfolioSection,
+    getPortfolioSectionFromUrl,
+    () => defaultPortfolioSectionId
+  )
   const [headerActionsEl, setHeaderActionsEl] = React.useState<HTMLDivElement | null>(null)
   const [uploadingPicture, setUploadingPicture] = React.useState(false)
   const [pictureError, setPictureError] = React.useState<string | null>(null)
   const pictureInputRef = React.useRef<HTMLInputElement>(null)
   const { headers } = useAuthorizedHeaders()
-
   const handlePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     event.target.value = ""
@@ -75,10 +100,10 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
     : undefined
 
   const handleSelectSection = (id: string) => {
-    setActiveSectionId(id)
     const url = new URL(window.location.href)
     url.searchParams.set("section", id)
     window.history.replaceState(null, "", url)
+    window.dispatchEvent(new Event(portfolioSectionChangeEvent))
   }
   const personalFields: ProfileFields[] = [
     { label: "Age", value: profile.age ?? "—" },

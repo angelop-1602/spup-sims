@@ -30,9 +30,8 @@ type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
 
 interface LeaveSettingsClientProps {
   initialLeaveTypes: LeaveType[]
+  initialSchoolYear: string
 }
-
-const currentYear = new Date().getFullYear().toString()
 
 function formatDays(value: number | string | undefined) {
   return String(value ?? 0)
@@ -58,7 +57,10 @@ function normalizeLeaveTypes(value: unknown): LeaveType[] {
   return []
 }
 
-export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettingsClientProps) {
+export default function LeaveSettingsClient({
+  initialLeaveTypes,
+  initialSchoolYear,
+}: LeaveSettingsClientProps) {
   const initialLeaveTypesList = React.useMemo(
     () => normalizeLeaveTypes(initialLeaveTypes),
     [initialLeaveTypes],
@@ -74,7 +76,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
     isActive: true,
   })
   const [selectedEmployeeId, setSelectedEmployeeId] = React.useState<string>("")
-  const [selectedSchoolYear, setSelectedSchoolYear] = React.useState(currentYear)
+  const [selectedSchoolYear, setSelectedSchoolYear] = React.useState(initialSchoolYear)
   const [adjustForm, setAdjustForm] = React.useState({
     leaveTypeId: initialLeaveTypesList[0]?.id ? String(initialLeaveTypesList[0].id) : "",
     totalDays: "",
@@ -447,7 +449,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                   id="school-year"
                   value={selectedSchoolYear}
                   onChange={(event) => setSelectedSchoolYear(event.target.value)}
-                  placeholder={currentYear}
+                  placeholder={initialSchoolYear}
                 />
               </div>
               <div className="space-y-2">

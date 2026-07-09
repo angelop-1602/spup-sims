@@ -70,7 +70,7 @@ type RequestOptions = {
 }
 
 /**
- * Thin, typed wrapper around `fetch` for the SIMS API.
+ * Thin, typed wrapper around `fetch` for HRM endpoints on the shared API.
  *
  * - Builds the URL from a relative path (proxied by the Next.js rewrite to the
  *   upstream API) and an optional query-string params object.

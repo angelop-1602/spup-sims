@@ -35,6 +35,7 @@ async function fetchLeaveTypes(): Promise<LeaveType[]> {
 
 export default async function LeaveSettingsPage() {
   const initialLeaveTypes = await fetchLeaveTypes()
+  const initialSchoolYear = new Date().getFullYear().toString()
 
   return (
     <div className="space-y-6">
@@ -47,7 +48,10 @@ export default async function LeaveSettingsPage() {
         </div>
       </div>
 
-      <LeaveSettingsClient initialLeaveTypes={initialLeaveTypes} />
+      <LeaveSettingsClient
+        initialLeaveTypes={initialLeaveTypes}
+        initialSchoolYear={initialSchoolYear}
+      />
     </div>
   )
 }

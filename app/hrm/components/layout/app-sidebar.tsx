@@ -109,8 +109,10 @@ export function AppSidebar() {
           </div>
 
           <div className="ml-3 group-data-[collapsible=icon]:hidden">
-            <p className="text-sm font-semibold">SPUP SIMS</p>
-            <p className="text-xs text-muted-foreground">HRM Module</p>
+            <p className="text-sm font-semibold">SPUP HRM</p>
+            <p className="text-xs text-muted-foreground">
+              Human Resource Management
+            </p>
           </div>
         </div>
       </SidebarHeader>
