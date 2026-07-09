@@ -27,6 +27,8 @@ type LeaveType = components["schemas"]["LeaveTypeResponse"]
 type LeaveBalance = components["schemas"]["LeaveBalanceResponse"]
 type Employee = components["schemas"]["EmployeeResponse"]
 type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
+type SchoolYear = components["schemas"]["SchoolYearResponse"]
+type PagedSchoolYears = components["schemas"]["PagedResponseOfSchoolYearResponse"]
 
 interface LeaveSettingsClientProps {
   initialLeaveTypes: LeaveType[]
@@ -74,7 +76,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
     isActive: true,
   })
   const [selectedEmployeeId, setSelectedEmployeeId] = React.useState<string>("")
-  const [selectedSchoolYear, setSelectedSchoolYear] = React.useState(currentYear)
+  const [selectedSchoolYear, setSelectedSchoolYear] = React.useState<string>("")
   const [adjustForm, setAdjustForm] = React.useState({
     leaveTypeId: initialLeaveTypesList[0]?.id ? String(initialLeaveTypesList[0].id) : "",
     totalDays: "",
@@ -103,11 +105,30 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
 
   const employees = employeesPaged?.data ?? []
 
+  const {
+    data: schoolYearsPaged,
+    loading: loadingSchoolYears,
+  } = useApiQuery<PagedSchoolYears>("/api/v1/academic/school-years", {
+    Page: 1,
+    PageSize: 100,
+    SortBy: "startDate",
+    Descending: false,
+  })
+
+  const schoolYears = React.useMemo(() => schoolYearsPaged?.data ?? [], [schoolYearsPaged])
+
   React.useEffect(() => {
     if (!selectedEmployeeId && employees.length) {
       setSelectedEmployeeId(String(employees[0].id ?? ""))
     }
   }, [employees, selectedEmployeeId])
+
+  React.useEffect(() => {
+    if (!selectedSchoolYear && schoolYears.length) {
+      const activeSchoolYear = schoolYears.find((schoolYear) => schoolYear.isActive) ?? schoolYears[0]
+      setSelectedSchoolYear(String(activeSchoolYear?.id ?? ""))
+    }
+  }, [schoolYears, selectedSchoolYear])
 
   React.useEffect(() => {
     if (!adjustForm.leaveTypeId && leaveTypes.length) {
@@ -443,12 +464,22 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
               </div>
               <div className="space-y-2">
                 <Label htmlFor="school-year">School year</Label>
-                <Input
+                <select
                   id="school-year"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   value={selectedSchoolYear}
                   onChange={(event) => setSelectedSchoolYear(event.target.value)}
-                  placeholder={currentYear}
-                />
+                  disabled={loadingSchoolYears}
+                >
+                  {!loadingSchoolYears && schoolYears.length === 0 ? (
+                    <option value="">No school years available</option>
+                  ) : null}
+                  {schoolYears.map((schoolYear) => (
+                    <option key={String(schoolYear.id)} value={String(schoolYear.id)}>
+                      {schoolYear.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="leave-type">Leave type</Label>
