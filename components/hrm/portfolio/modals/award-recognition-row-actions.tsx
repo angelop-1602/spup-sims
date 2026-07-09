@@ -211,7 +211,7 @@ export function AwardRecognitionRowActions({
                 onChange={(event) => {
                   setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
-                required
+                required={!row.attachment}
               />
             </div>
 

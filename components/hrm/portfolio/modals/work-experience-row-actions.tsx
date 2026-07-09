@@ -259,7 +259,7 @@ export function WorkExperienceRowActions({
                 onChange={(event) => {
                   setAttachmentFile(event.target.files?.[0] ?? null)
                 }}
-                required
+                required={!row.attachment}
               />
             </div>
 
