@@ -15,8 +15,20 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { z } from 'zod';
 
 type RegisterRequest = components["schemas"]["ApplicantRegisterRequest"]
+
+const registerSchema = z
+  .object({
+    email: z.email("Enter a valid email address."),
+    password: z.string().min(8, "Password must be at least 8 characters."),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  })
 
 export default function RegisterForm({
   className,
@@ -28,6 +40,11 @@ export default function RegisterForm({
   const [password, setPassword] = React.useState("")
   const [confirmPassword, setConfirmPassword] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = React.useState<{
+    email?: string
+    password?: string
+    confirmPassword?: string
+  }>({})
   const [submitting, setSubmitting] = React.useState(false)
   const [success, setSuccess] = React.useState(false)
 
@@ -35,10 +52,17 @@ export default function RegisterForm({
     event.preventDefault()
     setError(null)
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.")
+    const result = registerSchema.safeParse({ email, password, confirmPassword })
+    if (!result.success) {
+      const flat = z.flattenError(result.error).fieldErrors
+      setFieldErrors({
+        email: flat.email?.[0],
+        password: flat.password?.[0],
+        confirmPassword: flat.confirmPassword?.[0],
+      })
       return
     }
+    setFieldErrors({})
 
     setSubmitting(true)
     try {
@@ -76,7 +100,7 @@ export default function RegisterForm({
           <CardHeader>
             <CardTitle>Account created</CardTitle>
             <CardDescription>
-              Your account has been registered. You can now log in.
+              Verify your email address and log in to continue.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -136,6 +160,9 @@ export default function RegisterForm({
                 placeholder="m@example.com"
                 required
               />
+              {fieldErrors.email && (
+                <p className="mt-1 text-sm text-destructive">{fieldErrors.email}</p>
+              )}
             </div>
 
             <div>
@@ -146,8 +173,12 @@ export default function RegisterForm({
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
                 required
               />
+              {fieldErrors.password && (
+                <p className="mt-1 text-sm text-destructive">{fieldErrors.password}</p>
+              )}
             </div>
 
             <div>
@@ -158,8 +189,14 @@ export default function RegisterForm({
                 type="password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
+                placeholder="Confirm your password"
                 required
               />
+              {fieldErrors.confirmPassword && (
+                <p className="mt-1 text-sm text-destructive">
+                  {fieldErrors.confirmPassword}
+                </p>
+              )}
             </div>
 
             {error && <p className="text-sm text-destructive">{error}</p>}
