@@ -101,8 +101,8 @@ export function HrmAuthGuard({ children }: { children: React.ReactNode }) {
 
   const hasPermission = React.useCallback(
     (permission: string) =>
-      Boolean(currentUser?.permissions?.includes(permission)),
-    [currentUser?.permissions]
+      Boolean(currentUser?.isSuperAdmin || currentUser?.permissions?.includes(permission)),
+    [currentUser?.isSuperAdmin, currentUser?.permissions]
   )
 
   const contextValue = React.useMemo(

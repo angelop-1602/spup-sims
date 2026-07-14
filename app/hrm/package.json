@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "generate:schema": "openapi-typescript http://localhost:5106/openapi/v1.json -o lib/api/schema.ts"
   },
   "dependencies": {
     "@azure/msal-browser": "^5.15.0",

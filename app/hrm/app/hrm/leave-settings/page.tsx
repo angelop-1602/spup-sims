@@ -1,4 +1,5 @@
 ﻿import LeaveSettingsClient from "./leave-settings-client"
+import { PermissionGuard } from "@/components/auth/permission-guard"
 import type { components } from "@/lib/api"
 
 type LeaveType = components["schemas"]["LeaveTypeResponse"]

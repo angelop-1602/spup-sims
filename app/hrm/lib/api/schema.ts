@@ -1777,8 +1777,6 @@ export interface paths {
                     Search?: string;
                     SortBy?: string;
                     Descending?: boolean;
-                    DepartmentId?: number | string;
-                    DesignationId?: number | string;
                     EmployeeTypeId?: number | string;
                     EmploymentStatus?: components["schemas"]["EmploymentStatus"];
                     IsActive?: boolean;
@@ -6496,8 +6494,6 @@ export interface paths {
                     Search?: string;
                     SortBy?: string;
                     Descending?: boolean;
-                    DepartmentId?: number | string;
-                    DesignationId?: number | string;
                     EmployeeTypeId?: number | string;
                     EmploymentStatus?: components["schemas"]["EmploymentStatus"];
                     IsActive?: boolean;
@@ -9993,23 +9989,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/identity/roles/{roleId}/permissions": {
+    "/api/v1/identity/roles/{id}/departments": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: {
+        get?: never;
+        put: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    roleId: number;
+                    id: number;
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["SetRoleDepartmentsRequest"];
+                    "text/json": components["schemas"]["SetRoleDepartmentsRequest"];
+                    "application/*+json": components["schemas"]["SetRoleDepartmentsRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -10017,9 +10020,20 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "text/plain": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRoleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRoleResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -10057,7 +10071,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -17767,10 +17780,6 @@ export interface components {
             azureObjectIds?: null | string[];
             /** Format: int64 */
             employeeTypeId?: null | number | string;
-            /** Format: int64 */
-            departmentId?: null | number | string;
-            /** Format: int64 */
-            designationId?: null | number | string;
         };
         /** @description Summary of an import operation. */
         AzureImportResult: {
@@ -17915,10 +17924,6 @@ export interface components {
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
-            departmentId?: number | string;
-            /** Format: int64 */
-            designationId?: null | number | string;
-            /** Format: int64 */
             supervisorId?: null | number | string;
             employmentStatus?: components["schemas"]["EmploymentStatus"];
             employmentCategory?: components["schemas"]["EmploymentCategory"];
@@ -17957,10 +17962,6 @@ export interface components {
             employeeId: number | string;
             /** Format: int64 */
             schoolYearId: number | string;
-            /** Format: int64 */
-            departmentId: number | string;
-            /** Format: int64 */
-            designationId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
             /** Format: date */
@@ -18291,12 +18292,6 @@ export interface components {
             employeeTypeId: number | string;
             employeeType: null | string;
             /** Format: int64 */
-            departmentId: number | string;
-            department: null | string;
-            /** Format: int64 */
-            designationId: null | number | string;
-            designation: null | string;
-            /** Format: int64 */
             supervisorId: null | number | string;
             supervisor: null | string;
             employmentStatus: components["schemas"]["EmploymentStatus"];
@@ -18347,12 +18342,6 @@ export interface components {
             /** Format: int64 */
             schoolYearId: number | string;
             schoolYear: string;
-            /** Format: int64 */
-            departmentId: number | string;
-            department: string;
-            /** Format: int64 */
-            designationId: number | string;
-            designation: string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
             isActive: boolean;
@@ -19217,6 +19206,13 @@ export interface components {
         SendInvitationRequest: {
             employeeIds?: null | (number | string)[];
         };
+        SetRoleDepartmentsRequest: {
+            /**
+             * @description The complete set of department IDs to assign to this role.
+             *     Send an empty array to remove all department associations.
+             */
+            departmentIds?: (number | string)[];
+        };
         /** Format: binary */
         Stream: string;
         StringSegment: {
@@ -19437,10 +19433,6 @@ export interface components {
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
-            departmentId?: number | string;
-            /** Format: int64 */
-            designationId?: null | number | string;
-            /** Format: int64 */
             supervisorId?: null | number | string;
             employmentStatus?: components["schemas"]["EmploymentStatus"];
             employmentCategory?: components["schemas"]["EmploymentCategory"];
@@ -19469,10 +19461,6 @@ export interface components {
             endDate: null | string;
         };
         UpdateEmployeeSchoolYearAssignmentRequest: {
-            /** Format: int64 */
-            departmentId: number | string;
-            /** Format: int64 */
-            designationId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
             isActive: boolean;

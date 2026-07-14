@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useApiQuery } from "@/lib/api"
+import { PermissionGuard } from "@/components/auth/permission-guard"
 import {
   ArrowUpRight,
   CalendarClock,
@@ -30,19 +31,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { ApiErrorView } from "@/components/ui/error-page"
 
 const pipeline = [
   { stage: "Application Screening", count: 18, status: "In progress" },
   { stage: "Initial Interview", count: 8, status: "Scheduled" },
   { stage: "Final Interview", count: 6, status: "For panel" },
   { stage: "Job Offer", count: 4, status: "Pending" },
-] as const
-
-const departments = [
-  { name: "Academic Affairs", headcount: 96, capacity: 82 },
-  { name: "Student Services", headcount: 42, capacity: 76 },
-  { name: "Finance and Administration", headcount: 38, capacity: 68 },
-  { name: "Facilities", headcount: 31, capacity: 71 },
 ] as const
 
 const actions = [
@@ -59,41 +54,82 @@ type DashboardMetricResponse = {
   description: string | null
 }
 
-export default function HrmDashboardPage() {
-  const { data: employeeMetric, loading } = useApiQuery<DashboardMetricResponse>("/api/v1/hrms/dashboard/cards/employees-total")
+type DashboardBreakdownResponse = {
+  key: string
+  label: string
+  items: { label: string; value: number | string }[]
+}
 
-  const employeeCount = loading
-    ? "..."
-    : (employeeMetric?.value ?? 0)
+export default function HrmDashboardPage() {
+  const { data: totalMetric, loading: loadingTotal, error: totalError, refresh: refreshDashboard } =
+    useApiQuery<DashboardMetricResponse>("/api/v1/hrms/dashboard/cards/employees-total")
+
+  const { data: activeMetric, loading: loadingActive } =
+    useApiQuery<DashboardMetricResponse>("/api/v1/hrms/dashboard/cards/employees-active")
+
+  const { data: recruitmentMetric, loading: loadingRecruitment } =
+    useApiQuery<DashboardBreakdownResponse>("/api/v1/hrms/dashboard/cards/recruitment-status")
+
+  const { data: docsExpiringMetric, loading: loadingDocs } =
+    useApiQuery<DashboardMetricResponse>("/api/v1/hrms/dashboard/cards/documents-expiring")
+
+  const { data: byDepartmentMetric, loading: loadingByDept } =
+    useApiQuery<DashboardBreakdownResponse>("/api/v1/hrms/dashboard/cards/employees-by-department")
+
+  const fmt = (loading: boolean, value: number | string | undefined) =>
+    loading ? "..." : String(value ?? "—")
+
+  // Sum up all recruitment statuses for "Open Applicants"
+  const openApplicants = React.useMemo(() => {
+    if (loadingRecruitment || !recruitmentMetric) return "..."
+    const total = (recruitmentMetric.items ?? []).reduce(
+      (sum, item) => sum + Number(item.value ?? 0),
+      0,
+    )
+    return String(total)
+  }, [recruitmentMetric, loadingRecruitment])
 
   const summaryCards = [
     {
-      label: "Active Employees",
-      value: employeeCount.toString(),
-      detail: "12 departments covered",
+      label: "Total Employees",
+      value: fmt(loadingTotal, totalMetric?.value),
+      detail: totalMetric?.description ?? "All personnel records",
       icon: Users,
     },
     {
-      label: "Open Applicants",
-      value: "36",
-      detail: "8 scheduled for interview",
+      label: "Active Employees",
+      value: fmt(loadingActive, activeMetric?.value),
+      detail: activeMetric?.description ?? "Currently active staff",
       icon: UserRoundPlus,
     },
     {
-      label: "For Review",
-      value: "14",
-      detail: "Contracts and personnel files",
+      label: "Open Applicants",
+      value: openApplicants,
+      detail: "Across all recruitment stages",
       icon: FileCheck2,
     },
     {
-      label: "Due This Week",
-      value: "9",
-      detail: "Onboarding and evaluations",
+      label: "Documents Expiring",
+      value: fmt(loadingDocs, docsExpiringMetric?.value),
+      detail: docsExpiringMetric?.description ?? "Within the next 30 days",
       icon: CalendarClock,
     },
-  ] as const
+  ]
+
+  // Build department rows from the API breakdown
+  const departmentRows = React.useMemo(() => {
+    if (!byDepartmentMetric) return []
+    return (byDepartmentMetric.items ?? []).slice(0, 4).map((item) => ({
+      name: item.label,
+      headcount: Number(item.value ?? 0),
+    }))
+  }, [byDepartmentMetric])
 
   return (
+    <PermissionGuard requiredPermission="hrms.dashboard.view">
+    {totalError ? (
+      <ApiErrorView error={totalError} onRetry={refreshDashboard} fullScreen />
+    ) : (
     <div className="space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
@@ -162,17 +198,36 @@ export default function HrmDashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {pipeline.map((item) => (
-                  <TableRow key={item.stage}>
-                    <TableCell className="font-medium">{item.stage}</TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="rounded-md">
-                        {item.status}
-                      </Badge>
+                {loadingRecruitment ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="py-6 text-center text-sm text-muted-foreground">
+                      Loading pipeline…
                     </TableCell>
-                    <TableCell className="text-right">{item.count}</TableCell>
                   </TableRow>
-                ))}
+                ) : recruitmentMetric?.items && recruitmentMetric.items.length > 0
+                  ? recruitmentMetric.items.map((item) => (
+                    <TableRow key={item.label}>
+                      <TableCell className="font-medium">{item.label}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="rounded-md">
+                          Active
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">{item.value}</TableCell>
+                    </TableRow>
+                  ))
+                  : pipeline.map((item) => (
+                    <TableRow key={item.stage}>
+                      <TableCell className="font-medium">{item.stage}</TableCell>
+                      <TableCell>
+                        <Badge variant="secondary" className="rounded-md">
+                          {item.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">{item.count}</TableCell>
+                    </TableRow>
+                  ))
+                }
               </TableBody>
             </Table>
           </CardContent>
@@ -185,26 +240,37 @@ export default function HrmDashboardPage() {
 
         <Card className="rounded-lg">
           <CardHeader>
-            <CardTitle>Workforce Allocation</CardTitle>
+            <CardTitle>Workforce by Department</CardTitle>
             <CardDescription>
-              Department staffing against planned capacity.
+              Employee headcount per department.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
-            {departments.map((department) => (
-              <div key={department.name} className="space-y-2">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="font-medium">{department.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {department.headcount} active employees
-                    </p>
+            {loadingByDept ? (
+              <p className="text-sm text-muted-foreground">Loading…</p>
+            ) : departmentRows.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No department data available.</p>
+            ) : (
+              departmentRows.map((department) => (
+                <div key={department.name} className="space-y-2">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="font-medium">{department.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {department.headcount} employee{department.headcount !== 1 ? "s" : ""}
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-sm font-medium">{department.capacity}%</p>
+                  <Progress
+                    value={
+                      totalMetric?.value && Number(totalMetric.value) > 0
+                        ? Math.round((department.headcount / Number(totalMetric.value)) * 100)
+                        : 0
+                    }
+                  />
                 </div>
-                <Progress value={department.capacity} />
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
       </div>
@@ -237,5 +303,7 @@ export default function HrmDashboardPage() {
         </CardContent>
       </Card>
     </div>
+    )}
+    </PermissionGuard>
   )
 }

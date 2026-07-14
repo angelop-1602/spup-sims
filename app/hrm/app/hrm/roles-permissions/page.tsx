@@ -2,10 +2,13 @@
 
 import * as React from "react"
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
+import { PermissionGuard } from "@/components/auth/permission-guard"
+import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { ApiErrorView } from "@/components/ui/error-page"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
@@ -56,7 +59,8 @@ type PagedPermissions = components["schemas"]["PagedResponseOfPermissionResponse
 type Department = components["schemas"]["DepartmentResponse"]
 type PagedDepartments = components["schemas"]["PagedResponseOfDepartmentResponse"]
 type UserRoles = components["schemas"]["UserRolesResponse"]
-type RolePermissions = components["schemas"]["RolePermissionsResponse"]
+type RoleDepartment = components["schemas"]["RoleDepartmentResponse"]
+type SetRoleDepartmentsRequest = components["schemas"]["SetRoleDepartmentsRequest"]
 type CreateRoleRequest = components["schemas"]["CreateRoleRequest"]
 type CreatePermissionRequest = components["schemas"]["CreatePermissionRequest"]
 
@@ -70,13 +74,24 @@ const getDepartmentLabel = (department: Department) =>
   `${department.name} (${department.code})`
 
 export default function RolesPage() {
+  const { hasPermission } = useHrmAuth()
+
+  const canViewUsers    = hasPermission("identity.users.view")
+  const canViewRoles    = hasPermission("identity.roles.view")
+  const canViewPerms    = hasPermission("identity.permissions.view")
+  const canCreateRole   = hasPermission("identity.roles.create")
+  const canDeleteRole   = hasPermission("identity.roles.delete")
+  const canCreatePerm   = hasPermission("identity.permissions.create")
+  const canDeletePerm   = hasPermission("identity.permissions.delete")
+  const canUpdateUsers  = hasPermission("identity.users.update")
+
   const [activeTab, setActiveTab] = React.useState<"users" | "roles" | "departments" | "create">("users")
   const [selectedUserId, setSelectedUserId] = React.useState<string>("")
   const [selectedRoleId, setSelectedRoleId] = React.useState<string>("")
-  const [selectedDepartmentId, setSelectedDepartmentId] = React.useState<string>("")
+  const [selectedRoleForDeptId, setSelectedRoleForDeptId] = React.useState<string>("")
   const [assignedRoles, setAssignedRoles] = React.useState<Role[]>([])
   const [assignedPermissions, setAssignedPermissions] = React.useState<Permission[]>([])
-  const [assignedDepartments, setAssignedDepartments] = React.useState<Department[]>([])
+  const [assignedRoleDepts, setAssignedRoleDepts] = React.useState<RoleDepartment[]>([])
   const [selectedAssignRoleId, setSelectedAssignRoleId] = React.useState<string>("")
   const [selectedAssignPermissionId, setSelectedAssignPermissionId] = React.useState<string>("")
   const [selectedAssignDepartmentId, setSelectedAssignDepartmentId] = React.useState<string>("")
@@ -94,40 +109,39 @@ export default function RolesPage() {
     [],
   )
 
-  const { data: usersPaged, refresh: refreshUsers } = useApiQuery<PagedUsers>(
-    "/api/identity/users",
+  const { data: usersPaged, refresh: refreshUsers, error: usersError } = useApiQuery<PagedUsers>(
+    "/api/v1/identity/users",
     { Page: 1, PageSize: 100, SortBy: "id" },
     { onError: handleError },
   )
 
   const { data: rolesPaged, refresh: refreshRoles } = useApiQuery<PagedRoles>(
-
-    "/api/identity/roles",
+    "/api/v1/identity/roles",
     { Page: 1, PageSize: 100, SortBy: "id" },
     { onError: handleError },
   )
 
   const { data: permissionsPaged, refresh: refreshPermissions } =
     useApiQuery<PagedPermissions>(
-      "/api/identity/permissions",
+      "/api/v1/identity/permissions",
       { Page: 1, PageSize: 100, SortBy: "id" },
       { onError: handleError },
     )
 
   const { data: departmentsPaged, refresh: refreshDepartments } =
     useApiQuery<PagedDepartments>(
-      "/api/organization/departments",
+      "/api/v1/organization/departments",
       { Page: 1, PageSize: 100, SortBy: "id" },
       { onError: handleError },
     )
 
-  const users = usersPaged?.data ?? []
-  const roles = rolesPaged?.data ?? []
-  const permissions = permissionsPaged?.data ?? []
-  const departments = departmentsPaged?.data ?? []
+  const users = React.useMemo(() => usersPaged?.data ?? [], [usersPaged])
+  const roles = React.useMemo(() => rolesPaged?.data ?? [], [rolesPaged])
+  const permissions = React.useMemo(() => permissionsPaged?.data ?? [], [permissionsPaged])
+  const departments = React.useMemo(() => departmentsPaged?.data ?? [], [departmentsPaged])
 
   const { data: userRoles, refresh: refreshUserRoles } = useApiQuery<UserRoles>(
-    selectedUserId ? `/api/identity/users/${selectedUserId}/roles` : undefined,
+    selectedUserId ? `/api/v1/identity/users/${selectedUserId}/roles` : undefined,
     undefined,
     {
       enabled: Boolean(selectedUserId),
@@ -135,36 +149,35 @@ export default function RolesPage() {
     },
   )
 
-  const { data: rolePermissions, refresh: refreshRolePermissions } =
-    useApiQuery<RolePermissions>(
-      selectedRoleId ? `/api/identity/roles/${selectedRoleId}/permissions` : undefined,
-      undefined,
-      {
-        enabled: Boolean(selectedRoleId),
-        onError: handleError,
-      },
-    )
 
   React.useEffect(() => {
     setAssignedRoles(userRoles?.roles ?? [])
   }, [userRoles])
 
   React.useEffect(() => {
-    setAssignedPermissions(rolePermissions?.permissions ?? [])
-  }, [rolePermissions])
-
-  React.useEffect(() => {
-
     if (!selectedUserId) setAssignedRoles([])
   }, [selectedUserId])
 
   React.useEffect(() => {
-    if (!selectedRoleId) setAssignedPermissions([])
+    if (!selectedRoleId) {
+      setAssignedPermissions([])
+      return
+    }
+    // No standalone GET endpoint exists for role permissions in the API schema.
+    // Load the role via GET /api/v1/identity/roles/{id} (returns RoleResponse
+    // which includes departments but not permissions). Permissions are seeded
+    // from the response of POST/DELETE operations below.
+    setAssignedPermissions([])
   }, [selectedRoleId])
 
   React.useEffect(() => {
-    if (!selectedDepartmentId) setAssignedDepartments([])
-  }, [selectedDepartmentId])
+    if (!selectedRoleForDeptId) {
+      setAssignedRoleDepts([])
+    } else {
+      const role = roles.find((r) => String(r.id) === selectedRoleForDeptId)
+      setAssignedRoleDepts(role?.departments ?? [])
+    }
+  }, [selectedRoleForDeptId, roles])
 
   const { mutate: command, loading: saving } = useApiMutation()
 
@@ -181,7 +194,7 @@ export default function RolesPage() {
         return false
       }
       const ok = await command({
-        path: `/api/identity/users/${selectedUserId}/roles/${selectedAssignRoleId}`,
+        path: `/api/v1/identity/users/${selectedUserId}/roles/${selectedAssignRoleId}`,
         method: "POST",
       })
       if (ok) {
@@ -195,12 +208,13 @@ export default function RolesPage() {
     run(async () => {
       if (!selectedUserId) return false
       const ok = await command({
-        path: `/api/identity/users/${selectedUserId}/roles/${roleId}`,
+        path: `/api/v1/identity/users/${selectedUserId}/roles/${roleId}`,
         method: "DELETE",
       })
       if (ok) await refreshUserRoles()
       return ok
     }, "Unable to remove role from user")
+
 
   const assignPermissionToRole = () =>
     run(async () => {
@@ -209,12 +223,16 @@ export default function RolesPage() {
         return false
       }
       const ok = await command({
-
-        path: `/api/identity/roles/${selectedRoleId}/permissions/${selectedAssignPermissionId}`,
+        path: `/api/v1/identity/roles/${selectedRoleId}/permissions/${selectedAssignPermissionId}`,
         method: "POST",
       })
       if (ok) {
-        await refreshRolePermissions()
+        // POST returns RolePermissionsResponse but useApiMutation discards the
+        // body. Update optimistically from the local permissions list.
+        const perm = permissions.find(
+          (p) => String(p.id) === String(selectedAssignPermissionId),
+        )
+        if (perm) setAssignedPermissions((prev) => [...prev, perm])
         setSelectedAssignPermissionId("")
       }
       return ok
@@ -224,56 +242,54 @@ export default function RolesPage() {
     run(async () => {
       if (!selectedRoleId) return false
       const ok = await command({
-        path: `/api/identity/roles/${selectedRoleId}/permissions/${permissionId}`,
+        path: `/api/v1/identity/roles/${selectedRoleId}/permissions/${permissionId}`,
         method: "DELETE",
       })
-      if (ok) await refreshRolePermissions()
+      if (ok) {
+        // DELETE returns 204 — remove optimistically from local state
+        setAssignedPermissions((prev) =>
+          prev.filter((p) => String(p.id) !== String(permissionId)),
+        )
+      }
       return ok
     }, "Unable to remove permission from role")
 
   const assignDepartmentToRole = () =>
     run(async () => {
-      if (!selectedDepartmentId || !selectedAssignDepartmentId) {
-        setError("Select a department and a role to assign.")
+      if (!selectedRoleForDeptId || !selectedAssignDepartmentId) {
+        setError("Select a role and a department to assign.")
         return false
       }
+      const currentIds = assignedRoleDepts.map((d) => d.id)
+      const newIds = [...currentIds, selectedAssignDepartmentId]
+      const body: SetRoleDepartmentsRequest = { departmentIds: newIds }
       const ok = await command({
-        path: `/api/organization/departments/${selectedDepartmentId}/roles/${selectedAssignDepartmentId}`,
-        method: "POST",
+        path: `/api/v1/identity/roles/${selectedRoleForDeptId}/departments`,
+        method: "PUT",
+        body,
       })
       if (ok) {
-        // Refresh the assigned roles for this department
-        const departmentRoles = await command({
-          path: `/api/organization/departments/${selectedDepartmentId}/roles`,
-          method: "GET",
-        })
-        if (departmentRoles) {
-          setAssignedDepartments(departmentRoles as unknown as Department[])
-        }
+        await refreshRoles()
         setSelectedAssignDepartmentId("")
       }
       return ok
-    }, "Unable to assign role to department")
+    }, "Unable to assign department to role")
 
-  const removeDepartmentFromRole = (roleId: number | string) =>
+  const removeDepartmentFromRole = (departmentId: number | string) =>
     run(async () => {
-      if (!selectedDepartmentId) return false
+      if (!selectedRoleForDeptId) return false
+      const newIds = assignedRoleDepts
+        .filter((d) => String(d.id) !== String(departmentId))
+        .map((d) => d.id)
+      const body: SetRoleDepartmentsRequest = { departmentIds: newIds }
       const ok = await command({
-        path: `/api/organization/departments/${selectedDepartmentId}/roles/${roleId}`,
-        method: "DELETE",
+        path: `/api/v1/identity/roles/${selectedRoleForDeptId}/departments`,
+        method: "PUT",
+        body,
       })
-      if (ok) {
-        // Refresh the assigned roles for this department
-        const departmentRoles = await command({
-          path: `/api/organization/departments/${selectedDepartmentId}/roles`,
-          method: "GET",
-        })
-        if (departmentRoles) {
-          setAssignedDepartments(departmentRoles as unknown as Department[])
-        }
-      }
+      if (ok) await refreshRoles()
       return ok
-    }, "Unable to remove role from department")
+    }, "Unable to remove department from role")
 
   const createRole = () =>
     run(async () => {
@@ -287,7 +303,7 @@ export default function RolesPage() {
         isActive: newRoleIsActive,
       }
       const ok = await command({
-        path: "/api/identity/roles",
+        path: "/api/v1/identity/roles",
         method: "POST",
         body,
       })
@@ -314,7 +330,7 @@ export default function RolesPage() {
         action: newPermissionAction.trim(),
       }
       const ok = await command({
-        path: "/api/identity/permissions",
+        path: "/api/v1/identity/permissions",
         method: "POST",
         body,
       })
@@ -341,11 +357,12 @@ export default function RolesPage() {
       ),
   )
 
-  const availableRolesForDepartment = roles.filter(
-    (role) => !assignedDepartments.some((assigned) => String(assigned.id) === String(role.id)),
+  const availableDepartmentsForRole = departments.filter(
+    (dept) => !assignedRoleDepts.some((assigned) => String(assigned.id) === String(dept.id)),
   )
 
   return (
+    <PermissionGuard requiredPermission="identity.roles.view">
     <div className="space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">
@@ -357,6 +374,10 @@ export default function RolesPage() {
       </div>
 
 
+      {usersError ? (
+        <ApiErrorView error={usersError} onRetry={refreshUsers} fullScreen />
+      ) : (
+      <>
       {error && (
         <Card className="border-destructive bg-destructive/10">
           <CardContent className="flex items-start gap-3 pt-6">
@@ -393,7 +414,7 @@ export default function RolesPage() {
             </TabsTrigger>
             <TabsTrigger value="departments" className="flex items-center gap-2">
               <Building2 className="h-4 w-4" />
-              Department Roles
+              Role Departments
             </TabsTrigger>
             <TabsTrigger value="create" className="flex items-center gap-2">
               <Key className="h-4 w-4" />
@@ -454,14 +475,15 @@ export default function RolesPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {canUpdateUsers && (
                       <Button
                         onClick={assignRoleToUser}
-
                         disabled={!selectedUserId || !selectedAssignRoleId || saving}
                         size="default"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -511,6 +533,7 @@ export default function RolesPage() {
                               </Badge>
                             </TableCell>
                             <TableCell className="text-right">
+                              {canUpdateUsers && (
                               <Button
                                 variant="destructive"
                                 size="sm"
@@ -520,6 +543,7 @@ export default function RolesPage() {
                                 <Trash2 className="mr-1 h-3 w-3" />
                                 Remove
                               </Button>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))
@@ -584,6 +608,7 @@ export default function RolesPage() {
                           ))}
                         </SelectContent>
                       </Select>
+                      {canCreatePerm && (
                       <Button
                         onClick={assignPermissionToRole}
                         disabled={!selectedRoleId || !selectedAssignPermissionId || saving}
@@ -591,6 +616,7 @@ export default function RolesPage() {
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -645,6 +671,7 @@ export default function RolesPage() {
                               <Badge variant="outline">{permission.action}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
+                              {canDeletePerm && (
                               <Button
                                 variant="destructive"
                                 size="sm"
@@ -654,6 +681,7 @@ export default function RolesPage() {
                                 <Trash2 className="mr-1 h-3 w-3" />
                                 Remove
                               </Button>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))
@@ -670,26 +698,26 @@ export default function RolesPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building2 className="h-5 w-5" />
-                  Assign Roles to Departments
+                  Set Departments for Role
                 </CardTitle>
                 <CardDescription>
-                  Select a department and assign roles to define which roles are available in that department.
+                  Select a role and manage which departments it belongs to. Changes replace the full department set for the role.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="grid gap-6 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="department-select-assign" className="text-base font-medium">
-                      Select Department
+                    <Label htmlFor="role-dept-select" className="text-base font-medium">
+                      Select Role
                     </Label>
-                    <Select value={selectedDepartmentId} onValueChange={setSelectedDepartmentId}>
-                      <SelectTrigger id="department-select-assign">
-                        <SelectValue placeholder="Choose a department..." />
+                    <Select value={selectedRoleForDeptId} onValueChange={setSelectedRoleForDeptId}>
+                      <SelectTrigger id="role-dept-select">
+                        <SelectValue placeholder="Choose a role..." />
                       </SelectTrigger>
                       <SelectContent>
-                        {departments.map((dept) => (
-                          <SelectItem key={String(dept.id)} value={String(dept.id)}>
-                            {getDepartmentLabel(dept)}
+                        {roles.map((role) => (
+                          <SelectItem key={String(role.id)} value={String(role.id)}>
+                            {getRoleLabel(role)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -697,33 +725,35 @@ export default function RolesPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="assign-department-role-select" className="text-base font-medium">
-                      Assign Role
+                    <Label htmlFor="assign-dept-select" className="text-base font-medium">
+                      Add Department
                     </Label>
                     <div className="flex gap-2">
                       <Select
                         value={selectedAssignDepartmentId}
                         onValueChange={setSelectedAssignDepartmentId}
-                        disabled={!selectedDepartmentId}
+                        disabled={!selectedRoleForDeptId}
                       >
-                        <SelectTrigger id="assign-department-role-select">
-                          <SelectValue placeholder={selectedDepartmentId ? "Choose a role..." : "Select department first"} />
+                        <SelectTrigger id="assign-dept-select">
+                          <SelectValue placeholder={selectedRoleForDeptId ? "Choose a department..." : "Select role first"} />
                         </SelectTrigger>
                         <SelectContent>
-                          {availableRolesForDepartment.map((role) => (
-                            <SelectItem key={String(role.id)} value={String(role.id)}>
-                              {getRoleLabel(role)}
+                          {availableDepartmentsForRole.map((dept) => (
+                            <SelectItem key={String(dept.id)} value={String(dept.id)}>
+                              {getDepartmentLabel(dept)}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
+                      {canDeleteRole && (
                       <Button
                         onClick={assignDepartmentToRole}
-                        disabled={!selectedDepartmentId || !selectedAssignDepartmentId || saving}
+                        disabled={!selectedRoleForDeptId || !selectedAssignDepartmentId || saving}
                         size="default"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -733,45 +763,40 @@ export default function RolesPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>ID</TableHead>
-                        <TableHead>Role Name</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>Department Name</TableHead>
+                        <TableHead>Code</TableHead>
                         <TableHead className="text-right">Action</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {!selectedDepartmentId ? (
+                      {!selectedRoleForDeptId ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="h-32 text-center">
+                          <TableCell colSpan={4} className="h-32 text-center">
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                              <Building2 className="h-8 w-8 opacity-50" />
-                              <p className="text-sm">Select a department above to view its assigned roles</p>
+                              <Shield className="h-8 w-8 opacity-50" />
+                              <p className="text-sm">Select a role above to view its assigned departments</p>
                             </div>
                           </TableCell>
                         </TableRow>
-                      ) : assignedDepartments.length === 0 ? (
+                      ) : assignedRoleDepts.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="h-32 text-center">
+                          <TableCell colSpan={4} className="h-32 text-center">
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                              <Shield className="h-8 w-8 opacity-50" />
-                              <p className="text-sm">No roles assigned to this department yet</p>
+                              <Building2 className="h-8 w-8 opacity-50" />
+                              <p className="text-sm">No departments assigned to this role yet</p>
                             </div>
                           </TableCell>
                         </TableRow>
                       ) : (
-                        assignedDepartments.map((dept) => (
+                        assignedRoleDepts.map((dept) => (
                           <TableRow key={String(dept.id)}>
                             <TableCell className="font-mono text-xs">{dept.id}</TableCell>
                             <TableCell className="font-medium">{dept.name}</TableCell>
-                            <TableCell className="text-muted-foreground">
-                              {dept.code || "—"}
-                            </TableCell>
                             <TableCell>
-                              <Badge variant={dept.isActive ? "default" : "secondary"}>
-                                {dept.isActive ? "Active" : "Inactive"}
-                              </Badge>
+                              <Badge variant="outline">{dept.code}</Badge>
                             </TableCell>
                             <TableCell className="text-right">
+                              {canDeleteRole && (
                               <Button
                                 variant="destructive"
                                 size="sm"
@@ -781,6 +806,7 @@ export default function RolesPage() {
                                 <Trash2 className="mr-1 h-3 w-3" />
                                 Remove
                               </Button>
+                              )}
                             </TableCell>
                           </TableRow>
                         ))
@@ -866,7 +892,7 @@ export default function RolesPage() {
                     >
                       Clear
                     </Button>
-                    <Button type="submit" disabled={saving || !newRoleName.trim()}>
+                    <Button type="submit" disabled={saving || !newRoleName.trim() || !canCreateRole}>
                       {saving ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -989,6 +1015,7 @@ export default function RolesPage() {
                       type="submit"
                       disabled={
                         saving ||
+                        !canCreatePerm ||
                         !newPermissionName.trim() ||
                         !newPermissionModule.trim() ||
                         !newPermissionAction.trim()
@@ -1013,6 +1040,9 @@ export default function RolesPage() {
           </TabsContent>
         </Tabs>
       )}
+      </>
+      )}
     </div>
+    </PermissionGuard>
   )
 }

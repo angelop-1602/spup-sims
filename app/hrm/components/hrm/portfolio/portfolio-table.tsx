@@ -137,6 +137,7 @@ export function PortfolioTable<TRow extends { id: number | string }>({
   loadingLabel,
   columns,
   renderAddButton,
+  readOnly = false,
 }: {
   profileId: number | string
   headerActionsEl: HTMLElement | null
@@ -147,6 +148,7 @@ export function PortfolioTable<TRow extends { id: number | string }>({
     profileId: number | string
     onCreated: () => void
   }) => React.ReactNode
+  readOnly?: boolean
 }) {
   const [page, setPage] = React.useState(1)
 
@@ -158,9 +160,14 @@ export function PortfolioTable<TRow extends { id: number | string }>({
   const totalPages = Number(data?.totalPages ?? 1)
   const totalRecords = Number(data?.totalRecords ?? 0)
 
+  // Omit the "Actions" column when in read-only mode
+  const visibleColumns = readOnly
+    ? columns.filter((c) => c.header !== "Actions")
+    : columns
+
   return (
     <div>
-      {headerActionsEl &&
+      {!readOnly && headerActionsEl &&
         createPortal(
           renderAddButton ? (
             renderAddButton({ profileId, onCreated: refresh })
@@ -188,7 +195,7 @@ export function PortfolioTable<TRow extends { id: number | string }>({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/30 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                  {columns.map((column) => (
+                  {visibleColumns.map((column) => (
                     <th key={column.header} className="px-4 py-3 font-medium">
                       {column.header}
                     </th>
@@ -199,7 +206,7 @@ export function PortfolioTable<TRow extends { id: number | string }>({
                 {rows.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={columns.length}
+                      colSpan={visibleColumns.length}
                       className="px-4 py-6 text-center text-muted-foreground"
                     >
                       No results.
@@ -208,7 +215,7 @@ export function PortfolioTable<TRow extends { id: number | string }>({
                 ) : (
                   rows.map((row) => (
                     <tr key={row.id} className="border-b last:border-0 hover:bg-muted/30">
-                      {columns.map((column) => (
+                      {visibleColumns.map((column) => (
                         <td key={column.header} className="px-4 py-3">
                           {column.render(row, profileId, refresh)}
                         </td>

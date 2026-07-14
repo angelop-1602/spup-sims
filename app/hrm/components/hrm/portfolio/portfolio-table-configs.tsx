@@ -287,6 +287,7 @@ const awardsRecognition: PortfolioTableConfig<AwardRecognition> = {
 type PortfolioTableRenderer = (
   profileId: number | string,
   headerActionsEl: HTMLElement | null,
+  readOnly?: boolean,
 ) => React.ReactNode
 
 // TRow is captured here, at the one place it's still concrete — the returned
@@ -294,14 +295,15 @@ type PortfolioTableRenderer = (
 function makeRenderer<TRow extends { id: number | string }>(
   config: PortfolioTableConfig<TRow>,
 ): PortfolioTableRenderer {
-  return (profileId, headerActionsEl) => (
+  return (profileId, headerActionsEl, readOnly = false) => (
     <PortfolioTable<TRow>
       profileId={profileId}
       headerActionsEl={headerActionsEl}
       endpoint={config.endpoint(profileId)}
       loadingLabel={config.loadingLabel}
       columns={config.columns}
-      renderAddButton={config.renderAddButton}
+      renderAddButton={readOnly ? undefined : config.renderAddButton}
+      readOnly={readOnly}
     />
   )
 }

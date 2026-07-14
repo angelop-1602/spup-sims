@@ -1,9 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { ShieldCheck } from "lucide-react"
 import { useHrmAuth } from "./hrm-auth-guard"
+import { ErrorPage } from "@/components/ui/error-page"
 
 interface PermissionGuardProps {
   /** A single required permission (shorthand for `requiredPermissions: [permission]`). */
@@ -22,16 +21,18 @@ export function PermissionGuard({
   fallback,
   children,
 }: PermissionGuardProps) {
-  const { hasPermission } = useHrmAuth()
+  const { hasPermission, currentUser } = useHrmAuth()
 
   const permissions = requiredPermissions ?? (
     requiredPermission ? [requiredPermission] : []
   )
 
+  // Super admins bypass all permission checks
   const isAuthorized =
-    mode === "any"
+    currentUser?.isSuperAdmin ||
+    (mode === "any"
       ? permissions.some(hasPermission)
-      : permissions.every(hasPermission)
+      : permissions.every(hasPermission))
 
   if (isAuthorized) {
     return <>{children}</>
@@ -41,24 +42,5 @@ export function PermissionGuard({
     return <>{fallback}</>
   }
 
-  return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
-      <div className="w-full max-w-md rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-        <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          <div>
-            <h1 className="text-lg font-semibold">Unauthorized</h1>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              You do not have the required permissions to view this page.
-            </p>
-          </div>
-        </div>
-        <Button className="mt-6 w-full" variant="outline" onClick={() => window.history.back()}>
-          Go back
-        </Button>
-      </div>
-    </main>
-  )
+  return <ErrorPage status={403} fullScreen />
 }
