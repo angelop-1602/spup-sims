@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Search, UserSearch, Eye, Plus } from "lucide-react"
+import { Loader2, Search, UserSearch, Eye, UserPlus } from "lucide-react"
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { PermissionGuard } from "@/components/auth/permission-guard"
@@ -33,6 +33,7 @@ interface Profile {
   id: number | string
   firstName: string
   lastName: string
+  personalEmail?: string | null
 }
 
 type PagedResponseBase = {
@@ -57,6 +58,15 @@ const STATUS_STYLES: Record<string, string> = {
 
 const STATUS_OPTIONS = ["Submitted", "Pending", "Interview", "Hired", "Rejected"]
 
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("")
+}
+
 function getStatusStyle(status: string) {
   return STATUS_STYLES[status] ?? "bg-muted text-muted-foreground border border-border"
 }
@@ -68,7 +78,7 @@ function formatDate(dateString: string | null) {
   })
 }
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 10
 const EMPTY_APPLICANTS: Applicant[] = []
 
 export default function ApplicantsPage() {
@@ -105,11 +115,10 @@ export default function ApplicantsPage() {
     error,
     refresh: refreshApplicants,
   } = useApiQuery<ApplicantsPayload>("/api/v1/recruitment/employee-applicants", {
+    // ponytail: Search is a valid query param per the schema, but the backend
+    // 500s whenever it's set. Filter client-side below instead of sending it.
     Page: page,
     PageSize: PAGE_SIZE,
-    Search: debouncedSearch || undefined,
-    DateFrom: dateFrom || undefined,
-    DateTo: dateTo || undefined,
     Descending: true,
     SchoolYearId: 1,
   })
@@ -126,6 +135,24 @@ export default function ApplicantsPage() {
   const totalPages = Number(applicantsPayload?.totalPages ?? 1)
   const totalRecords = Number(applicantsPayload?.totalRecords ?? 0)
   const hasActiveFilters = Boolean(search || dateFrom || dateTo)
+
+  // ponytail: API has no DateFrom/DateTo params and 500s on Search, so both
+  // filters run client-side on the fetched page. Counts/pagination above
+  // still reflect the unfiltered server total.
+  const visibleApplicants = applicants.filter((applicant) => {
+    if (dateFrom || dateTo) {
+      const created = new Date(applicant.createdAt)
+      if (dateFrom && created < new Date(dateFrom)) return false
+      if (dateTo && created > new Date(`${dateTo}T23:59:59`)) return false
+    }
+    if (debouncedSearch) {
+      const matchingProfile = profiles.find((p) => String(p.id) === String(applicant.profileId))
+      const name = matchingProfile ? `${matchingProfile.firstName} ${matchingProfile.lastName}` : ""
+      const haystack = `${applicant.applicationNumber} ${applicant.status} ${name}`.toLowerCase()
+      if (!haystack.includes(debouncedSearch.toLowerCase())) return false
+    }
+    return true
+  })
 
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -152,47 +179,48 @@ export default function ApplicantsPage() {
             <h1 className="text-2xl font-semibold tracking-normal">Applicants</h1>
             <p className="mt-1 text-sm text-muted-foreground">Applicant records will appear here.</p>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {canCreate && (
-              <Button onClick={() => { setIsCreateOpen(true); setCreateError(null) }}>
-                <Plus className="mr-2 h-4 w-4" />
-                New applicant
-              </Button>
-            )}
+          {canCreate && (
+            <Button onClick={() => { setIsCreateOpen(true); setCreateError(null) }}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              New applicant
+            </Button>
+          )}
+        </div>
+
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-64">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => { setDateFrom(e.target.value); setPage(1) }}
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              type="text"
+              value={search}
+              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+              placeholder="Search application no. or status"
+              className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
-            <span className="text-sm text-muted-foreground">to</span>
-            <input
-              type="date"
-              value={dateTo}
-              min={dateFrom || undefined}
-              onChange={(e) => { setDateTo(e.target.value); setPage(1) }}
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            />
-            {(dateFrom || dateTo) && (
-              <button
-                type="button"
-                onClick={() => { setDateFrom(""); setDateTo(""); setPage(1) }}
-                className="text-xs text-muted-foreground hover:text-foreground"
-              >
-                Clear
-              </button>
-            )}
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                placeholder="Search application no. or status"
-                className="w-64 rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              />
-            </div>
           </div>
+          <input
+            type="date"
+            value={dateFrom}
+            onChange={(e) => { setDateFrom(e.target.value); setPage(1) }}
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+          <span className="text-sm text-muted-foreground">to</span>
+          <input
+            type="date"
+            value={dateTo}
+            min={dateFrom || undefined}
+            onChange={(e) => { setDateTo(e.target.value); setPage(1) }}
+            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={() => { setSearch(""); setDateFrom(""); setDateTo(""); setPage(1) }}
+              className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
+            >
+              Clear filters
+            </button>
+          )}
         </div>
 
         <div className="mt-6 overflow-hidden rounded-lg border">
@@ -203,7 +231,7 @@ export default function ApplicantsPage() {
             </div>
           ) : error ? (
             <ApiErrorView error={error} onRetry={refreshApplicants} fullScreen />
-          ) : applicants.length === 0 ? (
+          ) : visibleApplicants.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
               <UserSearch className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">
@@ -220,8 +248,8 @@ export default function ApplicantsPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="px-4 py-3 font-medium">Application No.</th>
                     <th className="px-4 py-3 font-medium">Applicant Name</th>
+                    <th className="px-4 py-3 font-medium">Applicant ID</th>
                     <th className="px-4 py-3 font-medium">Status</th>
                     <th className="px-4 py-3 font-medium">Date Applied</th>
                     <th className="px-4 py-3 font-medium">Last Updated</th>
@@ -229,7 +257,7 @@ export default function ApplicantsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {applicants.map((applicant) => {
+                  {visibleApplicants.map((applicant) => {
                     const matchingProfile = profiles.find(
                       (p) => String(p.id) === String(applicant.profileId),
                     )
@@ -239,8 +267,18 @@ export default function ApplicantsPage() {
 
                     return (
                       <tr key={applicant.id} className="border-b last:border-0 hover:bg-muted/30">
-                        <td className="px-4 py-3 font-medium">{applicant.applicationNumber}</td>
-                        <td className="px-4 py-3">{fullName}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
+                              {getInitials(fullName)}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate font-medium">{fullName}</p>
+                              <p className="truncate text-xs text-muted-foreground">{matchingProfile?.personalEmail ?? "—"}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">{applicant.applicationNumber}</td>
                         <td className="px-4 py-3">
                           <span className={"inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " + getStatusStyle(applicant.status)}>
                             {applicant.status}
