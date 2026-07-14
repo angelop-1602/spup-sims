@@ -132,7 +132,7 @@ export default function RegisterForm({
               <Input
                 value={firstName}
                 onChange={(event) => setFirstName(event.target.value)}
-                placeholder="John"
+                placeholder="Jane"
                 required
               />
             </div>
@@ -157,7 +157,7 @@ export default function RegisterForm({
                 type="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                placeholder="m@example.com"
+                placeholder="ict@spup.edu.ph"
                 required
               />
               {fieldErrors.email && (
