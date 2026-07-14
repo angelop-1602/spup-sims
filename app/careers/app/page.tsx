@@ -20,28 +20,6 @@ import JobDetailsModal from '../components/landing/JobDetailsModal';
 import ProcessTimeline from '../components/landing/ApplicationProcess';
 import FaqSection from '../components/landing/Faq';
 import JobBoardCTA from '../components/landing/Cta';
-import { Instrument_Serif, Poppins, Epilogue, Inter } from 'next/font/google';
-
-const instrumentSerif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: ['400'],
-  style: ['normal', 'italic'],
-});
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-});
-
-const epilogue = Epilogue({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-});
 
 export default function HrmPage() {
   const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile' | 'faqs' >('explore');
@@ -202,22 +180,22 @@ export default function HrmPage() {
                 />
               </div>
               <div className="text-left flex flex-col justify-center">
-                <h1 className="text-sm font-extrabold text-neutral-900 tracking-tight leading-none uppercase">
+                <h1 className="font-poppins text-sm font-extrabold text-neutral-900 tracking-tight leading-none uppercase">
                   SPUP HRM Careers
                 </h1>
-                <span className="text-[10px] font-bold text-neutral-400 mt-0.5 leading-none">
+                <span className="font-epilogue text-[10px] font-bold text-neutral-400 mt-1 leading-none">
                   St. Paul University Philippines
                 </span>
               </div>
             </div>
 
-            <nav className="flex items-center gap-6 ml-auto">
+            <nav className="flex items-center gap-6 ml-auto font-epilogue">
               <button 
                 onClick={() => {
                   setActiveTab('explore');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }} 
-                className={`text-xs font-semibold transition-colors cursor-pointer ${activeTab === 'explore' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+                className={`text-[11px] font-semibold transition-colors cursor-pointer ${activeTab === 'explore' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
               >
                 Home
               </button>
@@ -229,14 +207,14 @@ export default function HrmPage() {
                     document.getElementById('workspace-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 100);
                 }} 
-                className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+                className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
               >
                 Job Openings
               </button>
 
               <button 
                 onClick={() => setActiveTab('applications')} 
-                className={`text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+                className={`text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
               >
                 Application Process
                 {applications.length > 0 && (
@@ -253,7 +231,7 @@ export default function HrmPage() {
                     document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 100);
                 }} 
-                className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+                className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
               >
                 FAQs
               </button>
@@ -311,14 +289,14 @@ export default function HrmPage() {
 
               <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="relative w-full max-w-2xl mx-auto text-center bg-white border-2 border-emerald-950 rounded-2xl p-8 md:p-10 shadow-[6px_6px_0px_0px_#022c22]">
-                  <div className={`${epilogue.className} absolute -top-6 -right-6 bg-amber-400 border-2 border-amber-900 rounded-full w-16 h-16 flex items-center justify-center rotate-12 shadow-[3px_3px_0px_0px_#78350f] text-[10px] font-black text-neutral-900 text-center uppercase leading-tight`}>
+                  <div className="font-epilogue absolute -top-6 -right-6 bg-amber-400 border-2 border-amber-900 rounded-full w-16 h-16 flex items-center justify-center rotate-12 shadow-[3px_3px_0px_0px_#78350f] text-[10px] font-black text-neutral-900 text-center uppercase leading-tight">
                     Apply Today!
                   </div>
                   <div className="space-y-3">
-                    <h1 className={`${poppins.className} text-5xl text-center sm:text-4xl lg:text-6xl font-bold text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] md:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]`}>
+                    <h1 className="font-poppins text-5xl text-center sm:text-4xl lg:text-6xl font-bold text-emerald-800 tracking-wide leading-tight [-webkit-text-stroke:1px_#065f46] md:[-webkit-text-stroke:1.5px_#065f46] [text-shadow:0_2px_4px_rgba(0,0,0,0.15)]">
                       Build Your Career with SPUP
                     </h1>
-                    <p className={`${epilogue.className} text-sm text-black text-center font-normal leading-relaxed`}>
+                    <p className="font-epilogue text-sm text-black text-center font-normal leading-relaxed">
                       Join a mission-driven academic community committed to service, excellence, and transformative education. Discover where your passion aligns with systemic impact.
                     </p>
                   </div>
@@ -326,14 +304,14 @@ export default function HrmPage() {
                   <div className="flex flex-col sm:flex-row gap-3 pt-5 justify-center">
                     <a 
                       href="#advanced-search-box" 
-                      className={`${epilogue.className} inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none`}
+                      className="font-poppins inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
                     >
                       <Briefcase className="w-3.5 h-3.5" />
                       Browse Job Openings
                     </a>
                     <button 
                       onClick={() => setActiveTab('profile')} 
-                      className={`${epilogue.className} inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer`}
+                      className="font-epilogue inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       Setup Application Profile
@@ -362,9 +340,9 @@ export default function HrmPage() {
       <footer className="bg-white border-t border-neutral-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-neutral-400">
           <div className="flex items-center gap-2">
-            <span className={`${poppins.className} text-neutral-900 font-extrabold uppercase`}>SPUP HRM Careers</span>
+            <span className="font-poppins text-neutral-900 font-extrabold uppercase">SPUP HRM Careers</span>
             <span>•</span>
-            <span className={`${epilogue.className}`}>© 2026 St. Paul University Philippines. All rights reserved.</span>
+            <span className="font-epilogue">© 2026 St. Paul University Philippines. All rights reserved.</span>
           </div>
         </div>
       </footer>
