@@ -14,12 +14,12 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
-import { Job, UserProfile, Application, INITIAL_JOBS } from './components/types';
-import FeaturedJobs from './components/FeaturedJobs';
-import JobDetailsModal from './components/JobDetailsModal';
-import ProcessTimeline from './components/ApplicationProcess';
-import FaqSection from './components/Faq';
-import JobBoardCTA from './components/Cta';
+import { Job, UserProfile, Application, INITIAL_JOBS } from '../components/types';
+import FeaturedJobs from '../components/FeaturedJobs';
+import JobDetailsModal from '../components/JobDetailsModal';
+import ProcessTimeline from '../components/ApplicationProcess';
+import FaqSection from '../components/Faq';
+import JobBoardCTA from '../components/Cta';
 import { Instrument_Serif, Poppins, Epilogue, Inter } from 'next/font/google';
 
 const instrumentSerif = Instrument_Serif({
