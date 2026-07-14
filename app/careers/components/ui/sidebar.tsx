@@ -39,7 +39,7 @@ export default function ApplicantSidebar({ isOpen }: ApplicantSidebarProps) {
       groupLabel: "Main",
       items: [
         { label: "Dashboard", href: "/applicant", icon: LayoutDashboard },
-        { label: "My Portfolio", href: "/applicant/portfolio", icon: Folder },
+        { label: "My Profile", href: "/applicant/profile", icon: Folder },
       ],
     },
     {
