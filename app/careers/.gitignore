@@ -43,6 +43,6 @@ next-env.d.ts
 # ai
 CLAUDE.md
 .playwright-mcp
-.agents
 .mcp.json
 skills-lock.json
+.claude
