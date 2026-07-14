@@ -69,7 +69,7 @@ export default function LoginForm({
         return
       }
 
-      router.push("/")
+      router.push("/applicant/dashboard")
       router.refresh()
     } finally {
       setSubmitting(false)
