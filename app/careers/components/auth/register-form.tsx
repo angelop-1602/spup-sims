@@ -208,7 +208,9 @@ export default function RegisterForm({
               {submitting ? "Creating account..." : "Create account"}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account? <Link href="/login">Log in</Link>
+              Already have an account? <Link href="/login" className="text-black hover:underline">
+                Log in
+              </Link>
             </p>
           </CardFooter>
         </form>
