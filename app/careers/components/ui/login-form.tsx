@@ -1,3 +1,3 @@
 export default function LoginForm() {
-    return "hello";
+    return "hello from login form";
 }
