@@ -3488,7 +3488,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Uploads/registers an employee document; stored in EmployeeDocuments. */
+        /** Uploads an employee document as a multipart file. The server generates the storage path. */
         post: {
             parameters: {
                 query?: never;
@@ -3498,14 +3498,15 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CreateEmployeeDocumentRequest"];
-                    "text/json": components["schemas"]["CreateEmployeeDocumentRequest"];
-                    "application/*+json": components["schemas"]["CreateEmployeeDocumentRequest"];
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
                 };
             };
             responses: {
-                /** @description OK */
-                200: {
+                /** @description Created */
+                201: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -3513,6 +3514,39 @@ export interface paths {
                         "text/plain": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
                         "application/json": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
                         "text/json": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -3557,6 +3591,50 @@ export interface paths {
                         "text/plain": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
                         "application/json": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
                         "text/json": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -6662,10 +6740,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Returns Microsoft Entra ID users eligible for HRMS faculty onboarding.
-         *     Eligible users must be account-enabled, hold a M365EDU_A3_FACULTY or
-         *     STANDARDWOFFPACK_FACULTY license, and must not already have an HRMS
-         *     account or a pending invitation.
+         * Returns Microsoft Entra ID users eligible for HRMS faculty onboarding,
+         *     served from the local cache table. Call /sync first to refresh from Graph.
          */
         get: {
             parameters: {
@@ -6713,6 +6789,72 @@ export interface paths {
                         "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/azure/eligible-users/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refreshes the local eligible-users cache by pulling the latest data from
+         *     Microsoft Graph. Run this before browsing or importing to ensure the list
+         *     is up to date. Returns the count of users upserted.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfAzureSyncResult"];
+                        "application/json": components["schemas"]["ApiResponseOfAzureSyncResult"];
+                        "text/json": components["schemas"]["ApiResponseOfAzureSyncResult"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
                 /** @description Bad Gateway */
                 502: {
                     headers: {
@@ -6726,8 +6868,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -12886,165 +13026,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/sis/students": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateStudentRequest"];
-                    "text/json": components["schemas"]["CreateStudentRequest"];
-                    "application/*+json": components["schemas"]["CreateStudentRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sis/students/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateStudentRequest"];
-                    "text/json": components["schemas"]["UpdateStudentRequest"];
-                    "application/*+json": components["schemas"]["UpdateStudentRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/academic/school-years": {
         parameters: {
             query?: never;
@@ -13052,6 +13033,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lists all school years. */
         get: {
             parameters: {
                 query?: {
@@ -13080,37 +13062,32 @@ export interface paths {
                         "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSchoolYearResponse"];
                     };
                 };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateSchoolYearRequest"];
-                    "text/json": components["schemas"]["CreateSchoolYearRequest"];
-                    "application/*+json": components["schemas"]["CreateSchoolYearRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
+                /** @description Unauthorized */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
         };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -13124,6 +13101,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Gets a single school year by ID. */
         get: {
             parameters: {
                 query?: never;
@@ -13146,1053 +13124,6 @@ export interface paths {
                         "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
                     };
                 };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateSchoolYearRequest"];
-                    "text/json": components["schemas"]["UpdateSchoolYearRequest"];
-                    "application/*+json": components["schemas"]["UpdateSchoolYearRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/academic-terms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateAcademicTermRequest"];
-                    "text/json": components["schemas"]["CreateAcademicTermRequest"];
-                    "application/*+json": components["schemas"]["CreateAcademicTermRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/academic-terms/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateAcademicTermRequest"];
-                    "text/json": components["schemas"]["UpdateAcademicTermRequest"];
-                    "application/*+json": components["schemas"]["UpdateAcademicTermRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/programs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateProgramRequest"];
-                    "text/json": components["schemas"]["CreateProgramRequest"];
-                    "application/*+json": components["schemas"]["CreateProgramRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/programs/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateProgramRequest"];
-                    "text/json": components["schemas"]["UpdateProgramRequest"];
-                    "application/*+json": components["schemas"]["UpdateProgramRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curricula": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateCurriculumRequest"];
-                    "text/json": components["schemas"]["CreateCurriculumRequest"];
-                    "application/*+json": components["schemas"]["CreateCurriculumRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curricula/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateCurriculumRequest"];
-                    "text/json": components["schemas"]["UpdateCurriculumRequest"];
-                    "application/*+json": components["schemas"]["UpdateCurriculumRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/subjects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateSubjectRequest"];
-                    "text/json": components["schemas"]["CreateSubjectRequest"];
-                    "application/*+json": components["schemas"]["CreateSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/subjects/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateSubjectRequest"];
-                    "text/json": components["schemas"]["UpdateSubjectRequest"];
-                    "application/*+json": components["schemas"]["UpdateSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curriculum-subjects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateCurriculumSubjectRequest"];
-                    "text/json": components["schemas"]["CreateCurriculumSubjectRequest"];
-                    "application/*+json": components["schemas"]["CreateCurriculumSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curriculum-subjects/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateCurriculumSubjectRequest"];
-                    "text/json": components["schemas"]["UpdateCurriculumSubjectRequest"];
-                    "application/*+json": components["schemas"]["UpdateCurriculumSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/sections": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateSectionRequest"];
-                    "text/json": components["schemas"]["CreateSectionRequest"];
-                    "application/*+json": components["schemas"]["CreateSectionRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/sections/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateSectionRequest"];
-                    "text/json": components["schemas"]["UpdateSectionRequest"];
-                    "application/*+json": components["schemas"]["UpdateSectionRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -14213,2172 +13144,6 @@ export interface paths {
                         "text/plain": components["schemas"]["ProblemDetails"];
                         "application/json": components["schemas"]["ProblemDetails"];
                         "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollments/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollment-subjects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollment-subjects/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/classes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/classes/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/class-schedules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/class-schedules/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grades": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grades/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grade-components": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grade-components/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/avatars/{profileId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get user avatar/profile picture by profile ID (public access, no authentication required) */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    profileId: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["FileStreamResult"];
-                        "application/json": components["schemas"]["FileStreamResult"];
-                        "text/json": components["schemas"]["FileStreamResult"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/avatars/user/{userId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get user avatar by user ID (public access, no authentication required) */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["FileStreamResult"];
-                        "application/json": components["schemas"]["FileStreamResult"];
-                        "text/json": components["schemas"]["FileStreamResult"];
                     };
                 };
                 /** @description Not Found */
@@ -16409,7 +13174,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Gets the current school year, or 404 if none is set. */
+        /** Gets the current (active) school year, or 404 if none is set. */
         get: {
             parameters: {
                 query?: never;
@@ -16525,7 +13290,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Sets the given school year as the current one, replacing any previously-current year. */
+        /** Sets the given school year as the current one. */
         put: {
             parameters: {
                 query?: never;
@@ -16546,17 +13311,6 @@ export interface paths {
                         "text/plain": components["schemas"]["ApiResponseOfObject"];
                         "application/json": components["schemas"]["ApiResponseOfObject"];
                         "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -16601,25 +13355,253 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/academic/programs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists all academic programs. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Search?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                    SchoolYearId?: number | string;
+                    Status?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/academic/programs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gets a single program by ID. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/avatars/{profileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get user avatar/profile picture by profile ID (public access, no authentication required) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FileStreamResult"];
+                        "application/json": components["schemas"]["FileStreamResult"];
+                        "text/json": components["schemas"]["FileStreamResult"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/avatars/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get user avatar by user ID (public access, no authentication required) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FileStreamResult"];
+                        "application/json": components["schemas"]["FileStreamResult"];
+                        "text/json": components["schemas"]["FileStreamResult"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AcademicTermResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            /** Format: int64 */
-            schoolYearId?: number | string;
-            name: string;
-            /** Format: date */
-            startDate?: string;
-            /** Format: date */
-            endDate?: string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
         AdjustLeaveBalanceRequest: {
             /** Format: int64 */
             employeeId: number | string;
@@ -16642,17 +13624,6 @@ export interface components {
             responseTimestamp?: null | string;
             /** Format: date-time */
             timestamp?: string;
-        };
-        ApiResponseOfAcademicTermResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["AcademicTermResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
         };
         ApiResponseOfAttendanceReportResponse: {
             success: boolean;
@@ -16709,6 +13680,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfAzureSyncResult: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["AzureSyncResult"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfboolean: {
             success: boolean;
             message: string;
@@ -16746,28 +13728,6 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["CurrentUserResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfCurriculumResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["CurriculumResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfCurriculumSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["CurriculumSubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17061,17 +14021,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfAcademicTermResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfAcademicTermResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfAttendanceResponse: {
             success: boolean;
             message: string;
@@ -17120,28 +14069,6 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfCommunityInvolvementResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfCurriculumResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfCurriculumResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfCurriculumSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfCurriculumSubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17380,17 +14307,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfSectionResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfSectionResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfStudentApplicantGuardianResponse: {
             success: boolean;
             message: string;
@@ -17428,28 +14344,6 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfStudentApplicantStatusHistoryResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfStudentResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfStudentResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfSubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17567,17 +14461,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfSectionResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["SectionResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfStudentApplicantGuardianResponse: {
             success: boolean;
             message: string;
@@ -17615,28 +14498,6 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["StudentApplicantStatusHistoryResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfStudentResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["StudentResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["SubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17796,11 +14657,20 @@ export interface components {
             email: string;
             reason: string;
         };
+        /** @description Summary of a sync operation that refreshes the local Azure AD user cache from Graph. */
+        AzureSyncResult: {
+            /** Format: int32 */
+            upserted: number | string;
+            /** Format: date-time */
+            syncedAt: string;
+        };
         /** @description Azure user DTO for eligible faculty users from Microsoft Graph. */
         AzureUserDto: {
             azureObjectId: string;
             displayName: string;
             email: string;
+            givenName: null | string;
+            surname: null | string;
             department: null | string;
             jobTitle: null | string;
             licenses: string[];
@@ -17850,15 +14720,6 @@ export interface components {
             dateActivity: string;
             attachment: null | string;
         };
-        CreateAcademicTermRequest: {
-            /** Format: int64 */
-            schoolYearId?: number | string;
-            name: string;
-            /** Format: date */
-            startDate?: string;
-            /** Format: date */
-            endDate?: string;
-        };
         CreateAttendanceRequest: {
             /** Format: int64 */
             employeeId: number | string;
@@ -17877,25 +14738,6 @@ export interface components {
             code: string;
             isActive?: boolean;
         };
-        CreateCurriculumRequest: {
-            code: string;
-            name: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int32 */
-            effectiveYear?: number | string;
-        };
-        CreateCurriculumSubjectRequest: {
-            /** Format: int64 */
-            curriculumId?: number | string;
-            /** Format: int64 */
-            subjectId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            termSequence?: number | string;
-            isRequired?: boolean;
-        };
         CreateDepartmentRequest: {
             name: string;
             code: string;
@@ -17905,18 +14747,6 @@ export interface components {
             name: string;
             code: string;
             isActive?: boolean;
-        };
-        CreateEmployeeDocumentRequest: {
-            /** Format: int64 */
-            employeeId: number | string;
-            documentType: string;
-            fileName: string;
-            storedFileName: string;
-            mimeType: string;
-            /** Format: int64 */
-            fileSize: number | string;
-            /** Format: date */
-            expiryDate: null | string;
         };
         CreateEmployeeRequest: {
             employeeNumber: string;
@@ -17987,38 +14817,11 @@ export interface components {
             module: string;
             action: string;
         };
-        CreateProgramRequest: {
-            code: string;
-            name: string;
-            educationLevel?: components["schemas"]["EducationLevel"];
-            /** Format: int64 */
-            departmentId?: number | string;
-        };
         CreateRoleRequest: {
             name: string;
             description?: null | string;
             departmentIds?: (number | string)[];
             isActive?: boolean;
-        };
-        CreateSchoolYearRequest: {
-            name: string;
-            /** Format: date */
-            startDate?: string;
-            /** Format: date */
-            endDate?: string;
-            isActive?: boolean;
-        };
-        CreateSectionRequest: {
-            code: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int64 */
-            termId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            capacity?: number | string;
-            isOpen?: boolean;
         };
         CreateStudentApplicantGuardianRequest: {
             /** Format: int64 */
@@ -18052,18 +14855,6 @@ export interface components {
             status?: components["schemas"]["ApplicantStatus"];
             remarks?: null | string;
         };
-        CreateStudentRequest: {
-            /** Format: int64 */
-            profileId: number | string;
-            studentNumber: string;
-            currentStatus?: components["schemas"]["StudentStatus"];
-        };
-        CreateSubjectRequest: {
-            code: string;
-            title: string;
-            /** Format: double */
-            units?: number | string;
-        };
         CreateUserRequest: {
             username: string;
             email: string;
@@ -18084,33 +14875,6 @@ export interface components {
             permissions: string[];
             departments: components["schemas"]["RoleDepartmentResponse"][];
             isSuperAdmin: boolean;
-        };
-        CurriculumResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            code: string;
-            name: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int32 */
-            effectiveYear?: number | string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
-        CurriculumSubjectResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            /** Format: int64 */
-            curriculumId?: number | string;
-            /** Format: int64 */
-            subjectId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            termSequence?: number | string;
-            isRequired?: boolean;
         };
         DashboardBreakdownItemResponse: {
             key: string;
@@ -18534,19 +15298,6 @@ export interface components {
             remarks: null | string;
             attachment: null | string;
         };
-        PagedResponseOfAcademicTermResponse: {
-            data: components["schemas"]["AcademicTermResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfAttendanceResponse: {
             data: components["schemas"]["AttendanceResponse"][];
             /** Format: int32 */
@@ -18601,32 +15352,6 @@ export interface components {
         };
         PagedResponseOfCommunityInvolvementResponse: {
             data: components["schemas"]["CommunityInvolvementResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfCurriculumResponse: {
-            data: components["schemas"]["CurriculumResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfCurriculumSubjectResponse: {
-            data: components["schemas"]["CurriculumSubjectResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -18911,19 +15636,6 @@ export interface components {
             success?: boolean;
             message?: string;
         };
-        PagedResponseOfSectionResponse: {
-            data: components["schemas"]["SectionResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfStudentApplicantGuardianResponse: {
             data: components["schemas"]["StudentApplicantGuardianResponse"][];
             /** Format: int32 */
@@ -18965,32 +15677,6 @@ export interface components {
         };
         PagedResponseOfStudentApplicantStatusHistoryResponse: {
             data: components["schemas"]["StudentApplicantStatusHistoryResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfStudentResponse: {
-            data: components["schemas"]["StudentResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfSubjectResponse: {
-            data: components["schemas"]["SubjectResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -19178,24 +15864,6 @@ export interface components {
             /** Format: date-time */
             updatedAt?: null | string;
         };
-        SectionResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            code: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int64 */
-            termId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            capacity?: number | string;
-            isOpen?: boolean;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
         SelfAttendancePunchRequest: {
             /** Format: date */
             attendanceDate?: null | string;
@@ -19286,49 +15954,6 @@ export interface components {
             createdAt?: string;
             applicationNumber?: string;
         };
-        StudentResponse: {
-            /** Format: int64 */
-            id: number | string;
-            /** Format: int64 */
-            profileId: number | string;
-            studentNumber: string;
-            currentStatus: components["schemas"]["StudentStatus"];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: null | string;
-            firstName: string;
-            middleName: null | string;
-            lastName: string;
-            suffix: null | string;
-            fullName: string;
-            gender: components["schemas"]["Gender"];
-            /** Format: date */
-            birthDate: null | string;
-            civilStatus: components["schemas"]["CivilStatus"];
-            personalEmail: null | string;
-            phoneNumber: null | string;
-            mobileNumber: null | string;
-            /** Format: int32 */
-            age: null | number | string;
-            religion: null | string;
-            address: null | string;
-            qualifier: null | string;
-            profilePicture: null | string;
-        };
-        StudentStatus: number;
-        SubjectResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            code: string;
-            title: string;
-            /** Format: double */
-            units?: number | string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
         SubmitLeaveApplicationRequest: {
             /** Format: int64 */
             leaveTypeId: number | string;
@@ -19343,15 +15968,6 @@ export interface components {
             /** Format: date */
             dateSeparated: string;
             reason: null | string;
-        };
-        UpdateAcademicTermRequest: {
-            /** Format: int64 */
-            schoolYearId?: null | number | string;
-            name?: null | string;
-            /** Format: date */
-            startDate?: null | string;
-            /** Format: date */
-            endDate?: null | string;
         };
         UpdateApplicantProfileRequest: {
             firstName?: null | string;
@@ -19386,25 +16002,6 @@ export interface components {
             code: string;
             isActive?: boolean;
         };
-        UpdateCurriculumRequest: {
-            code?: null | string;
-            name?: null | string;
-            /** Format: int64 */
-            programId?: null | number | string;
-            /** Format: int32 */
-            effectiveYear?: null | number | string;
-        };
-        UpdateCurriculumSubjectRequest: {
-            /** Format: int64 */
-            curriculumId?: null | number | string;
-            /** Format: int64 */
-            subjectId?: null | number | string;
-            /** Format: int32 */
-            yearLevel?: null | number | string;
-            /** Format: int32 */
-            termSequence?: null | number | string;
-            isRequired?: null | boolean;
-        };
         UpdateDepartmentRequest: {
             name: string;
             code: string;
@@ -19415,13 +16012,9 @@ export interface components {
             code: string;
             isActive?: boolean;
         };
+        /** @description Updates metadata only — does not move the stored file. */
         UpdateEmployeeDocumentRequest: {
             documentType: string;
-            fileName: string;
-            storedFileName: string;
-            mimeType: string;
-            /** Format: int64 */
-            fileSize: number | string;
             /** Format: date */
             expiryDate: null | string;
             status: components["schemas"]["EmployeeDocumentStatus"];
@@ -19488,38 +16081,11 @@ export interface components {
             module: string;
             action: string;
         };
-        UpdateProgramRequest: {
-            code?: null | string;
-            name?: null | string;
-            educationLevel?: null | components["schemas"]["EducationLevel"];
-            /** Format: int64 */
-            departmentId?: null | number | string;
-        };
         UpdateRoleRequest: {
             name: string;
             description?: null | string;
             departmentIds?: (number | string)[];
             isActive?: boolean;
-        };
-        UpdateSchoolYearRequest: {
-            name?: null | string;
-            /** Format: date */
-            startDate?: null | string;
-            /** Format: date */
-            endDate?: null | string;
-            isActive?: null | boolean;
-        };
-        UpdateSectionRequest: {
-            code?: null | string;
-            /** Format: int64 */
-            programId?: null | number | string;
-            /** Format: int64 */
-            termId?: null | number | string;
-            /** Format: int32 */
-            yearLevel?: null | number | string;
-            /** Format: int32 */
-            capacity?: null | number | string;
-            isOpen?: null | boolean;
         };
         UpdateStudentApplicantGuardianRequest: {
             /** Format: int64 */
@@ -19546,18 +16112,6 @@ export interface components {
             isSubmitted?: null | boolean;
             fileName?: null | string;
             storagePath?: null | string;
-        };
-        UpdateStudentRequest: {
-            /** Format: int64 */
-            profileId?: null | number | string;
-            studentNumber?: null | string;
-            currentStatus?: null | components["schemas"]["StudentStatus"];
-        };
-        UpdateSubjectRequest: {
-            code?: null | string;
-            title?: null | string;
-            /** Format: double */
-            units?: null | number | string;
         };
         UpdateUserRequest: {
             username: string;
