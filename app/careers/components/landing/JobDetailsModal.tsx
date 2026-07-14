@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, MapPin, DollarSign, Briefcase, Award, CheckCircle2, ChevronRight, FileText, Sparkles, Loader2, Star } from 'lucide-react';
-import { Job, UserProfile } from '@/components/hrm/types';
+import { Job, UserProfile } from '@/components/landing/types';
 
 interface JobDetailsModalProps {
   job: Job;

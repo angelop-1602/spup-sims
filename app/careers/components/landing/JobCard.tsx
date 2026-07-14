@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion'; 
 import { ArrowUpRight, Briefcase, Bookmark, BookmarkCheck, School } from 'lucide-react';
-import { Job } from '@/components/hrm/types';
+import { Job } from '@/components/landing/types';
 
 interface JobCardProps {
   key?: string;
