@@ -129,7 +129,9 @@ export default function LoginForm({
               {submitting ? "Logging in..." : "Log in"}
             </Button>
             <p className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account? <Link href="/register">Register</Link>
+              Don&apos;t have an account? <Link href="/register" className="text-black hover:underline">
+                Register
+              </Link>
             </p>
           </CardFooter>
         </form>
