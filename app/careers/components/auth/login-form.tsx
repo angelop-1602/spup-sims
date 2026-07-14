@@ -112,6 +112,7 @@ export default function LoginForm({
                 type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
+                placeholder="Enter your password"
                 required
               />
               {fieldErrors.password && (
