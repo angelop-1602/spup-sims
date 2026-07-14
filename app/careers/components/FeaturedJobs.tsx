@@ -1,10 +1,10 @@
-"use client";
+ "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Bookmark, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import { Job } from '@/components/hrm/types';
+import { Job } from './types';
 import { Instrument_Serif, Poppins, Inter, Epilogue } from 'next/font/google';
 
 const instrumentSerif = Instrument_Serif({
