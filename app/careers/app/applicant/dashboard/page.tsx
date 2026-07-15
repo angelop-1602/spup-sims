@@ -1,16 +1,7 @@
 "use client"
 
-import * as React from "react"
-import { useState } from "react"
 import Link from "next/link"
-import {
-  ArrowUpRight,
-  ClipboardList,
-  FileCheck2,
-  AlertCircle,
-  CircleDot,
-  Menu
-} from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 
 import { Badge } from "../../../components/ui/badge"
 import { Button } from "../../../components/ui/button"
@@ -31,9 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../../components/ui/table"
-
-// Import custom collapsible sidebar
-import ApplicantSidebar from "../../../components/ui/sidebar"
+import { SidebarTrigger } from "@/components/ui/sidebar"
 
 const setupSteps = [
   { step: "Account Registration", status: "Completed", value: 100 },
@@ -49,61 +38,45 @@ const checklist = [
 ] as const
 
 export default function ApplicantDashboardPage() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  // const [sidebarOpen, setSidebarOpen] = useState(true)
 
-  const summaryCards = [
-    {
-      label: "Application Status",
-      value: "Draft",
-      detail: "Ready for profile completion",
-      icon: ClipboardList,
-      colorClass: "bg-amber-700/10 text-amber-700"
-    },
-    {
-      label: "Profile Completion",
-      value: "45%",
-      detail: "2 of 4 key modules filled",
-      icon: CircleDot,
-      colorClass: "bg-blue-700/10 text-blue-700"
-    },
-    {
-      label: "Uploaded Documents",
-      value: "1 / 4",
-      detail: "Mandatory files tracked",
-      icon: FileCheck2,
-      colorClass: "bg-emerald-700/10 text-emerald-700"
-    },
-    {
-      label: "Action Items",
-      value: "3 Pending",
-      detail: "Requires your attention",
-      icon: AlertCircle,
-      colorClass: "bg-rose-700/10 text-rose-700"
-    },
-  ]
+  // const summaryCards = [
+  //   {
+  //     label: "Application Status",
+  //     value: "Draft",
+  //     detail: "Ready for profile completion",
+  //     icon: ClipboardList,
+  //     colorClass: "bg-amber-700/10 text-amber-700"
+  //   },
+  //   {
+  //     label: "Profile Completion",
+  //     value: "45%",
+  //     detail: "2 of 4 key modules filled",
+  //     icon: CircleDot,
+  //     colorClass: "bg-blue-700/10 text-blue-700"
+  //   },
+  //   {
+  //     label: "Uploaded Documents",
+  //     value: "1 / 4",
+  //     detail: "Mandatory files tracked",
+  //     icon: FileCheck2,
+  //     colorClass: "bg-emerald-700/10 text-emerald-700"
+  //   },
+  //   {
+  //     label: "Action Items",
+  //     value: "3 Pending",
+  //     detail: "Requires your attention",
+  //     icon: AlertCircle,
+  //     colorClass: "bg-rose-700/10 text-rose-700"
+  //   },
+  // ]
 
   return (
     <div className="flex min-h-screen w-full bg-neutral-50/60 text-neutral-900 antialiased selection:bg-neutral-950/5">
-      
-      {/* 1. Self-contained Custom Sidebar */}
-      <ApplicantSidebar isOpen={sidebarOpen} />
 
-      {/* 2. Transition-Aware Main Workspace */}
-      <div 
-        className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${
-          sidebarOpen ? "pl-64" : "pl-16"
-        }`}
-      >
-        
         {/* Top Header Navigation Panel */}
         <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b border-neutral-200/50 bg-white/80 px-4 backdrop-blur-md md:px-6 shrink-0">
-          <button 
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="rounded-xl border border-neutral-200 p-2 hover:bg-neutral-50 transition-colors focus:outline-none"
-            aria-label="Toggle Navigation"
-          >
-            <Menu className="h-4 w-4 text-neutral-600" />
-          </button>
+          <SidebarTrigger className="rounded-xl border border-neutral-200 hover:bg-neutral-50" />
           <div className="h-4 w-px bg-neutral-200" />
           <span className="text-xs font-semibold text-neutral-400">Application Workspace</span>
         </header>
@@ -133,7 +106,7 @@ export default function ApplicantDashboardPage() {
             </Button>
           </div>
 
-          {/* Metric Cards Grid Layout */}
+          {/* Metric Cards Grid Layout
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {summaryCards.map((card) => {
               const Icon = card.icon
@@ -156,7 +129,7 @@ export default function ApplicantDashboardPage() {
                 </Card>
               )
             })}
-          </div>
+          </div> */}
 
           {/* Table Data and Completeness Weights Side-by-side */}
           <div className="grid gap-4 grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]">
@@ -263,6 +236,5 @@ export default function ApplicantDashboardPage() {
 
         </main>
       </div>
-    </div>
   )
 }

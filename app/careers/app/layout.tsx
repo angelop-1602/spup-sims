@@ -23,7 +23,6 @@ variable: '--font-epilogue'
 
 const inter = Inter({
   subsets: ['latin'],
-  weight: ['400', '500'],
   variable: '--font-inter'
 });
 
@@ -39,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-    <body className={`${instrumentSerif.variable} ${poppins.variable} ${epilogue.variable} ${inter.variable} antialiased`}>        {children}
+    <body className={`${instrumentSerif.variable} ${poppins.variable} ${epilogue.variable} ${inter.variable} font-sans antialiased`}>        {children}
       </body>
     </html>
   );
