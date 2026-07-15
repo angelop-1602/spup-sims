@@ -58,8 +58,7 @@ export default function LoginForm({
     setSubmitting(true)
     try {
       const body: LoginRequest = { email, password }
-      // Pointed explicitly to the backend server URL
-      const response = await fetch("https://sims.spup.space/api/v1/applicant/login", {
+      const response = await fetch("/api/v1/applicant/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
