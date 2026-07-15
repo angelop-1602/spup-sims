@@ -1,0 +1,7 @@
+.mcp.json
+next-env.d.ts
+.next
+.claude
+.agents
+app/careers
+node_modules/
