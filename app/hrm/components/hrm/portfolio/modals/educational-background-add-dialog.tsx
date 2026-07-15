@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -27,6 +28,7 @@ import {
 import { cn } from "@/lib/utils"
 import { request, useAuthorizedHeaders, type components } from "@/lib/api"
 import { EDUCATIONAL_ATTAINMENT_OPTIONS } from "@/components/hrm/portfolio/educational-attainment-options"
+import { DEGREE_LEVEL_OPTIONS } from "@/components/hrm/portfolio/degree-level-options"
 
 type EducationalBackgroundForm = Omit<components["schemas"]["EducationalBackgroundRequest"], "educationalAttainment"> & {
   educationalAttainment: string | null
@@ -52,6 +54,8 @@ export function EducationalBackgroundAddDialog({
 }) {
   const [open, setOpen] = React.useState(false)
   const [form, setForm] = React.useState<EducationalBackgroundForm>(EMPTY_FORM)
+  const [datePickerOpen, setDatePickerOpen] = React.useState(false)
+  const [isGraduated, setIsGraduated] = React.useState(true)
   const [diplomaFile, setDiplomaFile] = React.useState<File | null>(null)
   const [torFile, setTorFile] = React.useState<File | null>(null)
   const { headers } = useAuthorizedHeaders()
@@ -59,7 +63,21 @@ export function EducationalBackgroundAddDialog({
   const [error, setError] = React.useState<Error | null>(null)
   const attachmentsRequired =
     form.educationalAttainment === "Graduate" || form.educationalAttainment === "Postgraduate"
-  const degreeLevelRequired = form.educationalAttainment === "Postgraduate"
+  const degreeLevelOptions = form.educationalAttainment
+    ? DEGREE_LEVEL_OPTIONS[form.educationalAttainment] ?? []
+    : []
+  const isTertiary = form.educationalAttainment === "Tertiary"
+  const isPostgraduate = form.educationalAttainment === "Postgraduate"
+  const showUnitsEarned = isTertiary || (isPostgraduate && !isGraduated)
+  const dateRequired =
+    form.educationalAttainment === "Elementary"
+      ? form.degreeLevel === "Grade 6"
+      : form.educationalAttainment === "Secondary"
+        ? form.degreeLevel === "Grade 10" || form.degreeLevel === "Grade 12"
+        : true
+  const dateDisabled =
+    (form.educationalAttainment === "Elementary" || form.educationalAttainment === "Secondary") &&
+    !dateRequired
 
   // Dismissing via outside-click/Escape keeps the draft so reopening later
   // in this session picks up where you left off. Only Cancel discards it.
@@ -68,6 +86,8 @@ export function EducationalBackgroundAddDialog({
     setDiplomaFile(null)
     setTorFile(null)
     setError(null)
+    setDatePickerOpen(false)
+    setIsGraduated(true)
     setOpen(false)
   }
 
@@ -107,6 +127,7 @@ export function EducationalBackgroundAddDialog({
       setForm(EMPTY_FORM)
       setDiplomaFile(null)
       setTorFile(null)
+      setIsGraduated(true)
       setOpen(false)
     } catch (err) {
       setError(err instanceof Error ? err : new Error(String(err)))
@@ -139,15 +160,33 @@ export function EducationalBackgroundAddDialog({
             </label>
             <Select
               value={form.educationalAttainment ?? ""}
-              onValueChange={(value) =>
-                setForm((current) => ({ ...current, educationalAttainment: value }))
-              }
+              onValueChange={(value) => {
+                setIsGraduated(true)
+                setForm((current) => {
+                  const noDegree = value === "Elementary" || value === "Secondary"
+                  const wasNoDegree =
+                    current.educationalAttainment === "Elementary" ||
+                    current.educationalAttainment === "Secondary"
+                  return {
+                    ...current,
+                    educationalAttainment: value,
+                    degreeLevel: "",
+                    degree: noDegree ? "N/A" : wasNoDegree ? "" : current.degree,
+                    dateGraduated: null,
+                  }
+                })
+              }}
               required
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select attainment" />
               </SelectTrigger>
-              <SelectContent position="popper" side="bottom" avoidCollisions={false}>
+              <SelectContent
+                position="popper"
+                side="bottom"
+                avoidCollisions={false}
+                onCloseAutoFocus={(event) => event.preventDefault()}
+              >
                 {EDUCATIONAL_ATTAINMENT_OPTIONS.map((option) => (
                   <SelectItem key={option} value={option}>
                     {option}
@@ -159,16 +198,51 @@ export function EducationalBackgroundAddDialog({
 
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Degree Level {degreeLevelRequired && <span className="text-destructive">*</span>}
+              Educational Level {<span className="text-destructive">*</span>}
             </label>
-            <Input
-              value={form.degreeLevel}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, degreeLevel: event.target.value }))
-              }
-              placeholder="e.g. Masters, Doctorate"
-              required={degreeLevelRequired}
-            />
+            {form.educationalAttainment === "Vocational" ? (
+              <Input
+                value={form.degreeLevel ?? ""}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, degreeLevel: event.target.value }))
+                }
+                placeholder="e.g. Culinary Arts NC II"
+                required
+              />
+            ) : (
+              <Select
+                value={form.degreeLevel ?? ""}
+                onValueChange={(value) =>
+                  setForm((current) => ({
+                    ...current,
+                    degreeLevel: value,
+                    dateGraduated:
+                      current.educationalAttainment === "Elementary" ||
+                      current.educationalAttainment === "Secondary"
+                        ? null
+                        : current.dateGraduated,
+                  }))
+                }
+                disabled={degreeLevelOptions.length === 0}
+                required
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select educational level" />
+                </SelectTrigger>
+                <SelectContent
+                  position="popper"
+                  side="bottom"
+                  avoidCollisions={false}
+                  onCloseAutoFocus={(event) => event.preventDefault()}
+                >
+                  {degreeLevelOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div>
@@ -182,6 +256,7 @@ export function EducationalBackgroundAddDialog({
               }
               placeholder="e.g. BS Computer Science"
               required
+              disabled={["Elementary", "Secondary"].includes(form.educationalAttainment ?? "")}
             />
           </div>
 
@@ -210,46 +285,79 @@ export function EducationalBackgroundAddDialog({
 
           <div>
             <label className="mb-2 block text-sm font-medium">
-              Date Graduated <span className="text-destructive">*</span>
+              {showUnitsEarned ? "Units Earned" : "Date Graduated"}{" "}
+              {dateRequired && <span className="text-destructive">*</span>}
             </label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start font-normal",
-                    !form.dateGraduated && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 size-4" />
-                  {form.dateGraduated
-                    ? format(new Date(form.dateGraduated), "PPP")
-                    : "Select date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={form.dateGraduated ? new Date(form.dateGraduated) : undefined}
-                  onSelect={(date) =>
-                    setForm((current) => ({
-                      ...current,
-                      dateGraduated: date ? format(date, "yyyy-MM-dd") : null,
-                    }))
-                  }
-                  captionLayout="dropdown"
+
+            {isPostgraduate && (
+              <div className="mb-2 flex items-center gap-2 text-sm">
+                <Checkbox
+                  checked={isGraduated}
+                  onCheckedChange={(checked) => {
+                    setIsGraduated(checked === true)
+                    setForm((current) => ({ ...current, dateGraduated: null }))
+                  }}
                 />
-              </PopoverContent>
-            </Popover>
-            <input
-              type="text"
-              value={form.dateGraduated ?? ""}
-              onChange={() => {}}
-              required
-              className="sr-only"
-              tabIndex={-1}
-            />
+                <span>Graduated</span>
+              </div>
+            )}
+
+            {showUnitsEarned ? (
+              <Input
+                type="number"
+                value={form.dateGraduated ?? ""}
+                onChange={(event) =>
+                  setForm((current) => ({ ...current, dateGraduated: event.target.value }))
+                }
+                placeholder="e.g. 120"
+                required={dateRequired}
+              />
+            ) : (
+              <>
+                <Popover open={datePickerOpen} onOpenChange={setDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={dateDisabled}
+                      className={cn(
+                        "w-full justify-start font-normal",
+                        !form.dateGraduated && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 size-4" />
+                      {form.dateGraduated
+                        ? format(new Date(form.dateGraduated), "PPP")
+                        : "Select date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={form.dateGraduated ? new Date(form.dateGraduated) : undefined}
+                      onSelect={(date) => {
+                        setForm((current) => ({
+                          ...current,
+                          dateGraduated: date ? format(date, "yyyy-MM-dd") : null,
+                        }))
+                        setDatePickerOpen(false)
+                      }}
+                      captionLayout="dropdown"
+                      disabled={{ after: new Date() }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <input
+                  type="text"
+                  value={form.dateGraduated ?? ""}
+                  onChange={() => {}}
+                  required={dateRequired}
+                  disabled={dateDisabled}
+                  className="sr-only"
+                  tabIndex={-1}
+                />
+              </>
+            )}
           </div>
 
           <div>

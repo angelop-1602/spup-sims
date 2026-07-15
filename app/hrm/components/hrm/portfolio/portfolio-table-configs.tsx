@@ -51,7 +51,7 @@ const educationalBackground: PortfolioTableConfig<EducationalBackground> = {
   loadingLabel: "educational background",
   columns: [
     { header: "Educational Attainment", render: (row) => row.educationalAttainment ?? "—" },
-    { header: "Degree Level", render: (row) => row.degreeLevel },
+    { header: "Educational Level", render: (row) => row.degreeLevel },
     { header: "Degree", render: (row) => row.degree },
     { header: "Institution", render: (row) => row.institution },
     { header: "Date Graduated", render: (row) => formatDate(row.dateGraduated) },
