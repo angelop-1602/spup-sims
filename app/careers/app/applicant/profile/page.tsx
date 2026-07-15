@@ -48,7 +48,7 @@ export default function ApplicantSelfProfilePage() {
         throw new Error("No active session found. Please log in.")
       }
 
-      const response = await fetch("https://sims.spup.space/api/v1/applicant/me", {
+      const response = await fetch("/api/v1/applicant/me", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
