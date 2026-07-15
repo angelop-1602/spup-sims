@@ -112,8 +112,10 @@ export default function ApplicantSelfProfilePage() {
       {/* Top Profile Banner Card */}
       <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="h-16 w-16 shrink-0 rounded-full bg-[#373A40] text-white flex items-center justify-center text-sm font-semibold p-2 text-center break-all">
-            {data.applicationNumber ? data.applicationNumber.slice(-4) : "—"}
+          <div className="h-16 w-16 shrink-0 rounded-full bg-[#373A40] text-white flex items-center justify-center text-lg font-semibold uppercase">
+            {profile.firstName && profile.lastName 
+              ? `${profile.firstName.charAt(0)}${profile.lastName.charAt(0)}` 
+              : "—"}
           </div>
           <div className="space-y-1">
             <h1 className="text-xl font-semibold text-neutral-950">
