@@ -10,6 +10,7 @@ import type { ApplicantMePayload, ProfileUpdateForm, DocumentType } from "@/comp
 import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS } from "@/components/profile/types"
 import { ProfileBanner } from "@/components/profile/profile-banner"
 import { PersonalInfoSection } from "@/components/profile/personal-info-section"
+import { EditProfileModal } from "@/components/profile/edit-profile-modal"
 import { DocumentsChecklist } from "@/components/profile/documents-checklist"
 
 export default function ApplicantSelfProfilePage() {
@@ -25,9 +26,10 @@ export default function ApplicantSelfProfilePage() {
   const [currentUploadingDoc, setCurrentUploadingDoc] = React.useState<DocumentType | null>(null)
 
   // Profile editing states
-  const [isEditing, setIsEditing] = React.useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
-  const [editForm, setEditForm] = React.useState<ProfileUpdateForm>({
+  const [saveStatus, setSaveStatus] = React.useState<{ type: "success" | "error"; message: string } | null>(null)
+  const [editForm, setEditFormRaw] = React.useState<ProfileUpdateForm>({
     firstName: "",
     middleName: "",
     lastName: "",
@@ -38,6 +40,11 @@ export default function ApplicantSelfProfilePage() {
     mobileNumber: "",
     address: ""
   })
+
+  const setEditForm: typeof setEditFormRaw = (args) => {
+    setSaveStatus(null)
+    setEditFormRaw(args)
+  }
 
   const fetchMyProfile = React.useCallback(async () => {
     setIsLoading(true)
@@ -93,6 +100,21 @@ export default function ApplicantSelfProfilePage() {
   }, [router])
 
   const handleSaveProfile = async () => {
+    setSaveStatus(null)
+
+    const requiredFields: { key: keyof ProfileUpdateForm; label: string }[] = [
+      { key: "firstName", label: "First Name" },
+      { key: "lastName", label: "Last Name" },
+      { key: "personalEmail", label: "Email" },
+    ]
+
+    const missing = requiredFields.filter((f) => !editForm[f.key].trim())
+    if (missing.length > 0) {
+      const names = missing.map((f) => f.label).join(", ")
+      setSaveStatus({ type: "error", message: `${names} ${missing.length > 1 ? "are" : "is"} required.` })
+      return
+    }
+
     setIsSaving(true)
     try {
       const token = localStorage.getItem("access_token")
@@ -112,10 +134,9 @@ export default function ApplicantSelfProfilePage() {
       }
 
       await fetchMyProfile()
-      setIsEditing(false)
-      alert("Profile updated successfully!")
+      setSaveStatus({ type: "success", message: "Profile updated successfully!" })
     } catch (err: any) {
-      alert(err.message || "An error occurred while saving profile.")
+      setSaveStatus({ type: "error", message: err.message || "An error occurred while saving profile." })
     } finally {
       setIsSaving(false)
     }
@@ -258,12 +279,16 @@ export default function ApplicantSelfProfilePage() {
 
       <PersonalInfoSection
         profile={profile}
-        isEditing={isEditing}
+        onEdit={() => setIsEditModalOpen(true)}
+      />
+
+      <EditProfileModal
+        open={isEditModalOpen}
         isSaving={isSaving}
+        saveStatus={saveStatus}
         editForm={editForm}
         setEditForm={setEditForm}
-        onEdit={() => setIsEditing(true)}
-        onCancel={() => setIsEditing(false)}
+        onCancel={() => { setIsEditModalOpen(false); setSaveStatus(null) }}
         onSave={handleSaveProfile}
       />
 
