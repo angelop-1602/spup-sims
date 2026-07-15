@@ -298,7 +298,6 @@ export default function ApplicantSelfProfilePage() {
           </div>
         </div>
 
-        {/* Dynamic Actions with Visual Status Indicators */}
         <div className="flex flex-wrap items-center gap-2">
           
           {data.resumeUrl && (
@@ -346,7 +345,7 @@ export default function ApplicantSelfProfilePage() {
       <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
         {/* Profile Section */}
         <div className="bg-neutral-50/75 px-4 py-2 border-b border-neutral-200 flex justify-between items-center">
-          <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Personal Information</h2>
+          <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Personal</h2>
           
           {/* Edit/Save Changes */}
           <div className="flex items-center gap-2">
