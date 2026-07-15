@@ -4,6 +4,7 @@ import * as React from "react"
 import { Loader2, AlertCircle, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 import type { ApplicantMePayload, ProfileUpdateForm, DocumentType } from "@/components/profile/types"
 import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS } from "@/components/profile/types"
@@ -12,6 +13,7 @@ import { PersonalInfoSection } from "@/components/profile/personal-info-section"
 import { DocumentsChecklist } from "@/components/profile/documents-checklist"
 
 export default function ApplicantSelfProfilePage() {
+  const router = useRouter()
   const [data, setData] = React.useState<ApplicantMePayload | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
@@ -44,7 +46,8 @@ export default function ApplicantSelfProfilePage() {
       const token = localStorage.getItem("access_token")
 
       if (!token) {
-        throw new Error("No active session found. Please log in.")
+        router.push("/login?returnTo=/applicant/profile")
+        return
       }
 
       const response = await fetch("/api/v1/applicant/me", {
@@ -56,7 +59,8 @@ export default function ApplicantSelfProfilePage() {
       })
 
       if (response.status === 401) {
-        throw new Error("Unauthorized access. Please log in again.")
+        router.push("/login?returnTo=/applicant/profile")
+        return
       }
 
       if (!response.ok) {
@@ -86,7 +90,7 @@ export default function ApplicantSelfProfilePage() {
     } finally {
       setIsLoading(false)
     }
-  }, [])
+  }, [router])
 
   const handleSaveProfile = async () => {
     setIsSaving(true)

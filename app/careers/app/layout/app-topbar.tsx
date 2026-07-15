@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import {
   Bell,
   ChevronsUpDown,
@@ -41,6 +42,7 @@ function getInitials(name: string) {
 }
 
 export function AppTopbar() {
+  const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const displayName = "Applicant User"
   const roleLabel = "Role"
@@ -58,9 +60,10 @@ export function AppTopbar() {
     return () => document.removeEventListener("keydown", down)
   }, [])
 
-  // const handleLogout = async () => {
-  //   await signOutCurrentAccount(instance, account)
-  // }
+  const handleLogout = () => {
+    localStorage.removeItem("access_token")
+    router.push("/")
+  }
 
   return (
     <>
@@ -117,10 +120,10 @@ export function AppTopbar() {
 
               <DropdownMenuItem
                 className="text-destructive"
-                // onSelect={(event) => {
-                //   event.preventDefault()
-                //   void handleLogout()
-                // }}
+                onSelect={(event) => {
+                  event.preventDefault()
+                  handleLogout()
+                }}
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 import type { components } from "@/lib/api"
@@ -31,6 +31,7 @@ export default function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail] = React.useState("")
   const [password, setPassword] = React.useState("")
   const [error, setError] = React.useState<string | null>(null)
@@ -76,7 +77,12 @@ export default function LoginForm({
         localStorage.setItem("access_token", data.accessToken)
       }
 
-      router.push("/applicant/dashboard")
+      const returnTo = searchParams.get("returnTo")
+      const safeReturnTo =
+        returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") && !returnTo.startsWith("/\\")
+          ? returnTo
+          : "/applicant/dashboard"
+      router.push(safeReturnTo)
       router.refresh()
     } catch (err) {
       setError("An unexpected network error occurred.")
