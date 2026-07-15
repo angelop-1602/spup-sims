@@ -98,7 +98,7 @@ export default function ApplicantSelfProfilePage() {
         throw new Error("No active session found. Please log in.")
       }
 
-      const response = await fetch("https://sims.spup.space/api/v1/applicant/me", {
+      const response = await fetch("/api/v1/applicant/me", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -150,7 +150,7 @@ export default function ApplicantSelfProfilePage() {
       }
 
       // Send the updated details to the profile endpoint
-      const response = await fetch("https://sims.spup.space/api/v1/applicant/profile", {
+      const response = await fetch("/api/v1/applicant/profile", {
         method: "PUT", 
         headers: {
           "Content-Type": "application/json",
@@ -190,7 +190,7 @@ export default function ApplicantSelfProfilePage() {
       const formData = new FormData()
       formData.append("file", file) 
 
-      const response = await fetch("https://sims.spup.space/api/v1/applicant/documents/resume", {
+      const response = await fetch("/api/v1/applicant/documents/resume", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`
@@ -486,7 +486,7 @@ export default function ApplicantSelfProfilePage() {
           </div>
         </div>
 
-        {/* CONTACT Section */}
+        {/* Contact Section */}
         <div className="bg-neutral-50/75 px-4 py-2 border-t border-b border-neutral-200">
           <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Contact</h2>
         </div>
