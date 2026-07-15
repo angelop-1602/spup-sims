@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, X } from "lucide-react"
+import { Loader2, X, CheckCircle2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -10,6 +10,7 @@ import { calculateAge, type ProfileUpdateForm } from "./types"
 interface EditProfileModalProps {
   open: boolean
   isSaving: boolean
+  saveStatus: { type: "success" | "error"; message: string } | null
   editForm: ProfileUpdateForm
   setEditForm: React.Dispatch<React.SetStateAction<ProfileUpdateForm>>
   onCancel: () => void
@@ -19,6 +20,7 @@ interface EditProfileModalProps {
 export function EditProfileModal({
   open,
   isSaving,
+  saveStatus,
   editForm,
   setEditForm,
   onCancel,
@@ -128,6 +130,23 @@ export function EditProfileModal({
             Save Changes
           </Button>
         </div>
+
+        {saveStatus && (
+          <div
+            className={`flex items-center gap-2 px-5 py-2.5 text-xs font-medium ${
+              saveStatus.type === "success"
+                ? "bg-green-50 text-green-700 border-t border-green-200"
+                : "bg-red-50 text-red-700 border-t border-red-200"
+            }`}
+          >
+            {saveStatus.type === "success" ? (
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+            ) : (
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+            )}
+            {saveStatus.message}
+          </div>
+        )}
       </div>
     </div>
   )

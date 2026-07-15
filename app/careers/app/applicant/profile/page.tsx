@@ -26,6 +26,7 @@ export default function ApplicantSelfProfilePage() {
   // Profile editing states
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
+  const [saveStatus, setSaveStatus] = React.useState<{ type: "success" | "error"; message: string } | null>(null)
   const [editForm, setEditForm] = React.useState<ProfileUpdateForm>({
     firstName: "",
     middleName: "",
@@ -91,6 +92,7 @@ export default function ApplicantSelfProfilePage() {
 
   const handleSaveProfile = async () => {
     setIsSaving(true)
+    setSaveStatus(null)
     try {
       const token = localStorage.getItem("access_token")
       if (!token) throw new Error("No active session found.")
@@ -109,10 +111,9 @@ export default function ApplicantSelfProfilePage() {
       }
 
       await fetchMyProfile()
-      setIsEditModalOpen(false)
-      alert("Profile updated successfully!")
+      setSaveStatus({ type: "success", message: "Profile updated successfully!" })
     } catch (err: any) {
-      alert(err.message || "An error occurred while saving profile.")
+      setSaveStatus({ type: "error", message: err.message || "An error occurred while saving profile." })
     } finally {
       setIsSaving(false)
     }
@@ -261,9 +262,10 @@ export default function ApplicantSelfProfilePage() {
       <EditProfileModal
         open={isEditModalOpen}
         isSaving={isSaving}
+        saveStatus={saveStatus}
         editForm={editForm}
         setEditForm={setEditForm}
-        onCancel={() => setIsEditModalOpen(false)}
+        onCancel={() => { setIsEditModalOpen(false); setSaveStatus(null) }}
         onSave={handleSaveProfile}
       />
 
