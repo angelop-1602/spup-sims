@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, AlertCircle, FileText } from "lucide-react"
+import { Loader2, AlertCircle, FileText, ArrowLeft } from "lucide-react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
 interface ApplicantMePayload {
@@ -109,6 +110,16 @@ export default function ApplicantSelfProfilePage() {
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 bg-neutral-50/30 min-h-screen">
       
+      <div className="flex items-center">
+      <Link 
+        href="/applicant/dashboard" 
+        className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 transition-colors font-medium"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back to Dashboard
+      </Link>
+    </div>
+    
       {/* Top Profile Banner Card */}
       <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -141,10 +152,10 @@ export default function ApplicantSelfProfilePage() {
         </div>
       </div>
 
-      {/* Structured Details Matrix Lists */}
+      {/* Applicant Profile */}
       <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
         
-        {/* PERSONAL Section */}
+        {/* Personal Section */}
         <div className="bg-neutral-50/75 px-4 py-2 border-b border-neutral-200">
           <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Personal</h2>
         </div>
