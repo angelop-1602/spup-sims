@@ -21,7 +21,7 @@ import ProcessTimeline from '@/components/landing/ApplicationProcess';
 import FaqSection from '@/components/landing/Faq';
 import JobBoardCTA from '@/components/landing/Cta';
 
-export default function HrmPage() {
+export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile' | 'faqs' >('explore');
   const [jobs] = useState<Job[]>(INITIAL_JOBS);
 
