@@ -21,7 +21,8 @@ import { z } from 'zod';
 type LoginRequest = components["schemas"]["ApplicantLoginRequest"]
 
 const loginSchema = z.object({
-  email: z.email("Enter a valid email address."),
+  // Adjusted to use correct Zod email validator syntax
+  email: z.string().email("Enter a valid email address."),
   password: z.string().min(1, "Password is required."),
 })
 
@@ -39,7 +40,7 @@ export default function LoginForm({
   }>({})
   const [submitting, setSubmitting] = React.useState(false)
 
-  async function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setError(null)
 
@@ -57,7 +58,8 @@ export default function LoginForm({
     setSubmitting(true)
     try {
       const body: LoginRequest = { email, password }
-      const response = await fetch("/api/v1/applicant/login", {
+      // Pointed explicitly to the backend server URL
+      const response = await fetch("https://sims.spup.space/api/v1/applicant/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -69,8 +71,16 @@ export default function LoginForm({
         return
       }
 
+      const data = await response.json()
+
+      if (data.accessToken) {
+        localStorage.setItem("access_token", data.accessToken)
+      }
+
       router.push("/applicant/dashboard")
       router.refresh()
+    } catch (err) {
+      setError("An unexpected network error occurred.")
     } finally {
       setSubmitting(false)
     }

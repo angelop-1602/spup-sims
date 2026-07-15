@@ -1,167 +1,202 @@
-'use client';
+"use client"
 
-import React, { useState } from 'react';
-import { Upload, FileText, CheckCircle2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import * as React from "react"
+import { Loader2, AlertCircle, FileText } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
-export default function ApplicantProfilePage() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+interface ApplicantMePayload {
+  id: number | string
+  applicationNumber?: string
+  status?: string
+  resumeUrl?: string | null
+  createdAt: string
+  profile: {
+    id: number | string
+    firstName: string
+    middleName?: string | null
+    lastName: string
+    birthDate?: string | null  // Fixed
+    age?: number | string | null
+    religion?: string | null
+    personalEmail?: string | null
+    phoneNumber?: string | null // Fixed
+    mobileNumber?: string | null // Fixed
+    address?: string | null
+  }
+}
+
+const STATUS_STYLES: Record<string, string> = {
+  Interview: "bg-blue-500/10 text-blue-600 border border-blue-500/20",
+  Hired:     "bg-green-500/10 text-green-600 border border-green-500/20",
+  Rejected:  "bg-red-500/10 text-red-600 border border-red-500/20",
+  Pending:   "bg-yellow-500/10 text-yellow-600 border border-yellow-500/20",
+  Submitted: "bg-purple-500/10 text-purple-600 border border-purple-500/20",
+}
+
+export default function ApplicantSelfProfilePage() {
+  const [data, setData] = React.useState<ApplicantMePayload | null>(null)
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+
+  const fetchMyProfile = React.useCallback(async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const token = localStorage.getItem("access_token")
+
+      if (!token) {
+        throw new Error("No active session found. Please log in.")
+      }
+
+      const response = await fetch("https://sims.spup.space/api/v1/applicant/me", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      })
+
+      if (response.status === 401) {
+        throw new Error("Unauthorized access. Please log in again.")
+      }
+
+      if (!response.ok) {
+        throw new Error(`Server returned error status code: ${response.status}`)
+      }
+
+      const payload = await response.json()
+      setData(payload?.data || payload)
+
+    } catch (err: any) {
+      setError(err.message || "Failed to retrieve your applicant profile.")
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  React.useEffect(() => {
+    fetchMyProfile()
+  }, [fetchMyProfile])
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] gap-2 text-sm text-muted-foreground">
+        <Loader2 className="h-6 w-6 animate-spin text-neutral-600" />
+        <p>Retrieving your profile details...</p>
+      </div>
+    )
+  }
+
+  if (error || !data || !data.profile) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[450px] gap-3 p-4 text-center max-w-sm mx-auto">
+        <AlertCircle className="h-8 w-8 text-destructive" />
+        <p className="text-sm font-medium text-neutral-900">Unable to load profile</p>
+        <p className="text-xs text-muted-foreground">{error}</p>
+        <Button variant="outline" size="sm" onClick={fetchMyProfile} className="mt-1">
+          Retry
+        </Button>
+      </div>
+    )
+  }
+
+  const { profile } = data
+  const statusStyle = STATUS_STYLES[data.status || "Submitted"] ?? "bg-neutral-100 text-neutral-600"
+  const createdString = new Date(data.createdAt || Date.now()).toLocaleDateString("en-US", {
+    month: "short", day: "numeric", year: "numeric"
+  })
 
   return (
-    <div className="min-h-screen bg-neutral-50/50 p-6 md:p-10">
-      <div className="max-w-5xl mx-auto space-y-6">
-        
-        {/* Top Header Row */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white p-6 rounded-2xl border border-neutral-100 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-neutral-950 text-white flex items-center justify-center text-xl font-bold">
-              AA
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-neutral-900">a a</h1>
-              <p className="text-sm text-neutral-500">a@aas.com</p>
-              <span className="mt-1.5 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-100">
-                Submitted
+    <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 bg-neutral-50/30 min-h-screen">
+      
+      {/* Top Profile Banner Card */}
+      <div className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="h-16 w-16 shrink-0 rounded-full bg-[#373A40] text-white flex items-center justify-center text-sm font-semibold p-2 text-center break-all">
+            {data.applicationNumber ? data.applicationNumber.slice(-4) : "—"}
+          </div>
+          <div className="space-y-1">
+            <h1 className="text-xl font-semibold text-neutral-950">
+              {profile.firstName} {profile.lastName}
+            </h1>
+            <p className="text-sm text-neutral-500">{profile.personalEmail || "—"}</p>
+            <div className="flex flex-wrap items-center gap-2 pt-0.5">
+              <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${statusStyle}`}>
+                {data.status || "Submitted"}
               </span>
             </div>
+            <p className="text-xs text-muted-foreground pt-1">
+              Profile #{profile.id} · Created {createdString}
+            </p>
           </div>
-          <Button variant="outline" className="sm:self-center gap-2 rounded-xl text-xs font-semibold h-10 px-4">
-            <FileText className="h-4 w-4" /> View Resume
-          </Button>
         </div>
 
-        {/* Main Grid Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Left Column: Personal & Contact Information Form */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="rounded-2xl border-neutral-100 shadow-sm overflow-hidden">
-              <CardHeader className="bg-white border-b border-neutral-50 py-4">
-                <CardTitle className="text-xs font-bold tracking-wider text-neutral-400 uppercase">Personal Information</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="firstName" className="text-xs font-semibold text-neutral-600">First Name</Label>
-                  <Input id="firstName" defaultValue="a" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="middleName" className="text-xs font-semibold text-neutral-600">Middle Name</Label>
-                  <Input id="middleName" placeholder="—" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="lastName" className="text-xs font-semibold text-neutral-600">Last Name</Label>
-                  <Input id="lastName" defaultValue="a" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="birthDate" className="text-xs font-semibold text-neutral-600">Date of Birth</Label>
-                  <Input id="birthDate" type="date" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="age" className="text-xs font-semibold text-neutral-600">Age</Label>
-                  <Input id="age" type="number" placeholder="—" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="religion" className="text-xs font-semibold text-neutral-600">Religion</Label>
-                  <Input id="religion" placeholder="—" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                </div>
-              </CardContent>
-            </Card>
+        <div>
+          <Button variant="outline" className="text-sm font-normal text-neutral-600 bg-white border-neutral-200 shadow-none hover:bg-neutral-50">
+            <FileText className="mr-2 h-4 w-4 text-neutral-400" />
+            {data.resumeUrl ? "View resume" : "No resume"}
+          </Button>
+        </div>
+      </div>
 
-            <Card className="rounded-2xl border-neutral-100 shadow-sm overflow-hidden">
-              <CardHeader className="bg-white border-b border-neutral-50 py-4">
-                <CardTitle className="text-xs font-bold tracking-wider text-neutral-400 uppercase">Contact Details</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email" className="text-xs font-semibold text-neutral-600">Email Address</Label>
-                    <Input id="email" defaultValue="a@aas.com" disabled className="rounded-xl bg-neutral-50 border-neutral-200 text-sm text-neutral-500" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="phone" className="text-xs font-semibold text-neutral-600">Phone Number</Label>
-                    <Input id="phone" placeholder="—" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="mobile" className="text-xs font-semibold text-neutral-600">Mobile Number</Label>
-                    <Input id="mobile" placeholder="—" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="address" className="text-xs font-semibold text-neutral-600">Complete Address</Label>
-                    <Input id="address" placeholder="—" className="rounded-xl border-neutral-200 focus-visible:ring-neutral-950 text-sm" />
-                  </div>
-                </div>
-                <div className="flex justify-end pt-2">
-                  <Button className="rounded-xl text-xs font-bold px-6 bg-neutral-950 hover:bg-neutral-800 text-white h-10">
-                    Save Changes
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+      {/* Structured Details Matrix Lists */}
+      <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
+        
+        {/* PERSONAL Section */}
+        <div className="bg-neutral-50/75 px-4 py-2 border-b border-neutral-200">
+          <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Personal</h2>
+        </div>
+        <div className="divide-y divide-neutral-100 text-sm">
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">First Name</span>
+            <span className="col-span-2 font-medium text-neutral-900">{profile.firstName || "—"}</span>
           </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Middle Name</span>
+            <span className="col-span-2 text-neutral-900">{profile.middleName || "—"}</span>
+          </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Last Name</span>
+            <span className="col-span-2 font-medium text-neutral-900">{profile.lastName || "—"}</span>
+          </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Date of Birth</span>
+            <span className="col-span-2 text-neutral-900">{profile.birthDate || "—"}</span>
+          </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Age</span>
+            <span className="col-span-2 text-neutral-900">{profile.age || "—"}</span>
+          </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Religion</span>
+            <span className="col-span-2 text-neutral-900">{profile.religion || "—"}</span>
+          </div>
+        </div>
 
-          {/* Right Column: Status Summary & Live Drag-and-Drop Document Uploader */}
-          <div className="space-y-6">
-            
-            {/* Status Timeline History Mirror */}
-            <Card className="rounded-2xl border-neutral-100 shadow-sm overflow-hidden">
-              <CardHeader className="bg-white border-b border-neutral-50 py-4">
-                <CardTitle className="text-xs font-bold tracking-wider text-neutral-400 uppercase">Application Lifecycle</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <div className="relative border-l border-neutral-200 pl-4 space-y-4">
-                  <div className="relative">
-                    <div className="absolute -left-[21px] mt-1.5 h-2.5 w-2.5 rounded-full bg-blue-600 ring-4 ring-white" />
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-neutral-900 px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md border border-blue-100">Interview</span>
-                      <span className="text-[10px] text-neutral-400 font-medium">Jul 13, 2026</span>
-                    </div>
-                    <p className="text-xs text-neutral-500 mt-1">Seeded applicant interview status</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Document Upload Center (POST /api/v1/applicant/documents) */}
-            <Card className="rounded-2xl border-neutral-100 shadow-sm overflow-hidden">
-              <CardHeader className="bg-white border-b border-neutral-50 py-4">
-                <CardTitle className="text-xs font-bold tracking-wider text-neutral-400 uppercase">Required Documents</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6 space-y-4">
-                
-                {/* Interactive Drag Drop Zone */}
-                <Label htmlFor="doc-upload" className="group block cursor-pointer border border-dashed border-neutral-200 hover:border-neutral-400 bg-neutral-50/50 hover:bg-neutral-50 p-6 rounded-xl transition-all text-center">
-                  <input id="doc-upload" type="file" className="hidden" multiple />
-                  <Upload className="mx-auto h-5 w-5 text-neutral-400 group-hover:text-neutral-600 transition-colors mb-2" />
-                  <p className="text-xs font-semibold text-neutral-800">Click to upload files or drag and drop</p>
-                  <p className="text-[10px] text-neutral-400 mt-1">PDF, PNG, or JPG up to 10MB</p>
-                </Label>
-
-                {/* Uploaded File List Tracking UI */}
-                <div className="space-y-2 pt-2">
-                  <div className="flex items-center justify-between p-3 rounded-xl border border-neutral-100 bg-white">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <FileText className="h-4 w-4 text-neutral-400 shrink-0" />
-                      <div className="truncate">
-                        <p className="text-xs font-semibold text-neutral-800 truncate">Transcript_of_Records.pdf</p>
-                        <p className="text-[10px] text-neutral-400">2.4 MB</p>
-                      </div>
-                    </div>
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                  </div>
-                </div>
-
-              </CardContent>
-            </Card>
-
+        {/* Contact Section */}
+        <div className="bg-neutral-50/75 px-4 py-2 border-t border-b border-neutral-200">
+          <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Contact</h2>
+        </div>
+        <div className="divide-y divide-neutral-100 text-sm">
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Email</span>
+            <span className="col-span-2 font-medium text-neutral-900">{profile.personalEmail || "—"}</span>
+          </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Phone</span>
+            <span className="col-span-2 text-neutral-900">{profile.phoneNumber || "—"}</span>
+          </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Mobile</span>
+            <span className="col-span-2 text-neutral-900">{profile.mobileNumber || "—"}</span>
+          </div>
+          <div className="grid grid-cols-3 px-4 py-3">
+            <span className="text-neutral-500">Address</span>
+            <span className="col-span-2 text-neutral-900">{profile.address || "—"}</span>
           </div>
         </div>
 
       </div>
     </div>
-  );
+  )
 }
