@@ -9,6 +9,7 @@ import type { ApplicantMePayload, ProfileUpdateForm, DocumentType } from "@/comp
 import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS } from "@/components/profile/types"
 import { ProfileBanner } from "@/components/profile/profile-banner"
 import { PersonalInfoSection } from "@/components/profile/personal-info-section"
+import { EditProfileModal } from "@/components/profile/edit-profile-modal"
 import { DocumentsChecklist } from "@/components/profile/documents-checklist"
 
 export default function ApplicantSelfProfilePage() {
@@ -23,7 +24,7 @@ export default function ApplicantSelfProfilePage() {
   const [currentUploadingDoc, setCurrentUploadingDoc] = React.useState<DocumentType | null>(null)
 
   // Profile editing states
-  const [isEditing, setIsEditing] = React.useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
   const [editForm, setEditForm] = React.useState<ProfileUpdateForm>({
     firstName: "",
@@ -108,7 +109,7 @@ export default function ApplicantSelfProfilePage() {
       }
 
       await fetchMyProfile()
-      setIsEditing(false)
+      setIsEditModalOpen(false)
       alert("Profile updated successfully!")
     } catch (err: any) {
       alert(err.message || "An error occurred while saving profile.")
@@ -254,12 +255,15 @@ export default function ApplicantSelfProfilePage() {
 
       <PersonalInfoSection
         profile={profile}
-        isEditing={isEditing}
+        onEdit={() => setIsEditModalOpen(true)}
+      />
+
+      <EditProfileModal
+        open={isEditModalOpen}
         isSaving={isSaving}
         editForm={editForm}
         setEditForm={setEditForm}
-        onEdit={() => setIsEditing(true)}
-        onCancel={() => setIsEditing(false)}
+        onCancel={() => setIsEditModalOpen(false)}
         onSave={handleSaveProfile}
       />
 
