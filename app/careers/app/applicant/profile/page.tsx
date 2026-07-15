@@ -27,7 +27,7 @@ export default function ApplicantSelfProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
   const [isSaving, setIsSaving] = React.useState(false)
   const [saveStatus, setSaveStatus] = React.useState<{ type: "success" | "error"; message: string } | null>(null)
-  const [editForm, setEditForm] = React.useState<ProfileUpdateForm>({
+  const [editForm, setEditFormRaw] = React.useState<ProfileUpdateForm>({
     firstName: "",
     middleName: "",
     lastName: "",
@@ -38,6 +38,11 @@ export default function ApplicantSelfProfilePage() {
     mobileNumber: "",
     address: ""
   })
+
+  const setEditForm: typeof setEditFormRaw = (args) => {
+    setSaveStatus(null)
+    setEditFormRaw(args)
+  }
 
   const fetchMyProfile = React.useCallback(async () => {
     setIsLoading(true)
@@ -91,8 +96,22 @@ export default function ApplicantSelfProfilePage() {
   }, [])
 
   const handleSaveProfile = async () => {
-    setIsSaving(true)
     setSaveStatus(null)
+
+    const requiredFields: { key: keyof ProfileUpdateForm; label: string }[] = [
+      { key: "firstName", label: "First Name" },
+      { key: "lastName", label: "Last Name" },
+      { key: "personalEmail", label: "Email" },
+    ]
+
+    const missing = requiredFields.filter((f) => !editForm[f.key].trim())
+    if (missing.length > 0) {
+      const names = missing.map((f) => f.label).join(", ")
+      setSaveStatus({ type: "error", message: `${names} ${missing.length > 1 ? "are" : "is"} required.` })
+      return
+    }
+
+    setIsSaving(true)
     try {
       const token = localStorage.getItem("access_token")
       if (!token) throw new Error("No active session found.")

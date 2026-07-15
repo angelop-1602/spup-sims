@@ -56,6 +56,7 @@ export function EditProfileModal({
               required
               value={editForm.firstName}
               onChange={(v) => setEditForm({ ...editForm, firstName: v })}
+              hasError={saveStatus?.type === "error" && saveStatus.message.includes("First Name")}
             />
             <FormField
               label="Middle Name"
@@ -67,6 +68,7 @@ export function EditProfileModal({
               required
               value={editForm.lastName}
               onChange={(v) => setEditForm({ ...editForm, lastName: v })}
+              hasError={saveStatus?.type === "error" && saveStatus.message.includes("Last Name")}
             />
             <FormField
               label="Date of Birth"
@@ -91,6 +93,7 @@ export function EditProfileModal({
               required
               value={editForm.personalEmail}
               onChange={(v) => setEditForm({ ...editForm, personalEmail: v })}
+              hasError={saveStatus?.type === "error" && saveStatus.message.includes("Email")}
             />
             <FormField
               label="Phone"
@@ -158,12 +161,14 @@ function FormField({
   required = false,
   value,
   onChange,
+  hasError = false,
 }: {
   label: string
   type?: string
   required?: boolean
   value: string
   onChange: (value: string) => void
+  hasError?: boolean
 }) {
   return (
     <div className="space-y-1.5">
@@ -175,7 +180,7 @@ function FormField({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-9 text-sm"
+        className={`h-9 text-sm ${hasError ? "border-red-400 focus-visible:ring-red-200" : ""}`}
       />
     </div>
   )
