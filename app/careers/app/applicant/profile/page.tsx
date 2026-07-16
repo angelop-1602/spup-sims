@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, AlertCircle, ArrowLeft } from "lucide-react"
+import { Loader2, AlertCircle, ArrowLeft, CheckCircle2, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -26,6 +28,16 @@ export default function ApplicantSelfProfilePage() {
   const [activeDeleteKey, setActiveDeleteKey] = React.useState<string | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const [currentUploadingDoc, setCurrentUploadingDoc] = React.useState<DocumentType | null>(null)
+
+  // Status modal state (for success/error feedback)
+  const [statusModal, setStatusModal] = React.useState<{ open: boolean; type: "success" | "error"; title: string; message: string }>({
+    open: false, type: "success", title: "", message: ""
+  })
+
+  // Delete confirmation dialog state
+  const [deleteConfirm, setDeleteConfirm] = React.useState<{ open: boolean; doc: DocumentType | null }>({
+    open: false, doc: null
+  })
 
   // Profile editing states
   const [isEditModalOpen, setIsEditModalOpen] = React.useState(false)
@@ -221,9 +233,9 @@ export default function ApplicantSelfProfilePage() {
       await fetchMyProfile()
       await fetchDocuments()
       await saveFile(currentUploadingDoc.key, file)
-      alert(`${currentUploadingDoc.label} uploaded successfully!`)
+      setStatusModal({ open: true, type: "success", title: "Upload Successful", message: `${currentUploadingDoc.label} has been uploaded successfully.` })
     } catch (err: any) {
-      alert(err.message || "Failed to upload document.")
+      setStatusModal({ open: true, type: "error", title: "Upload Failed", message: err.message || "Failed to upload document." })
     } finally {
       setActiveUploadKey(null)
       setCurrentUploadingDoc(null)
@@ -232,7 +244,13 @@ export default function ApplicantSelfProfilePage() {
   }
 
   const handleDocumentDelete = async (doc: DocumentType) => {
-    if (!confirm(`Are you sure you want to delete your uploaded ${doc.label}?`)) return
+    setDeleteConfirm({ open: true, doc })
+  }
+
+  const confirmDelete = async () => {
+    const doc = deleteConfirm.doc
+    if (!doc) return
+    setDeleteConfirm({ open: false, doc: null })
 
     setActiveDeleteKey(doc.key)
     try {
@@ -253,9 +271,9 @@ export default function ApplicantSelfProfilePage() {
       await fetchMyProfile()
       await fetchDocuments()
       await deleteFile(doc.key)
-      alert(`${doc.label} deleted successfully!`)
+      setStatusModal({ open: true, type: "success", title: "Delete Successful", message: `${doc.label} has been deleted successfully.` })
     } catch (err: any) {
-      alert(err.message || "Failed to delete document.")
+      setStatusModal({ open: true, type: "error", title: "Delete Failed", message: err.message || "Failed to delete document." })
     } finally {
       setActiveDeleteKey(null)
     }
@@ -301,7 +319,7 @@ export default function ApplicantSelfProfilePage() {
       window.open(blobUrl, "_blank")
       setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
     } catch (err: any) {
-      alert(err.message || "Failed to open document.")
+      setStatusModal({ open: true, type: "error", title: "View Failed", message: err.message || "Failed to open document." })
     } finally {
       setViewingDocKey(null)
     }
@@ -383,6 +401,51 @@ export default function ApplicantSelfProfilePage() {
         onDelete={handleDocumentDelete}
         onView={handleViewDocument}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirm.open} onOpenChange={(open) => !open && setDeleteConfirm({ open: false, doc: null })}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="h-5 w-5 text-destructive" />
+              Delete Document
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete your uploaded <strong>{deleteConfirm.doc?.label}</strong>? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction variant="destructive" onClick={confirmDelete}>
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Status Modal (Success/Error) */}
+      <Dialog open={statusModal.open} onOpenChange={(open) => !open && setStatusModal((s) => ({ ...s, open: false }))}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {statusModal.type === "success" ? (
+                <CheckCircle2 className="h-5 w-5 text-green-600" />
+              ) : (
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              )}
+              {statusModal.title}
+            </DialogTitle>
+            <DialogDescription>
+              {statusModal.message}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setStatusModal((s) => ({ ...s, open: false }))}>
+              OK
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
     </div>
   )
