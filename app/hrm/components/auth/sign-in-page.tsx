@@ -1,10 +1,11 @@
 "use client"
 
 import Image from "next/image"
-import { ArrowLeft, Loader2 } from "lucide-react"
+import { ArrowLeft, LifeBuoy, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ThemeSwitcher } from "@/components/ui/theme-switcher"
 import { cn } from "@/lib/utils"
 
 type AuthAction = () => void | Promise<void>
@@ -34,17 +35,11 @@ function MicrosoftMark() {
 
 function AuthBackground({ children }: { children: React.ReactNode }) {
   return (
-    <main className="relative min-h-svh overflow-hidden bg-[#f7f7f5] text-zinc-950">
-      {/* <Image
-        src="/img/bg-auth.png"
-        alt=""
-        aria-hidden="true"
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover object-[center_bottom]"
-      /> */}
-      <div className="absolute inset-0 bg-white/15" />
+    <main className="relative min-h-svh overflow-hidden bg-background text-foreground">
+      <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-32 -left-24 size-96 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -right-32 -bottom-40 size-96 rounded-full bg-accent/50 blur-3xl" />
+      </div>
 
       <div className="relative z-10 flex min-h-svh flex-col px-5 py-5 sm:px-8 lg:px-10">
         {children}
@@ -64,14 +59,16 @@ export function SignInPage({
   return (
     <AuthBackground>
       <header className="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={() => void onBack()}
-          className="inline-flex h-9 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-zinc-700 transition-colors hover:bg-white/55 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20"
+          className="px-2"
         >
-          <ArrowLeft className="size-3.5" />
+          <ArrowLeft aria-hidden="true" />
           Back
-        </button>
+        </Button>
 
         <Image
           src="/SPUP-final-logo.png"
@@ -82,22 +79,25 @@ export function SignInPage({
           className="absolute left-1/2 top-1/2 size-11 -translate-x-1/2 -translate-y-1/2 object-contain"
         />
 
-        <a
-          href={supportHref}
-          className="rounded-md px-2 py-2 text-xs font-medium text-zinc-700 transition-colors hover:bg-white/55 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/20"
-        >
-          Contact support
-        </a>
+        <div className="flex items-center gap-1">
+          <ThemeSwitcher />
+          <Button asChild variant="ghost" size="sm" className="px-2">
+            <a href={supportHref} aria-label="Contact support">
+              <LifeBuoy aria-hidden="true" className="sm:hidden" />
+              <span className="hidden sm:inline">Contact support</span>
+            </a>
+          </Button>
+        </div>
       </header>
 
       <section className="flex flex-1 items-center justify-center py-8">
-        <div className="w-full max-w-[360px] rounded-[8px] border border-black/5 bg-white/95 p-5 text-zinc-950 shadow-[0_24px_80px_rgba(18,18,18,0.12)] backdrop-blur-sm sm:p-6">
+        <div className="w-full max-w-[360px] sm:p-6 text-center">
           <div className="space-y-5">
             <div className="space-y-1.5">
               <h1 className="text-2xl font-medium leading-tight">
                 Log in to SPUP SIMS
               </h1>
-              <p className="text-sm text-zinc-500">
+              <p className="text-sm text-muted-foreground">
                 Your school portal starts here
               </p>
             </div>
@@ -105,11 +105,11 @@ export function SignInPage({
             <Button
               type="button"
               disabled={isBusy}
-              className="h-10 w-full rounded-md bg-zinc-950 text-white hover:bg-zinc-800"
+              className="h-10 w-full"
               onClick={() => void onSignIn()}
             >
               {isBusy ? (
-                <Loader2 className="size-4 animate-spin" />
+                <Loader2 aria-hidden="true" className="size-4 animate-spin" />
               ) : (
                 <MicrosoftMark />
               )}
@@ -120,18 +120,18 @@ export function SignInPage({
           <p
             aria-live="polite"
             className={cn(
-              "mt-5 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700",
+              "mt-5 rounded-md border border-destructive-border bg-destructive-muted px-3 py-2 text-sm text-destructive",
               !errorMessage && "hidden"
             )}
           >
             {errorMessage}
           </p>
 
-          <p className="mt-5 text-center text-xs text-zinc-500">
+          <p className="mt-5 text-center text-xs text-muted-foreground">
             Don&apos;t have access?{" "}
             <a
               href={supportHref}
-              className="font-medium text-zinc-900 underline-offset-4 hover:underline"
+              className="font-medium text-foreground underline-offset-4 hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
             >
               Contact support
             </a>
@@ -146,20 +146,20 @@ export function SignInPageSkeleton() {
   return (
     <AuthBackground>
       <header className="relative mx-auto flex h-14 w-full max-w-6xl items-center justify-between">
-        <Skeleton className="h-8 w-16 bg-white/60" />
-        <Skeleton className="absolute left-1/2 top-1/2 size-11 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/65" />
-        <Skeleton className="h-8 w-24 bg-white/60" />
+        <Skeleton className="h-9 w-16" />
+        <Skeleton className="absolute left-1/2 top-1/2 size-11 -translate-x-1/2 -translate-y-1/2 rounded-full" />
+        <Skeleton className="h-9 w-28" />
       </header>
 
       <section className="flex flex-1 items-center justify-center py-8">
-        <div className="w-full max-w-[360px] rounded-[8px] border border-black/5 bg-white/95 p-5 shadow-[0_24px_80px_rgba(18,18,18,0.12)] backdrop-blur-sm sm:p-6">
+        <div className="w-full max-w-[360px] rounded-lg border bg-card/95 p-5 shadow-sm backdrop-blur-sm sm:p-6">
           <div className="space-y-5">
             <div className="space-y-2">
-              <Skeleton className="h-8 w-56 bg-zinc-200" />
-              <Skeleton className="h-4 w-40 bg-zinc-200" />
+              <Skeleton className="h-8 w-56" />
+              <Skeleton className="h-4 w-40" />
             </div>
-            <Skeleton className="h-10 w-full bg-zinc-200" />
-            <Skeleton className="mx-auto h-3 w-48 bg-zinc-200" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="mx-auto h-3 w-48" />
           </div>
         </div>
       </section>

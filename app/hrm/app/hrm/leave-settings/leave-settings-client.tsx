@@ -23,7 +23,7 @@ import {
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import { PermissionGuard } from "@/components/auth/permission-guard"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 import {
   AlertDialog,
   AlertDialogAction,
