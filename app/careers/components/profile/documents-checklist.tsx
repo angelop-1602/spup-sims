@@ -10,6 +10,7 @@ interface DocumentRowProps {
   isUploading: boolean
   isDeleting: boolean
   isViewing: boolean
+  isDeletable: boolean
   onUploadClick: (doc: DocumentType) => void
   onDelete: (doc: DocumentType) => void
   onView: (doc: DocumentType) => void
@@ -21,6 +22,7 @@ function DocumentRow({
   isUploading,
   isDeleting,
   isViewing,
+  isDeletable,
   onUploadClick,
   onDelete,
   onView,
@@ -70,13 +72,13 @@ function DocumentRow({
           variant="ghost"
           size="sm"
           onClick={() => onDelete(doc)}
-          disabled={!isUploaded || isDeleting || isUploading}
+          disabled={!isUploaded || !isDeletable || isDeleting || isUploading}
           className={`h-8 w-8 p-0 ${
-            isUploaded 
+            isUploaded && isDeletable
               ? "text-red-400 hover:text-red-600 hover:bg-red-50" 
               : "text-neutral-300 cursor-not-allowed opacity-50"
           }`}
-          title={isUploaded ? "Delete Document" : "No document to delete"}
+          title={!isDeletable ? "Required document — use Replace instead" : isUploaded ? "Delete Document" : "No document to delete"}
         >
           {isDeleting ? (
             <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
@@ -152,6 +154,7 @@ export function DocumentsChecklist({
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
             isViewing={viewingDocKey === doc.key}
+            isDeletable={false}
             onUploadClick={onUploadClick}
             onDelete={onDelete}
             onView={onView}
@@ -179,6 +182,7 @@ export function DocumentsChecklist({
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
             isViewing={viewingDocKey === doc.key}
+            isDeletable={true}
             onUploadClick={onUploadClick}
             onDelete={onDelete}
             onView={onView}
