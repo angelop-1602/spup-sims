@@ -10,6 +10,7 @@ interface DocumentRowProps {
   isUploading: boolean
   isDeleting: boolean
   isViewing: boolean
+  isDeletable: boolean
   onUploadClick: (doc: DocumentType) => void
   onDelete: (doc: DocumentType) => void
   onView: (doc: DocumentType) => void
@@ -21,6 +22,7 @@ function DocumentRow({
   isUploading,
   isDeleting,
   isViewing,
+  isDeletable,
   onUploadClick,
   onDelete,
   onView,
@@ -53,7 +55,7 @@ function DocumentRow({
           disabled={!isUploaded || isDeleting || isUploading || isViewing}
           className={`h-8 w-8 p-0 ${
             isUploaded
-              ? "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100"
+              ? "border-1 border-gray text-neutral-800 hover:text-neutral-800 hover:bg-neutral-100"
               : "text-neutral-300 cursor-not-allowed opacity-50"
           }`}
           title={isUploaded ? "View Document" : "No document uploaded"}
@@ -69,29 +71,9 @@ function DocumentRow({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onDelete(doc)}
-          disabled={!isUploaded || isDeleting || isUploading}
-          className={`h-8 w-8 p-0 ${
-            isUploaded 
-              ? "text-red-400 hover:text-red-600 hover:bg-red-50" 
-              : "text-neutral-300 cursor-not-allowed opacity-50"
-          }`}
-          title={isUploaded ? "Delete Document" : "No document to delete"}
-        >
-          {isDeleting ? (
-            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
-          ) : (
-            <Trash2 className="h-4 w-4" />
-          )}
-          <span className="sr-only">Delete</span>
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
           onClick={() => onUploadClick(doc)}
           disabled={isUploading || isDeleting}
-          className="h-8 w-8 p-0 text-neutral-500 border-1 border-gray hover:text-neutral-800 hover:bg-neutral-100"
+          className="h-8 w-8 p-0 border-1 text-neutral-800 border-gray hover:text-neutral-800 hover:bg-neutral-100"
           title={isUploaded ? "Replace File" : "Upload File"}
         >
           {isUploading ? (
@@ -100,6 +82,26 @@ function DocumentRow({
             <Upload className="h-4 w-4" />
           )}
           <span className="sr-only">Upload</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDelete(doc)}
+          disabled={!isUploaded || !isDeletable || isDeleting || isUploading}
+          className={`h-8 w-8 p-0 ${
+            isUploaded && isDeletable
+              ? "bg-red-100 text-red-600 hover:text-red-600 hover:bg-red-50" 
+              : "text-neutral-300 cursor-not-allowed opacity-50"
+          }`}
+          title={!isDeletable ? "Required document. Use Replace instead" : isUploaded ? "Delete Document" : "No document to delete"}
+        >
+          {isDeleting ? (
+            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+          <span className="sr-only">Delete</span>
         </Button>
 
       </div>
@@ -135,6 +137,7 @@ export function DocumentsChecklist({
       {/* Required Documents */}
       <div className="bg-neutral-50/75 px-4 py-2 border-b border-neutral-200">
         <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Required</h2>
+        <p className="text-[11px] text-neutral-400 mt-0.5">Accepted file types: PDF, DOC, DOCX, JPG, PNG. Max file size: 10 MB</p>
       </div>
 
       <div className="divide-y divide-neutral-100 text-sm">
@@ -152,6 +155,7 @@ export function DocumentsChecklist({
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
             isViewing={viewingDocKey === doc.key}
+            isDeletable={false}
             onUploadClick={onUploadClick}
             onDelete={onDelete}
             onView={onView}
@@ -162,6 +166,7 @@ export function DocumentsChecklist({
       {/* If Applicable Documents */}
       <div className="bg-neutral-50/75 px-4 py-2 border-t border-b border-neutral-200">
         <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">If Applicable</h2>
+        <p className="text-[11px] text-neutral-400 mt-0.5">Accepted file types: PDF, JPG, PNG. Max file size: 10 MB</p>
       </div>
 
       <div className="divide-y divide-neutral-100 text-sm">
@@ -179,6 +184,7 @@ export function DocumentsChecklist({
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
             isViewing={viewingDocKey === doc.key}
+            isDeletable={true}
             onUploadClick={onUploadClick}
             onDelete={onDelete}
             onView={onView}

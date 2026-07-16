@@ -1,6 +1,6 @@
 "use client"
 
-import { Pencil } from "lucide-react"
+import { PenLine } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { calculateAge, type ApplicantMePayload } from "./types"
 
@@ -19,10 +19,10 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
           variant="ghost"
           size="sm"
           onClick={onEdit}
-          className="h-7 text-xs px-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100/50"
+          className="h-7 text-xs px-2 text-neutral-800 border-1 border-gray-300 hover:text-neutral-900 hover:bg-neutral-100/50"
         >
-          <Pencil className="h-3.5 w-3.5 mr-1" />
-          Edit Profile
+          <PenLine className="h-3 w-3 mr-1" />
+          Edit
         </Button>
       </div>
 

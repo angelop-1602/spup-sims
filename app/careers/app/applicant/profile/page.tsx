@@ -227,7 +227,7 @@ export default function ApplicantSelfProfilePage() {
       const token = localStorage.getItem("access_token")
       if (!token) throw new Error("No session found.")
 
-      const response = await fetch(doc.endpoint, {
+      const response = await fetch(`/api/v1/applicant/documents/${doc.apiName}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`
