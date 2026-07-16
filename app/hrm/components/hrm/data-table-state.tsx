@@ -38,7 +38,9 @@ export function DataTableState({
           onRetry={onRetry}
           className="min-h-72 border-0 bg-transparent"
         />
-      ) : !loading && empty ? (
+      ) : loading ? (
+        children
+      ) : empty ? (
         emptyState
       ) : (
         children

@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useMsal } from "@azure/msal-react";
 import type { components } from "./schema";
-import { url } from "inspector/promises";
 
 /**
  * Error thrown by {@link request} when the response is not OK or the API
