@@ -9,9 +9,10 @@ interface DocumentRowProps {
   isUploaded: boolean
   isUploading: boolean
   isDeleting: boolean
-  docUrl: string | null | undefined
+  isViewing: boolean
   onUploadClick: (doc: DocumentType) => void
   onDelete: (doc: DocumentType) => void
+  onView: (doc: DocumentType) => void
 }
 
 function DocumentRow({
@@ -19,9 +20,10 @@ function DocumentRow({
   isUploaded,
   isUploading,
   isDeleting,
-  docUrl,
+  isViewing,
   onUploadClick,
   onDelete,
+  onView,
 }: DocumentRowProps) {
   return (
     <div className="grid grid-cols-3 px-4 py-3 items-center">
@@ -44,30 +46,24 @@ function DocumentRow({
       </div>
 
       <div className="flex items-center gap-2">
-        
         <Button
           variant="ghost"
           size="sm"
-          asChild={isUploaded} 
-          disabled={!isUploaded || isDeleting || isUploading}
+          onClick={() => onView(doc)}
+          disabled={!isUploaded || isDeleting || isUploading || isViewing}
           className={`h-8 w-8 p-0 ${
-            isUploaded 
-              ? "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100" 
+            isUploaded
+              ? "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100"
               : "text-neutral-300 cursor-not-allowed opacity-50"
           }`}
           title={isUploaded ? "View Document" : "No document uploaded"}
         >
-          {isUploaded ? (
-            <a href={docUrl ?? "#"} target="_blank" rel="noopener noreferrer">
-              <Eye className="h-4 w-4" />
-              <span className="sr-only">View</span>
-            </a>
+          {isViewing ? (
+            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
           ) : (
-            <>
-              <Eye className="h-4 w-4" />
-              <span className="sr-only">View (Unavailable)</span>
-            </>
+            <Eye className="h-4 w-4" />
           )}
+          <span className="sr-only">View</span>
         </Button>
 
         <Button
@@ -116,9 +112,11 @@ interface DocumentsChecklistProps {
   ifApplicableDocuments: DocumentType[]
   activeUploadKey: string | null
   activeDeleteKey: string | null
+  viewingDocKey: string | null
   getDocUrl: (key: string) => string | null | undefined
   onUploadClick: (doc: DocumentType) => void
   onDelete: (doc: DocumentType) => void
+  onView: (doc: DocumentType) => void
 }
 
 export function DocumentsChecklist({
@@ -126,9 +124,11 @@ export function DocumentsChecklist({
   ifApplicableDocuments,
   activeUploadKey,
   activeDeleteKey,
+  viewingDocKey,
   getDocUrl,
   onUploadClick,
   onDelete,
+  onView,
 }: DocumentsChecklistProps) {
   return (
     <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
@@ -148,12 +148,13 @@ export function DocumentsChecklist({
           <DocumentRow
             key={doc.key}
             doc={doc}
-            isUploaded={!!getDocUrl(doc.key)}
+            isUploaded={!!getDocUrl(doc.apiName)}
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
-            docUrl={getDocUrl(doc.key)}
+            isViewing={viewingDocKey === doc.key}
             onUploadClick={onUploadClick}
             onDelete={onDelete}
+            onView={onView}
           />
         ))}
       </div>
@@ -174,12 +175,13 @@ export function DocumentsChecklist({
           <DocumentRow
             key={doc.key}
             doc={doc}
-            isUploaded={!!getDocUrl(doc.key)}
+            isUploaded={!!getDocUrl(doc.apiName)}
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
-            docUrl={getDocUrl(doc.key)}
+            isViewing={viewingDocKey === doc.key}
             onUploadClick={onUploadClick}
             onDelete={onDelete}
+            onView={onView}
           />
         ))}
       </div>
