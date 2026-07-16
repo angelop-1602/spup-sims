@@ -99,7 +99,6 @@ export function EditProfileModal({
               label="Phone"
               prefix="+63-"
               placeholder="78-000-0000"
-              hint="Format: +63-78-000-0000"
               maxDigits={9}
               grouping={[2, 3, 4]}
               value={editForm.phoneNumber}
@@ -109,7 +108,6 @@ export function EditProfileModal({
               label="Mobile"
               prefix="+63-"
               placeholder="900-000-0000"
-              hint="Format: +63-900-000-0000"
               maxDigits={10}
               grouping={[3, 3, 4]}
               value={editForm.mobileNumber}
@@ -223,7 +221,6 @@ function PhoneField({
   label,
   prefix,
   placeholder,
-  hint,
   maxDigits,
   grouping,
   value,
@@ -232,7 +229,6 @@ function PhoneField({
   label: string
   prefix: string
   placeholder: string
-  hint: string
   maxDigits: number
   grouping: number[]
   value: string
@@ -261,9 +257,6 @@ function PhoneField({
           className="h-9 text-sm rounded-l-none"
         />
       </div>
-      <p className="text-[11px] text-neutral-400">
-        {hint} — {maxDigits} digits required
-      </p>
     </div>
   )
 }
