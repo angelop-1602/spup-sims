@@ -96,7 +96,7 @@ export default function ApplicantDashboardPage() {
 
             <Button asChild size="sm" className="rounded-xl shadow-sm font-medium shrink-0">
               <Link href="/applicant/profile" className="flex items-center gap-1.5">
-                Complete Profile
+                Edit Profile
                 <ArrowUpRight className="size-3.5" />
               </Link>
             </Button>

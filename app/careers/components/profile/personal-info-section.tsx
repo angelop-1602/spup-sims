@@ -29,7 +29,7 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
       <div className="divide-y divide-border text-sm">
         <div className="grid grid-cols-3 px-4 py-3 items-center">
           <span className="text-muted-foreground">First Name</span>
-          <span className="col-span-2 font-medium text-foreground">{profile.firstName || "—"}</span>
+          <span className="col-span-2 text-foreground">{profile.firstName || "—"}</span>
         </div>
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">
@@ -39,7 +39,7 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">
           <span className="text-muted-foreground">Last Name</span>
-          <span className="col-span-2 font-medium text-foreground">{profile.lastName || "—"}</span>
+          <span className="col-span-2 text-foreground">{profile.lastName || "—"}</span>
         </div>
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">
@@ -49,7 +49,7 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">
           <span className="text-muted-foreground">Age</span>
-          <span className="col-span-2 text-foreground font-medium">{calculateAge(profile.birthDate)}</span>
+          <span className="col-span-2 text-foreground">{calculateAge(profile.birthDate)}</span>
         </div>
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">
@@ -64,7 +64,7 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
       <div className="divide-y divide-border text-sm">
         <div className="grid grid-cols-3 px-4 py-3 items-center">
           <span className="text-muted-foreground">Email</span>
-          <span className="col-span-2 font-medium text-foreground">{profile.personalEmail || "—"}</span>
+          <span className="col-span-2 text-foreground">{profile.personalEmail || "—"}</span>
         </div>
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">

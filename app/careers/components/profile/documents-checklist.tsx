@@ -42,7 +42,7 @@ function DocumentRow({
         ) : (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-muted text-muted-foreground text-xs font-medium">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
-            Missing
+            Pending
           </span>
         )}
       </div>
