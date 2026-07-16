@@ -35,6 +35,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { navItems } from "./app-sidebar"
+import { Separator } from "@/components/ui/separator"
 
 const HOME_ITEM = navItems[0]
 
@@ -78,6 +79,7 @@ export function AppTopbar() {
     <>
       <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
         <SidebarTrigger />
+        <Separator orientation="vertical" className="mx-2" />
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
@@ -118,7 +120,7 @@ export function AppTopbar() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 px-2">
+              <Button variant="ghost" className="gap-2 px-2 hover:bg-transparent">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="" alt={`${displayName} avatar`} />
                   <AvatarFallback>{initials}</AvatarFallback>

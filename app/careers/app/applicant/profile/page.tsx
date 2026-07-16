@@ -351,16 +351,6 @@ export default function ApplicantSelfProfilePage() {
         className="hidden"
       />
 
-      <div className="flex items-center">
-        <Link
-          href="/applicant/dashboard"
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Dashboard
-        </Link>
-      </div>
-
       <ProfileBanner
         profile={profile}
         status={data.status}
