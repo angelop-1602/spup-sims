@@ -2,7 +2,6 @@ export interface ApplicantMePayload {
   id: number | string
   applicationNumber?: string
   status?: string
-  resumeUrl?: string | null
   createdAt: string
   profile: {
     id: number | string
@@ -17,6 +16,13 @@ export interface ApplicantMePayload {
     mobileNumber?: string | null
     address?: string | null
   }
+}
+
+export interface DocumentEntry {
+  id: number | string
+  storagePath: string
+  requirementName: string
+  fileName: string
 }
 
 export interface ProfileUpdateForm {
@@ -35,20 +41,22 @@ export interface DocumentType {
   key: string
   label: string
   endpoint: string
+  apiName: string
+  accept: string
 }
 
 export const REQUIRED_DOCUMENTS: DocumentType[] = [
-  { key: "resume", label: "Resume", endpoint: "/api/v1/applicant/documents/resume" },
-  { key: "application_letter", label: "Application Letter", endpoint: "/api/v1/applicant/documents/application-letter" },
-  { key: "tor", label: "Transcript of Records (TOR)", endpoint: "/api/v1/applicant/documents/transcript-of-records" },
-  { key: "diploma", label: "Diploma", endpoint: "/api/v1/applicant/documents/diploma" }
+  { key: "resume", label: "Resume", endpoint: "/api/v1/applicant/documents/resume", apiName: "Resume", accept: ".pdf,.doc,.docx,.jpg,.jpeg,.png" },
+  { key: "application_letter", label: "Application Letter", endpoint: "/api/v1/applicant/documents/application-letter", apiName: "Application Letter", accept: ".pdf,.doc,.docx" },
+  { key: "transcript_of_records", label: "Transcript of Records (TOR)", endpoint: "/api/v1/applicant/documents/transcript-of-records", apiName: "Transcript of Records", accept: ".pdf,.jpg,.jpeg,.png" },
+  { key: "diploma", label: "Diploma", endpoint: "/api/v1/applicant/documents/diploma", apiName: "Diploma", accept: ".pdf,.jpg,.jpeg,.png" }
 ]
 
 export const IF_APPLICABLE_DOCUMENTS: DocumentType[] = [
-  { key: "prc_id", label: "PRC ID", endpoint: "/api/v1/applicant/documents/prc-id" },
-  { key: "certificate_of_employment", label: "Certificate of Employment", endpoint: "/api/v1/applicant/documents/certificate-of-employment" },
-  { key: "latest_performance_rating", label: "Latest Performance Rating", endpoint: "/api/v1/applicant/documents/latest-performance-rating" },
-  { key: "certificates_of_training", label: "Certificates of Training", endpoint: "/api/v1/applicant/documents/certificates-of-training" }
+  { key: "prc_id", label: "PRC ID", endpoint: "/api/v1/applicant/documents/prc-id", apiName: "PRC ID", accept: ".pdf,.jpg,.jpeg,.png" },
+  { key: "certificate_of_employment", label: "Certificate of Employment", endpoint: "/api/v1/applicant/documents/certificate-of-employment", apiName: "Certificate of Employment", accept: ".pdf,.jpg,.jpeg,.png" },
+  { key: "latest_performance_rating", label: "Latest Performance Rating", endpoint: "/api/v1/applicant/documents/latest-performance-rating", apiName: "Latest Performance Rating", accept: ".pdf,.jpg,.jpeg,.png" },
+  { key: "certificates_of_training", label: "Certificates of Training", endpoint: "/api/v1/applicant/documents/certificates-of-training", apiName: "Certificates of Training", accept: ".pdf,.jpg,.jpeg,.png" }
 ]
 
 export const STATUS_STYLES: Record<string, string> = {
