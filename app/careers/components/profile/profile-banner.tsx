@@ -31,7 +31,7 @@ export function ProfileBanner({ profile, status, createdAt }: ProfileBannerProps
             </span>
           </div>
           <p className="text-xs text-muted-foreground pt-1">
-            Profile #{profile.id} · Created {createdString}
+            Profile #{profile.id} · Last Updated {createdString}
           </p>
         </div>
       </div>
