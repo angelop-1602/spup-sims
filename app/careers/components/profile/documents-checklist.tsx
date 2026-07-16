@@ -55,7 +55,7 @@ function DocumentRow({
           disabled={!isUploaded || isDeleting || isUploading || isViewing}
           className={`h-8 w-8 p-0 ${
             isUploaded
-              ? "text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100"
+              ? "border-1 border-gray text-neutral-800 hover:text-neutral-800 hover:bg-neutral-100"
               : "text-neutral-300 cursor-not-allowed opacity-50"
           }`}
           title={isUploaded ? "View Document" : "No document uploaded"}
@@ -73,7 +73,7 @@ function DocumentRow({
           size="sm"
           onClick={() => onUploadClick(doc)}
           disabled={isUploading || isDeleting}
-          className="h-8 w-8 p-0 text-neutral-500 border-1 border-gray hover:text-neutral-800 hover:bg-neutral-100"
+          className="h-8 w-8 p-0 border-1 text-neutral-800 border-gray hover:text-neutral-800 hover:bg-neutral-100"
           title={isUploaded ? "Replace File" : "Upload File"}
         >
           {isUploading ? (
@@ -91,7 +91,7 @@ function DocumentRow({
           disabled={!isUploaded || !isDeletable || isDeleting || isUploading}
           className={`h-8 w-8 p-0 ${
             isUploaded && isDeletable
-              ? "text-red-400 hover:text-red-600 hover:bg-red-50" 
+              ? "bg-red-100 text-red-600 hover:text-red-600 hover:bg-red-50" 
               : "text-neutral-300 cursor-not-allowed opacity-50"
           }`}
           title={!isDeletable ? "Required document. Use Replace instead" : isUploaded ? "Delete Document" : "No document to delete"}
