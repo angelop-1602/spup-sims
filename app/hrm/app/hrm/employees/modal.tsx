@@ -60,12 +60,12 @@ export function EmployeeDetailsModal({
               {/* Core Employment Details */}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">Department</span>
-                  <span className="font-medium">{employee.department || "—"}</span>
+                  <span className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">Employee Type</span>
+                  <span className="font-medium">{employee.employeeType || "—"}</span>
                 </div>
                 <div>
-                  <span className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">Designation</span>
-                  <span className="font-medium">{employee.designation || "—"}</span>
+                  <span className="block text-xs font-medium text-muted-foreground uppercase tracking-wider">Supervisor</span>
+                  <span className="font-medium">{employee.supervisor || "—"}</span>
                 </div>
               </div>
 

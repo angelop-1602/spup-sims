@@ -9,6 +9,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { PermissionGuard } from "@/components/auth/permission-guard"
+import { ApiErrorView } from "@/components/ui/error-page"
 
 // ─── Interfaces ────────────────────────────────────────────────
 
@@ -152,66 +154,73 @@ export default function ProfileDetailPage() {
 
   const [profile, setProfile] = React.useState<ProfileValues | null>(null)
   const [isLoading, setIsLoading] = React.useState(true)
+  const [fetchError, setFetchError] = React.useState<Error | null>(null)
   const [documents, setDocuments] = React.useState<ApplicantDocument[]>([])
   const [statusHistory, setStatusHistory] = React.useState<StatusHistoryEntry[]>([])
   const [interviews, setInterviews] = React.useState<InterviewSchedule[]>([])
 
   const { query, account } = useApiClient()
 
-  React.useEffect(() => {
+  const fetchAll = React.useCallback(async () => {
     if (!account || !id) return
+    setIsLoading(true)
+    setFetchError(null)
+    try {
+      const profileRequest = query<ProfileRecord>(`/api/v1/core/profiles/${id}`)
+      const documentsRequest = applicantId
+        ? query<ApplicantDocuments>(
+            "/api/v1/recruitment/employee-applicant-documents",
+            { EmployeeApplicantId: applicantId },
+          )
+        : Promise.resolve(null)
+      const historyRequest = applicantId
+        ? query<ApplicantStatusHistory>(
+            "/api/v1/recruitment/employee-applicant-status-history",
+            { EmployeeApplicantId: applicantId },
+          )
+        : Promise.resolve(null)
+      const interviewsRequest = applicantId
+        ? query<ApplicantInterviews>(
+            "/api/v1/recruitment/interview-schedules",
+            { EmployeeApplicantId: applicantId },
+          )
+        : Promise.resolve(null)
 
-    async function fetchAll() {
-      setIsLoading(true)
-      try {
-        const profileRequest = query<ProfileRecord>(`/api/v1/core/profiles/${id}`)
-        const documentsRequest = applicantId
-          ? query<ApplicantDocuments>(
-              "/api/v1/recruitment/employee-applicant-documents",
-              { EmployeeApplicantId: applicantId },
-            )
-          : Promise.resolve(null)
-        const historyRequest = applicantId
-          ? query<ApplicantStatusHistory>(
-              "/api/v1/recruitment/employee-applicant-status-history",
-              { EmployeeApplicantId: applicantId },
-            )
-          : Promise.resolve(null)
-        const interviewsRequest = applicantId
-          ? query<ApplicantInterviews>(
-              "/api/v1/recruitment/interview-schedules",
-              { EmployeeApplicantId: applicantId },
-            )
-          : Promise.resolve(null)
+      const [
+        profileResult,
+        documentsResult,
+        historyResult,
+        interviewsResult,
+      ] = await Promise.allSettled([
+        profileRequest,
+        documentsRequest,
+        historyRequest,
+        interviewsRequest,
+      ])
 
-        const [
-          profileResult,
-          documentsResult,
-          historyResult,
-          interviewsResult,
-        ] = await Promise.allSettled([
-          profileRequest,
-          documentsRequest,
-          historyRequest,
-          interviewsRequest,
-        ])
-
-        setProfile(profileResult.status === "fulfilled" ? profileResult.value : null)
-        setDocuments(documentsResult.status === "fulfilled" ? documentsResult.value?.data ?? [] : [])
-        setStatusHistory(historyResult.status === "fulfilled" ? historyResult.value?.data ?? [] : [])
-        setInterviews(interviewsResult.status === "fulfilled" ? interviewsResult.value?.data ?? [] : [])
-      } catch {
+      if (profileResult.status === "rejected") {
+        setFetchError(profileResult.reason instanceof Error ? profileResult.reason : new Error(String(profileResult.reason)))
         setProfile(null)
-        setDocuments([])
-        setStatusHistory([])
-        setInterviews([])
-      } finally {
-        setIsLoading(false)
+      } else {
+        setProfile(profileResult.value)
       }
+      setDocuments(documentsResult.status === "fulfilled" ? documentsResult.value?.data ?? [] : [])
+      setStatusHistory(historyResult.status === "fulfilled" ? historyResult.value?.data ?? [] : [])
+      setInterviews(interviewsResult.status === "fulfilled" ? interviewsResult.value?.data ?? [] : [])
+    } catch (err) {
+      setFetchError(err instanceof Error ? err : new Error(String(err)))
+      setProfile(null)
+      setDocuments([])
+      setStatusHistory([])
+      setInterviews([])
+    } finally {
+      setIsLoading(false)
     }
-
-    fetchAll()
   }, [query, account, id, applicantId])
+
+  React.useEffect(() => {
+    void fetchAll()
+  }, [fetchAll])
 
   const fullName = profile
     ? [profile.firstName, profile.middleName, profile.lastName, profile.suffix].filter(Boolean).join(" ")
@@ -232,6 +241,7 @@ export default function ProfileDetailPage() {
   )
 
   return (
+    <PermissionGuard requiredPermission="hrms.recruitment.applicants.view">
     <div className="space-y-5">
       <Link
         href="/hrm/applicants"
@@ -246,6 +256,8 @@ export default function ProfileDetailPage() {
           <Loader2 className="h-4 w-4 animate-spin" />
           Loading profile…
         </div>
+      ) : fetchError ? (
+        <ApiErrorView error={fetchError} onRetry={fetchAll} fullScreen />
       ) : !profile ? (
         <div className="flex flex-col items-center justify-center gap-2 py-32 text-center">
           <p className="text-sm font-medium">Profile not found</p>
@@ -409,5 +421,6 @@ export default function ProfileDetailPage() {
         </div>
       )}
     </div>
+    </PermissionGuard>
   )
 }

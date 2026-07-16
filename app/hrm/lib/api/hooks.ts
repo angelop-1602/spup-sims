@@ -16,8 +16,8 @@ type QueryOptions = {
  * declare *what* they want.
  *
  * @example
- * const { data, loading, error, refresh } = useApiQuery<DepartmentResponse>(
- *   "/api/organization/departments",
+ * const { data, loading, error, refresh } = useApiQuery<EmployeeResponse>(
+ *   "/api/v1/hrms/employees",
  *   { Page: 1, PageSize: 50, SortBy: "id" },
  * )
  */
@@ -34,6 +34,12 @@ export function useApiQuery<T>(
   const enabled = options.enabled ?? true
   const paramsKey = JSON.stringify(params ?? null)
 
+  // Stable ref for onError so it never causes load() to be recreated
+  const onErrorRef = React.useRef(options.onError)
+  React.useEffect(() => {
+    onErrorRef.current = options.onError
+  })
+
   const load = React.useCallback(async () => {
     if (!path || !account || !enabled) {
       setLoading(false)
@@ -49,11 +55,12 @@ export function useApiQuery<T>(
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err))
       setError(error)
-      options.onError?.(error)
+      onErrorRef.current?.(error)
     } finally {
       setLoading(false)
     }
-  }, [path, account, enabled, headers, paramsKey, options.onError])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [path, account, enabled, headers, paramsKey])
 
   React.useEffect(() => {
     void load()

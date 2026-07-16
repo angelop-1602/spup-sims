@@ -4,18 +4,11 @@ import type {
 } from "@azure/msal-browser"
 
 import { loginRequest } from "@/lib/authConfig"
+import type { components } from "@/lib/api/schema"
 
 const HRM_ACCESS_CACHE_KEY = "spup:sims:hrm-access"
 
-export type CurrentUser = {
-  userId: number | string | null
-  profileId: number | string | null
-  email: string | null
-  azureId: string | null
-  roles: string[]
-  permissions: string[]
-  isSuperAdmin: boolean
-}
+export type CurrentUser = components["schemas"]["CurrentUserResponse"]
 
 type CachedHrmAccess = {
   accountKey: string
@@ -90,6 +83,7 @@ function parseCurrentUser(payload: unknown): CurrentUser | null {
     azureId: getNullableString(payload.azureId),
     roles,
     permissions,
+    departments: Array.isArray(payload.departments) ? payload.departments as CurrentUser["departments"] : [],
     isSuperAdmin: payload.isSuperAdmin === true,
   }
 }

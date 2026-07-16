@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Camera, Loader2 } from "lucide-react"
+import { Camera, Edit3, Loader2 } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -10,8 +10,17 @@ import {
   CardDescription,
 } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { request, useAuthorizedHeaders, type components } from "@/lib/api"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { request, useAuthorizedHeaders, useApiMutation, type components } from "@/lib/api"
 import portfolioSections from "@/app/hrm/portfolio/data.json"
 import { PortfolioSectionNav } from "@/components/hrm/portfolio/portfolio-section-nav"
 import {
@@ -31,9 +40,35 @@ type ProfileFields = {
 type EmployeePortfolioDetailsProps = {
   profile: components["schemas"]["EmployeeResponse"]
   onProfileUpdated?: () => void
+  /** When true, hides the avatar upload button and edit actions (e.g. when viewing another employee's profile) */
+  readOnly?: boolean
 }
 
-export function EmployeePortfolioDetails({ profile, onProfileUpdated }: EmployeePortfolioDetailsProps) {
+type EditProfileForm = {
+  firstName: string
+  middleName: string
+  lastName: string
+  suffix: string
+  mobileNumber: string
+  phoneNumber: string
+  religion: string
+  age: string
+}
+
+function toEditForm(profile: components["schemas"]["EmployeeResponse"]): EditProfileForm {
+  return {
+    firstName: profile.firstName ?? "",
+    middleName: (profile as Record<string, unknown>).middleName as string ?? "",
+    lastName: profile.lastName ?? "",
+    suffix: (profile as Record<string, unknown>).suffix as string ?? "",
+    mobileNumber: profile.mobileNumber ?? "",
+    phoneNumber: profile.phoneNumber ?? "",
+    religion: profile.religion ?? "",
+    age: profile.age != null ? String(profile.age) : "",
+  }
+}
+
+export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly = false }: EmployeePortfolioDetailsProps) {
   const [activeSectionId, setActiveSectionId] = React.useState(() => {
     if (typeof window === "undefined") return portfolioSections[0].id
     const fromUrl = new URLSearchParams(window.location.search).get("section")
@@ -46,6 +81,51 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
   const [pictureError, setPictureError] = React.useState<string | null>(null)
   const pictureInputRef = React.useRef<HTMLInputElement>(null)
   const { headers } = useAuthorizedHeaders()
+
+  // Edit profile dialog state
+  const [editOpen, setEditOpen] = React.useState(false)
+  const [editForm, setEditForm] = React.useState<EditProfileForm>(() => toEditForm(profile))
+  const [editError, setEditError] = React.useState<string | null>(null)
+  const { mutate: saveProfile, loading: savingProfile } = useApiMutation()
+
+  const handleEditOpen = (open: boolean) => {
+    if (open) {
+      setEditForm(toEditForm(profile))
+      setEditError(null)
+    }
+    setEditOpen(open)
+  }
+
+  const handleEditSave = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setEditError(null)
+
+    const ok = await saveProfile({
+      path: `/api/v1/hrms/employees/${profile.id}`,
+      method: "PUT",
+      body: {
+        employeeNumber: profile.employeeNumber ?? "",
+        profile: {
+          firstName: editForm.firstName,
+          middleName: editForm.middleName || null,
+          lastName: editForm.lastName,
+          suffix: editForm.suffix || null,
+          mobileNumber: editForm.mobileNumber || null,
+          phoneNumber: editForm.phoneNumber || null,
+          religion: editForm.religion || null,
+          age: editForm.age ? Number(editForm.age) : null,
+        },
+      },
+    })
+
+    if (!ok) {
+      setEditError("Unable to save profile changes.")
+      return
+    }
+
+    onProfileUpdated?.()
+    setEditOpen(false)
+  }
 
   const handlePictureChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -90,8 +170,6 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
   const portfolioFields: ProfileFields[] = [
     { label: "Employee number", value: profile.employeeNumber },
     { label: "Employee type", value: profile.employeeType ?? "—" },
-    { label: "Department", value: profile.department ?? "—" },
-    { label: "Designation", value: profile.designation ?? "—" },
     { label: "Supervisor", value: profile.supervisor ?? "—" },
     { label: "Category", value: profile.employmentCategory ?? "—" },
     { label: "Date hired", value: profile.dateHired ?? "—" },
@@ -114,49 +192,56 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
                   {profile.fullName?.charAt(0) ?? "?"}
                 </AvatarFallback>
               </Avatar>
-              <button
-                type="button"
-                onClick={() => pictureInputRef.current?.click()}
-                disabled={uploadingPicture}
-                aria-label="Change profile photo"
-                className="absolute bottom-1 right-1 flex size-10.5 items-center justify-center rounded-full border bg-background text-foreground shadow-xs transition-colors hover:bg-accent disabled:opacity-50"
-              >
-                {uploadingPicture ? (
-                  <Loader2 className="size-4 animate-spin" />
-                ) : (
-                  <Camera className="size-4" />
-                )}
-              </button>
-              <input
-                ref={pictureInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handlePictureChange}
-              />
+              {!readOnly && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => pictureInputRef.current?.click()}
+                    disabled={uploadingPicture}
+                    aria-label="Change profile photo"
+                    className="absolute bottom-1 right-1 flex size-10.5 items-center justify-center rounded-full border bg-background text-foreground shadow-xs transition-colors hover:bg-accent disabled:opacity-50"
+                  >
+                    {uploadingPicture ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Camera className="size-4" />
+                    )}
+                  </button>
+                  <input
+                    ref={pictureInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePictureChange}
+                  />
+                </>
+              )}
             </div>
             {pictureError && (
               <p className="text-xs text-destructive">{pictureError}</p>
             )}
             <div>
               <CardTitle className="text-lg">{profile.fullName}</CardTitle>
-              {profile.designation && (
-                <Badge
-                  variant="outline"
-                  className="mt-1 border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400"
-                >
-                  {profile.designation}
-                </Badge>
-              )}
               <CardDescription className="mt-1">{profile.email}</CardDescription>
             </div>
           </div>
 
           <div className="divide-y border-t lg:border-t-0">
             <div className="p-6">
-              <p className="pb-2 text-sm font-semibold text-foreground">
-                Personal Details
-              </p>
+              <div className="flex items-center justify-between pb-2">
+                <p className="text-sm font-semibold text-foreground">Personal Details</p>
+                {!readOnly && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEditOpen(true)}
+                    aria-label="Edit profile"
+                  >
+                    <Edit3 className="mr-1.5 h-3.5 w-3.5" />
+                    Edit
+                  </Button>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 {personalFields.map((field) => (
                   <DetailRow key={field.label} label={field.label} value={field.value} />
@@ -178,6 +263,107 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
         </div>
       </Card>
 
+      {/* Edit profile dialog */}
+      {!readOnly && (
+        <Dialog open={editOpen} onOpenChange={handleEditOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit profile</DialogTitle>
+              <DialogDescription>Update your personal details.</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleEditSave} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    First name <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    value={editForm.firstName}
+                    onChange={(e) => setEditForm((f) => ({ ...f, firstName: e.target.value }))}
+                    placeholder="Juan"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Middle name</label>
+                  <Input
+                    value={editForm.middleName}
+                    onChange={(e) => setEditForm((f) => ({ ...f, middleName: e.target.value }))}
+                    placeholder="Santos"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Last name <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    value={editForm.lastName}
+                    onChange={(e) => setEditForm((f) => ({ ...f, lastName: e.target.value }))}
+                    placeholder="Dela Cruz"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Suffix</label>
+                  <Input
+                    value={editForm.suffix}
+                    onChange={(e) => setEditForm((f) => ({ ...f, suffix: e.target.value }))}
+                    placeholder="Jr., Sr., III"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Mobile number</label>
+                  <Input
+                    value={editForm.mobileNumber}
+                    onChange={(e) => setEditForm((f) => ({ ...f, mobileNumber: e.target.value }))}
+                    placeholder="+63 9XX XXX XXXX"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Phone number</label>
+                  <Input
+                    value={editForm.phoneNumber}
+                    onChange={(e) => setEditForm((f) => ({ ...f, phoneNumber: e.target.value }))}
+                    placeholder="(02) XXXX XXXX"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Religion</label>
+                  <Input
+                    value={editForm.religion}
+                    onChange={(e) => setEditForm((f) => ({ ...f, religion: e.target.value }))}
+                    placeholder="e.g. Roman Catholic"
+                  />
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Age</label>
+                  <Input
+                    type="number"
+                    min={0}
+                    value={editForm.age}
+                    onChange={(e) => setEditForm((f) => ({ ...f, age: e.target.value }))}
+                    placeholder="e.g. 30"
+                  />
+                </div>
+              </div>
+              {editError && (
+                <p className="text-sm text-destructive">{editError}</p>
+              )}
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={savingProfile}>
+                  {savingProfile ? "Saving…" : "Save changes"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      )}
+
       <div className="grid items-start gap-4 lg:grid-cols-[20rem_1fr]">
         <PortfolioSectionNav
           sections={portfolioSections}
@@ -192,7 +378,7 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated }: Employee
           </CardHeader>
 
           <CardContent className="p-0" key={activeSectionId}>
-            {activeTableRenderer?.(profile.id, headerActionsEl)}
+            {activeTableRenderer?.(profile.id, headerActionsEl, readOnly)}
           </CardContent>
         </Card>
       </div>

@@ -2,19 +2,46 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Search, Users, Eye } from "lucide-react"
+import { Loader2, Search, Users, Eye, Edit3, Trash2, UserPlus, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PermissionGuard } from "@/components/auth/permission-guard"
+import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import {
   useApiQuery,
-  useApiClient,
+  useApiMutation,
   type components,
 } from "@/lib/api"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { ApiErrorView } from "@/components/ui/error-page"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 type Employee = components["schemas"]["EmployeeResponse"]
 type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
-type PagedDepartments = components["schemas"]["PagedResponseOfDepartmentResponse"]
-type PagedDesignations = components["schemas"]["PagedResponseOfDesignationResponse"]
+type CreateEmployeeRequest = components["schemas"]["CreateEmployeeRequest"]
 
 const PAGE_SIZE = 10
 
@@ -27,24 +54,74 @@ function getInitials(name: string) {
     .join("")
 }
 
+/** An employee has an empty portfolio when all personal detail fields are unfilled. */
+function isPortfolioEmpty(employee: Employee): boolean {
+  return (
+    !employee.mobileNumber &&
+    !employee.phoneNumber &&
+    employee.age == null &&
+    !employee.religion
+  )
+}
+
+type EmployeeForm = {
+  firstName: string
+  lastName: string
+  email: string
+  employeeNumber: string
+}
+
+const EMPTY_FORM: EmployeeForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  employeeNumber: "",
+}
+
+function toCreateRequest(form: EmployeeForm): CreateEmployeeRequest {
+  return {
+    employeeNumber: form.employeeNumber,
+    profile: {
+      firstName: form.firstName,
+      lastName: form.lastName,
+      personalEmail: form.email,
+    },
+  }
+}
+
 export default function EmployeesPage() {
   const router = useRouter()
+  const { hasPermission } = useHrmAuth()
+
+  const canCreate = hasPermission("hrms.employees.create")
+  // canManageOthers gates edit/delete on the employee list — only HR-level roles
+  // that can also create employees should manage other employees. Self-service
+  // roles (Employee, Faculty, DepartmentHead) have hrms.employees.update only
+  // for their own profile via the portfolio page, not for the employee list.
+  const canManageOthers = hasPermission("hrms.employees.create")
+  const canDelete = hasPermission("hrms.employees.delete")
 
   // Search and filters
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
-  const [departmentFilter, setDepartmentFilter] = useState("")
-  const [designationFilter, setDesignationFilter] = useState("")
-
-  // Pagination
   const [page, setPage] = useState(1)
 
-  // Search input
+  // Dialog state
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
+  const [formState, setFormState] = useState<EmployeeForm>(EMPTY_FORM)
+  const [formError, setFormError] = useState<string | null>(null)
+
+  // Invite state — track which employee id is being sent, and success set
+  const [invitingId, setInvitingId] = useState<number | string | null>(null)
+  const [invitedIds, setInvitedIds] = useState<Set<number | string>>(new Set())
+  const [inviteError, setInviteError] = useState<string | null>(null)
+
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedSearch(search.trim())
       setPage(1)
-    }, 200) // 200ms debounce
+    }, 200)
     return () => clearTimeout(timeout)
   }, [search])
 
@@ -52,47 +129,83 @@ export default function EmployeesPage() {
     data: employeesPaged,
     loading,
     error,
+    refresh,
   } = useApiQuery<PagedEmployees>("/api/v1/hrms/employees", {
-    page,
-    pageSize: PAGE_SIZE,
-    search: debouncedSearch || undefined,
-    designationId: designationFilter || undefined,
-    departmentId: departmentFilter || undefined,
+    Page: page,
+    PageSize: PAGE_SIZE,
+    Search: debouncedSearch || undefined,
   })
 
-  const { data: departmentsPaged } = useApiQuery<PagedDepartments>(
-    "/api/v1/organization/departments",
-    { Page: 1, PageSize: 100, SortBy: "name" },
-  )
-
-  const { data: designationsPaged } = useApiQuery<PagedDesignations>(
-    "/api/v1/organization/designations",
-    {
-      Page: 1,
-      PageSize: 100,
-      SortBy: "name",
-      departmentId: departmentFilter || undefined,
-    },
-  )
-
-  const departmentOptions = (departmentsPaged?.data ?? [])
-    .filter((item) => item.name)
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  const designationOptions = (designationsPaged?.data ?? [])
-    .filter((item) => item.name)
-    .sort((a, b) => a.name.localeCompare(b.name))
-
-  // Redirects to porfolio?? (hopefully)
-  async function handleViewDetails(id: number) {
-    router.push(`/hrm/portfolio/${id}`)
-  }
+  const { mutate: saveEmployee, loading: saving } = useApiMutation()
+  const { mutate: deleteEmployee, loading: deleting } = useApiMutation()
+  const { mutate: sendInvite } = useApiMutation()
 
   const employees = employeesPaged?.data ?? []
   const totalPages = Number(employeesPaged?.totalPages ?? 1)
   const totalRecords = employeesPaged?.totalRecords ?? 0
+  const hasActiveFilters = Boolean(search)
 
-  const hasActiveFilters = Boolean(search || departmentFilter || designationFilter)
+  function openCreateDialog() {
+    setSelectedEmployee(null)
+    setFormState(EMPTY_FORM)
+    setFormError(null)
+    setIsDialogOpen(true)
+  }
+
+  function openEditDialog(employee: Employee) {
+    setSelectedEmployee(employee)
+    setFormState({
+      firstName: employee.firstName ?? "",
+      lastName: employee.lastName ?? "",
+      email: employee.email ?? "",
+      employeeNumber: employee.employeeNumber ?? "",
+    })
+    setFormError(null)
+    setIsDialogOpen(true)
+  }
+
+  async function handleSave(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setFormError(null)
+
+    const path = selectedEmployee
+      ? `/api/v1/hrms/employees/${selectedEmployee.id}`
+      : "/api/v1/hrms/employees"
+    const method = selectedEmployee ? "PUT" : "POST"
+
+    const ok = await saveEmployee({ path, method, body: toCreateRequest(formState) })
+    if (!ok) {
+      setFormError("Unable to save employee.")
+      return
+    }
+
+    await refresh()
+    setIsDialogOpen(false)
+  }
+
+  async function handleDelete(employee: Employee) {
+    const ok = await deleteEmployee({
+      path: `/api/v1/hrms/employees/${employee.id}`,
+      method: "DELETE",
+    })
+    if (ok) await refresh()
+  }
+
+  async function handleSendInvite(employee: Employee) {
+    setInviteError(null)
+    setInvitingId(employee.id)
+    const ok = await sendInvite({
+      path: "/api/v1/hrms/azure/invitations/send",
+      method: "POST",
+      body: { employeeIds: [employee.id] },
+    })
+    setInvitingId(null)
+    if (!ok) {
+      setInviteError(`Failed to send invitation to ${employee.fullName}.`)
+      return
+    }
+    setInvitedIds((prev) => new Set(prev).add(employee.id))
+  }
 
   return (
     <PermissionGuard requiredPermission="hrms.employees.view">
@@ -104,6 +217,12 @@ export default function EmployeesPage() {
               Employee details will appear below.
             </p>
           </div>
+          {canCreate && (
+            <Button onClick={openCreateDialog}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              New employee
+            </Button>
+          )}
         </div>
 
         <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -117,55 +236,22 @@ export default function EmployeesPage() {
               className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             />
           </div>
-
-          <select
-            value={departmentFilter}
-            onChange={(e) => {
-              setDepartmentFilter(e.target.value)
-              setDesignationFilter("")
-              setPage(1)
-            }}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-48"
-          >
-            <option value="">All departments</option>
-            {departmentOptions.map((dept) => (
-              <option key={String(dept.id)} value={String(dept.id)}>
-                {dept.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={designationFilter}
-            onChange={(e) => {
-              setDesignationFilter(e.target.value)
-              setPage(1)
-            }}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-48"
-          >
-            <option value="">All designations</option>
-            {designationOptions.map((role) => (
-              <option key={String(role.id)} value={String(role.id)}>
-                {role.name}
-              </option>
-            ))}
-          </select>
-
           {hasActiveFilters && (
             <button
               type="button"
-              onClick={() => {
-                setSearch("")
-                setDepartmentFilter("")
-                setDesignationFilter("")
-                setPage(1)
-              }}
+              onClick={() => { setSearch(""); setPage(1) }}
               className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
             >
               Clear filters
             </button>
           )}
         </div>
+
+        {inviteError && (
+          <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+            {inviteError}
+          </div>
+        )}
 
         <div className="mt-4 overflow-hidden rounded-lg border">
           {loading ? (
@@ -174,10 +260,7 @@ export default function EmployeesPage() {
               Loading employees…
             </div>
           ) : error ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-              <p className="text-sm font-medium">Couldn&apos;t load employees</p>
-              <p className="text-sm text-muted-foreground">{error.message}</p>
-            </div>
+            <ApiErrorView error={error} onRetry={refresh} fullScreen />
           ) : employees.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
               <Users className="h-8 w-8 text-muted-foreground" />
@@ -185,9 +268,7 @@ export default function EmployeesPage() {
                 {hasActiveFilters ? "No employees match your filters" : "No employees yet"}
               </p>
               <p className="text-sm text-muted-foreground">
-                {hasActiveFilters
-                  ? "Try a different name."
-                  : "Employees you add will show up here."}
+                {hasActiveFilters ? "Try a different name." : "Employees you add will show up here."}
               </p>
             </div>
           ) : (
@@ -197,58 +278,114 @@ export default function EmployeesPage() {
                   <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-3 font-medium">Employee</th>
                     <th className="px-4 py-3 font-medium">Employee ID</th>
-                    <th className="px-4 py-3 font-medium">Department</th>
-                    <th className="px-4 py-3 font-medium">Designation</th>
                     <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium text-center">Actions</th>
+                    <th className="px-4 py-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {employees.map((employee) => (
-                    <tr key={employee.id} className="border-b last:border-0 hover:bg-muted/30">
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
-                            {getInitials(employee.fullName)}
+                  {employees.map((employee) => {
+                    const emptyPortfolio = isPortfolioEmpty(employee)
+                    const alreadyInvited = invitedIds.has(employee.id)
+                    const isSending = invitingId === employee.id
+
+                    return (
+                      <tr key={employee.id} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="px-4 py-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-medium">
+                              {getInitials(employee.fullName ?? "")}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate font-medium">{employee.fullName}</p>
+                              <p className="truncate text-xs text-muted-foreground">{employee.email}</p>
+                            </div>
                           </div>
-                          <div className="min-w-0">
-                            <p className="truncate font-medium">{employee.fullName}</p>
-                            <p className="truncate text-xs text-muted-foreground">
-                              {employee.email}
-                            </p>
+                        </td>
+                        <td className="px-4 py-3 text-muted-foreground">{employee.employeeNumber}</td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={
+                              "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " +
+                              (employee.isActive ? "bg-green-50 text-green-700" : "bg-zinc-100 text-zinc-600")
+                            }
+                          >
+                            {employee.isActive ? "Active" : "Inactive"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-right whitespace-nowrap">
+                          <div className="flex items-center justify-end gap-2">
+                            {/* View */}
+                            <Button
+                              variant="outline"
+                              size="icon-sm"
+                              onClick={() => router.push(`/hrm/portfolio/${employee.id}`)}
+                              aria-label="View portfolio"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            {/* Edit — only HR-level users who can create employees */}
+                            {canManageOthers && (
+                              <Button
+                                variant="outline"
+                                size="icon-sm"
+                                onClick={() => openEditDialog(employee)}
+                                aria-label="Edit employee"
+                              >
+                                <Edit3 className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {/* Send invitation — only HR-level users, only when portfolio is empty */}
+                            {canManageOthers && emptyPortfolio && (
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    size="icon-sm"
+                                    onClick={() => handleSendInvite(employee)}
+                                    disabled={isSending || alreadyInvited}
+                                    aria-label="Send portfolio invitation"
+                                  >
+                                    {isSending ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <Send className={alreadyInvited ? "h-4 w-4 text-green-600" : "h-4 w-4"} />
+                                    )}
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  {alreadyInvited ? "Invitation sent" : "Send portfolio invitation"}
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                            {/* Delete */}
+                            {canDelete && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button variant="destructive" size="icon-sm" aria-label="Delete employee">
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Delete employee</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will archive <strong>{employee.fullName}</strong>. This action cannot be undone.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDelete(employee)} disabled={deleting}>
+                                      {deleting ? "Deleting…" : "Delete"}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
                           </div>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {employee.employeeNumber}
-                      </td>
-                      <td className="px-4 py-3">{employee.department ?? "—"}</td>
-                      <td className="px-4 py-3">{employee.designation ?? "—"}</td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={
-                            "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " +
-                            (employee.isActive
-                              ? "bg-green-50 text-green-700"
-                              : "bg-zinc-100 text-zinc-600")
-                          }
-                        >
-                          {employee.isActive ? "Active" : "Inactive"}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-center whitespace-nowrap">
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
-                          className="active:translate-y-0!"
-                          onClick={() => handleViewDetails(employee.id as number)}
-                          aria-label="View portfolio"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>
@@ -258,8 +395,7 @@ export default function EmployeesPage() {
         {!loading && !error && employees.length > 0 && (
           <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
             <p className="text-sm text-muted-foreground">
-              Page {page} of {totalPages} · {totalRecords} employee
-              {totalRecords === 1 ? "" : "s"}
+              Page {page} of {totalPages} · {totalRecords} employee{totalRecords === 1 ? "" : "s"}
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -281,6 +417,71 @@ export default function EmployeesPage() {
             </div>
           </div>
         )}
+
+        {/* Create / Edit dialog */}
+        <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setFormError(null) }}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedEmployee ? "Edit employee" : "New employee"}</DialogTitle>
+              <DialogDescription>Fill in the employee details below.</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSave} className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="emp-first-name">First name</Label>
+                  <Input
+                    id="emp-first-name"
+                    value={formState.firstName}
+                    onChange={(e) => setFormState((s) => ({ ...s, firstName: e.target.value }))}
+                    placeholder="Juan"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="emp-last-name">Last name</Label>
+                  <Input
+                    id="emp-last-name"
+                    value={formState.lastName}
+                    onChange={(e) => setFormState((s) => ({ ...s, lastName: e.target.value }))}
+                    placeholder="Dela Cruz"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="emp-email">Email</Label>
+                <Input
+                  id="emp-email"
+                  type="email"
+                  value={formState.email}
+                  onChange={(e) => setFormState((s) => ({ ...s, email: e.target.value }))}
+                  placeholder="juan@spup.edu.ph"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="emp-number">Employee number</Label>
+                <Input
+                  id="emp-number"
+                  value={formState.employeeNumber}
+                  onChange={(e) => setFormState((s) => ({ ...s, employeeNumber: e.target.value }))}
+                  placeholder="EMP-0001"
+                />
+              </div>
+              {formError && (
+                <p className="text-sm text-destructive">{formError}</p>
+              )}
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={saving}>
+                  {saving ? "Saving…" : selectedEmployee ? "Save changes" : "Create employee"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </PermissionGuard>
   )

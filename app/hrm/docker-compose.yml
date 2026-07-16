@@ -1,8 +1,24 @@
 services:
   nextjs:
-    build: .
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_APP_NAME: "SIMS"
+        NEXT_PUBLIC_TENANT_ID: "5e08452c-54ef-4783-a014-08c000c22f58"
+        NEXT_PUBLIC_CLIENT_ID: "2a33f56d-622a-42f0-947d-e7edd9b24751"
+        NEXT_PUBLIC_MSAL_REDIRECT_URI: "https://hrm.spup.space/redirect"
+        NEXT_PUBLIC_API_SCOPES: "api://2a33f56d-622a-42f0-947d-e7edd9b24751/access_as_user"
     container_name: nextjs
     ports:
       - "3000:3000"
     environment:
       NODE_ENV: production
+      # Server-side: proxy rewrites and API route both use this to reach the API internally
+      API_BASE_URL: "http://sis-api-1:8080"
+      SIMS_API_BASE_URL: "http://sis-api-1:8080/api/v1"
+    networks:
+      - hrm-network
+
+networks:
+  hrm-network:
+    external: true

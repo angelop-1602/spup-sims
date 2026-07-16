@@ -21,6 +21,20 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
+import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
+import { PermissionGuard } from "@/components/auth/permission-guard"
+import { ApiErrorView } from "@/components/ui/error-page"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import { Edit3, Loader2, Plus, Save, Trash2 } from "lucide-react"
 
 type LeaveType = components["schemas"]["LeaveTypeResponse"]
@@ -61,6 +75,12 @@ function normalizeLeaveTypes(value: unknown): LeaveType[] {
 }
 
 export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettingsClientProps) {
+  const { hasPermission } = useHrmAuth()
+
+  const canCreateType = hasPermission("hrms.leaveTypes.create")
+  const canUpdateType = hasPermission("hrms.leaveTypes.update")
+  const canDeleteType = hasPermission("hrms.leaveTypes.delete")
+  const canAdjustBalance = hasPermission("hrms.leaveBalances.update")
   const initialLeaveTypesList = React.useMemo(
     () => normalizeLeaveTypes(initialLeaveTypes),
     [initialLeaveTypes],
@@ -99,8 +119,8 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
     loading: loadingEmployees,
     error: employeesError,
   } = useApiQuery<PagedEmployees>("/api/v1/hrms/employees", {
-    page: 1,
-    pageSize: 100,
+    Page: 1,
+    PageSize: 100,
   })
 
   const employees = employeesPaged?.data ?? []
@@ -253,6 +273,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   )
 
   return (
+    <PermissionGuard requiredPermission="hrms.leaveTypes.view">
     <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
       <Card>
         <CardHeader>
@@ -343,6 +364,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              {(canCreateType || canUpdateType) && (
               <Button type="submit" disabled={savingLeaveType}>
                 {savingLeaveType ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -353,6 +375,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 )}
                 {selectedType ? "Save changes" : "Add leave type"}
               </Button>
+              )}
               {selectedType ? (
                 <Button type="button" variant="outline" onClick={resetTypeForm}>
                   Cancel
@@ -411,23 +434,44 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                       </div>
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleTypeEdit(leaveType)}
-                      >
-                        <Edit3 className="mr-2 h-4 w-4" />
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleTypeDelete(leaveType)}
-                        disabled={deletingLeaveType}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
+                      {canUpdateType && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleTypeEdit(leaveType)}
+                        >
+                          <Edit3 className="mr-2 h-4 w-4" />
+                          Edit
+                        </Button>
+                      )}
+                      {canDeleteType && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            disabled={deletingLeaveType}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
                         Delete
-                      </Button>
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete leave type</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This will permanently remove <strong>{leaveType.name}</strong>. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleTypeDelete(leaveType)} disabled={deletingLeaveType}>
+                              {deletingLeaveType ? "Deleting..." : "Delete"}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -529,14 +573,16 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Button type="submit" disabled={adjustingBalance || !selectedEmployeeId}>
-                {adjustingBalance ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Save className="mr-2 h-4 w-4" />
-                )}
-                Adjust balance
-              </Button>
+              {canAdjustBalance && (
+                <Button type="submit" disabled={adjustingBalance || !selectedEmployeeId}>
+                  {adjustingBalance ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="mr-2 h-4 w-4" />
+                  )}
+                  Adjust balance
+                </Button>
+              )}
             </div>
           </form>
 
@@ -599,12 +645,11 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             </Table>
           </div>
           {employeesError || leaveBalancesError ? (
-            <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-              {employeesError?.message ?? leaveBalancesError?.message}
-            </div>
+            <ApiErrorView error={(employeesError ?? leaveBalancesError)!} fullScreen />
           ) : null}
         </CardContent>
       </Card>
     </div>
+    </PermissionGuard>
   )
 }
