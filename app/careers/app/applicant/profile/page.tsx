@@ -147,6 +147,18 @@ export default function ApplicantSelfProfilePage() {
       return
     }
 
+    const phoneDigits = editForm.phoneNumber.replace(/\D/g, "").replace(/^63/, "")
+    if (editForm.phoneNumber && phoneDigits.length !== 9) {
+      setSaveStatus({ type: "error", message: "Phone number is incomplete." })
+      return
+    }
+
+    const mobileDigits = editForm.mobileNumber.replace(/\D/g, "").replace(/^63/, "")
+    if (editForm.mobileNumber && mobileDigits.length !== 10) {
+      setSaveStatus({ type: "error", message: "Mobile number is incomplete." })
+      return
+    }
+
     setIsSaving(true)
     try {
       const token = localStorage.getItem("access_token")

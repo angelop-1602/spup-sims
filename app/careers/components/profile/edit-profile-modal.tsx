@@ -95,13 +95,21 @@ export function EditProfileModal({
               onChange={(v) => setEditForm({ ...editForm, personalEmail: v })}
               hasError={saveStatus?.type === "error" && saveStatus.message.includes("Email")}
             />
-            <FormField
+            <PhoneField
               label="Phone"
+              prefix="+63-"
+              placeholder="78-000-0000"
+              maxDigits={9}
+              grouping={[2, 3, 4]}
               value={editForm.phoneNumber}
               onChange={(v) => setEditForm({ ...editForm, phoneNumber: v })}
             />
-            <FormField
+            <PhoneField
               label="Mobile"
+              prefix="+63-"
+              placeholder="900-000-0000"
+              maxDigits={10}
+              grouping={[3, 3, 4]}
               value={editForm.mobileNumber}
               onChange={(v) => setEditForm({ ...editForm, mobileNumber: v })}
             />
@@ -182,6 +190,73 @@ function FormField({
         onChange={(e) => onChange(e.target.value)}
         className={`h-9 text-sm ${hasError ? "border-red-400 focus-visible:ring-red-200" : ""}`}
       />
+    </div>
+  )
+}
+
+function extractDigits(value: string): string {
+  let digits = value.replace(/\D/g, "")
+  if (digits.startsWith("63")) digits = digits.slice(2)
+  if (digits.startsWith("0")) digits = digits.slice(1)
+  return digits
+}
+
+function formatDigits(raw: string, grouping: number[]): string {
+  let result = ""
+  let i = 0
+  for (const size of grouping) {
+    if (i >= raw.length) break
+    if (result) result += "-"
+    result += raw.slice(i, i + size)
+    i += size
+  }
+  if (i < raw.length) {
+    if (result) result += "-"
+    result += raw.slice(i)
+  }
+  return result
+}
+
+function PhoneField({
+  label,
+  prefix,
+  placeholder,
+  maxDigits,
+  grouping,
+  value,
+  onChange,
+}: {
+  label: string
+  prefix: string
+  placeholder: string
+  maxDigits: number
+  grouping: number[]
+  value: string
+  onChange: (value: string) => void
+}) {
+  const rawDigits = React.useMemo(() => extractDigits(value), [value])
+  const formatted = React.useMemo(() => formatDigits(rawDigits, grouping), [rawDigits, grouping])
+
+  return (
+    <div className="space-y-1.5">
+      <Label className="text-xs text-neutral-500">{label}</Label>
+      <div className="flex">
+        <span className="h-9 flex items-center px-3 text-sm bg-neutral-100 border border-r-0 border-neutral-200 rounded-l-md text-neutral-500 select-none">
+          {prefix}
+        </span>
+        <Input
+          type="tel"
+          inputMode="numeric"
+          pattern="[0-9-]*"
+          value={formatted}
+          placeholder={placeholder}
+          onChange={(e) => {
+            const raw = e.target.value.replace(/\D/g, "").slice(0, maxDigits)
+            onChange(raw ? `${prefix}${formatDigits(raw, grouping)}` : "")
+          }}
+          className="h-9 text-sm rounded-l-none"
+        />
+      </div>
     </div>
   )
 }
