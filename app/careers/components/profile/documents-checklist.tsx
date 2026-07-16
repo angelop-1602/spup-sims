@@ -137,6 +137,7 @@ export function DocumentsChecklist({
       {/* Required Documents */}
       <div className="bg-neutral-50/75 px-4 py-2 border-b border-neutral-200">
         <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Required</h2>
+        <p className="text-[11px] text-neutral-400 mt-0.5">Accepted file types: PDF, DOC, DOCX, JPG, PNG. Max file size: 10 MB</p>
       </div>
 
       <div className="divide-y divide-neutral-100 text-sm">
@@ -165,6 +166,7 @@ export function DocumentsChecklist({
       {/* If Applicable Documents */}
       <div className="bg-neutral-50/75 px-4 py-2 border-t border-b border-neutral-200">
         <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">If Applicable</h2>
+        <p className="text-[11px] text-neutral-400 mt-0.5">Accepted file types: PDF, JPG, PNG. Max file size: 10 MB</p>
       </div>
 
       <div className="divide-y divide-neutral-100 text-sm">
