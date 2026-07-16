@@ -15,6 +15,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import {
+  FieldDescription,
+} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { z } from 'zod';
 
@@ -95,14 +98,14 @@ export default function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>Log in</CardTitle>
+          <CardTitle>Login</CardTitle>
           <CardDescription>
-            Enter your email and password to log in.
+            Enter your email and password to login.
           </CardDescription>
         </CardHeader>
 
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <CardContent className="space-y-6">
             <div>
               <label className="mb-2 block text-sm font-medium">
                 Email <span className="text-destructive">*</span>
@@ -120,9 +123,16 @@ export default function LoginForm({
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium">
-                Password <span className="text-destructive">*</span>
-              </label>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-sm font-medium">
+                  Password <span className="text-destructive">*</span>
+                </label>
+                <FieldDescription>
+                  <Link href="#" className="text-foreground no-underline! hover:underline!">
+                    Forgot your password?
+                  </Link>
+                </FieldDescription>
+              </div>
               <Input
                 type="password"
                 value={password}
@@ -137,17 +147,16 @@ export default function LoginForm({
 
             {error && <p className="text-sm text-destructive">{error}</p>}
           </CardContent>
-          <br></br>
 
           <CardFooter className="flex-col gap-4">
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? "Logging in..." : "Log in"}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Don&apos;t have an account? <Link href="/register" className="text-black hover:underline">
+            <FieldDescription className="text-center text-sm text-muted-foreground">
+              Don&apos;t have an account? <Link href="/register" className="text-foreground no-underline! hover:underline!">
                 Register
               </Link>
-            </p>
+            </FieldDescription>
           </CardFooter>
         </form>
       </Card>

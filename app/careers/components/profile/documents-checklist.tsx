@@ -29,7 +29,7 @@ function DocumentRow({
 }: DocumentRowProps) {
   return (
     <div className="grid grid-cols-3 px-4 py-3 items-center">
-      <span className="font-medium text-neutral-900">
+      <span className="font-medium text-foreground">
         {doc.label}
       </span>
 
@@ -40,8 +40,8 @@ function DocumentRow({
             Attached
           </span>
         ) : (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-neutral-200 bg-neutral-50 text-neutral-400 text-xs font-medium">
-            <FileText className="h-3.5 w-3.5 text-neutral-300" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-muted text-muted-foreground text-xs font-medium">
+            <FileText className="h-3.5 w-3.5 text-muted-foreground" />
             Missing
           </span>
         )}
@@ -55,13 +55,13 @@ function DocumentRow({
           disabled={!isUploaded || isDeleting || isUploading || isViewing}
           className={`h-8 w-8 p-0 ${
             isUploaded
-              ? "border-1 border-gray text-neutral-800 hover:text-neutral-800 hover:bg-neutral-100"
-              : "text-neutral-300 cursor-not-allowed opacity-50"
+              ? "border border-border text-foreground hover:text-foreground hover:bg-muted"
+              : "text-muted-foreground cursor-not-allowed opacity-50"
           }`}
           title={isUploaded ? "View Document" : "No document uploaded"}
         >
           {isViewing ? (
-            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           ) : (
             <Eye className="h-4 w-4" />
           )}
@@ -73,7 +73,7 @@ function DocumentRow({
           size="sm"
           onClick={() => onUploadClick(doc)}
           disabled={isUploading || isDeleting}
-          className="h-8 w-8 p-0 border-1 text-neutral-800 border-gray hover:text-neutral-800 hover:bg-neutral-100"
+          className="h-8 w-8 p-0 border border-border text-foreground hover:text-foreground hover:bg-muted"
           title={isUploaded ? "Replace File" : "Upload File"}
         >
           {isUploading ? (
@@ -91,13 +91,13 @@ function DocumentRow({
           disabled={!isUploaded || !isDeletable || isDeleting || isUploading}
           className={`h-8 w-8 p-0 ${
             isUploaded && isDeletable
-              ? "bg-red-100 text-red-600 hover:text-red-600 hover:bg-red-50" 
-              : "text-neutral-300 cursor-not-allowed opacity-50"
+              ? "bg-red-100 text-red-600 hover:text-red-600 hover:bg-red-50"
+              : "text-muted-foreground cursor-not-allowed opacity-50"
           }`}
           title={!isDeletable ? "Required document. Use Replace instead" : isUploaded ? "Delete Document" : "No document to delete"}
         >
           {isDeleting ? (
-            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
           ) : (
             <Trash2 className="h-4 w-4" />
           )}
@@ -133,18 +133,18 @@ export function DocumentsChecklist({
   onView,
 }: DocumentsChecklistProps) {
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white overflow-hidden shadow-sm">
+    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
       {/* Required Documents */}
-      <div className="bg-neutral-50/75 px-4 py-2 border-b border-neutral-200">
-        <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">Required</h2>
-        <p className="text-[11px] text-neutral-400 mt-0.5">Accepted file types: PDF, DOC, DOCX, JPG, PNG. Max file size: 10 MB</p>
+      <div className="bg-muted/75 px-4 py-2 border-b border-border">
+        <h2 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">Required</h2>
+        <p className="text-[11px] text-muted-foreground mt-0.5">Accepted file types: PDF, DOC, DOCX, JPG, PNG. Max file size: 10 MB</p>
       </div>
 
-      <div className="divide-y divide-neutral-100 text-sm">
-        <div className="grid grid-cols-3 px-4 py-2 border-b border-neutral-100">
-          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Document</span>
-          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Attachment</span>
-          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Actions</span>
+      <div className="divide-y divide-border text-sm">
+        <div className="grid grid-cols-3 px-4 py-2 border-b border-border">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Document</span>
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Attachment</span>
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</span>
         </div>
 
         {requiredDocuments.map((doc) => (
@@ -164,16 +164,16 @@ export function DocumentsChecklist({
       </div>
 
       {/* If Applicable Documents */}
-      <div className="bg-neutral-50/75 px-4 py-2 border-t border-b border-neutral-200">
-        <h2 className="text-xs font-bold tracking-wider text-neutral-500 uppercase">If Applicable</h2>
-        <p className="text-[11px] text-neutral-400 mt-0.5">Accepted file types: PDF, JPG, PNG. Max file size: 10 MB</p>
+      <div className="bg-muted/75 px-4 py-2 border-t border-b border-border">
+        <h2 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">If Applicable</h2>
+        <p className="text-[11px] text-muted-foreground mt-0.5">Accepted file types: PDF, JPG, PNG. Max file size: 10 MB</p>
       </div>
 
-      <div className="divide-y divide-neutral-100 text-sm">
-        <div className="grid grid-cols-3 px-4 py-2 border-b border-neutral-100">
-          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Document</span>
-          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Attachment</span>
-          <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">Actions</span>
+      <div className="divide-y divide-border text-sm">
+        <div className="grid grid-cols-3 px-4 py-2 border-b border-border">
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Document</span>
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Attachment</span>
+          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Actions</span>
         </div>
 
         {ifApplicableDocuments.map((doc) => (

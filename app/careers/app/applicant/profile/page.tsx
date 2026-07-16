@@ -303,7 +303,7 @@ export default function ApplicantSelfProfilePage() {
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[450px] gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin text-neutral-600" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         <p>Retrieving your profile details...</p>
       </div>
     )
@@ -313,7 +313,7 @@ export default function ApplicantSelfProfilePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[450px] gap-3 p-4 text-center max-w-sm mx-auto">
         <AlertCircle className="h-8 w-8 text-destructive" />
-        <p className="text-sm font-medium text-neutral-900">Unable to load profile</p>
+        <p className="text-sm font-medium text-foreground">Unable to load profile</p>
         <p className="text-xs text-muted-foreground">{error}</p>
         <div className="flex items-center gap-2 mt-1">
           <Button variant="outline" size="sm" onClick={fetchMyProfile}>
@@ -330,7 +330,7 @@ export default function ApplicantSelfProfilePage() {
   const { profile } = data
 
   return (
-    <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 bg-neutral-50/30 min-h-screen">
+    <div className="p-4 md:p-8 max-w-5xl mx-auto space-y-6 bg-muted/30 min-h-screen">
 
       <input
         type="file"
@@ -342,7 +342,7 @@ export default function ApplicantSelfProfilePage() {
       <div className="flex items-center">
         <Link
           href="/applicant/dashboard"
-          className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 transition-colors font-medium"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-medium"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Dashboard

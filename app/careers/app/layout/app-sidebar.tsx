@@ -65,7 +65,7 @@ function NavGroup({
   {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-neutral-600">{label}</SidebarGroupLabel>
+      <SidebarGroupLabel className="text-muted-foreground">{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (

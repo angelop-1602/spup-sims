@@ -75,7 +75,7 @@ export default function ApplicantDashboardPage() {
   ]
 
   return (
-    <div className="flex min-h-screen w-full bg-neutral-50/60 text-neutral-900 antialiased selection:bg-neutral-950/5">
+    <div className="flex min-h-screen w-full bg-muted/30 text-foreground antialiased">
       
         {/* main container limits and controls grid flow */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto space-y-6">
@@ -83,18 +83,18 @@ export default function ApplicantDashboardPage() {
           {/* Header Title Section */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <Badge variant="outline" className="mb-2 rounded-md border-neutral-200 text-neutral-600 px-2 py-0.5 text-[10px] font-medium tracking-wide">
+              <Badge variant="outline" className="mb-2 rounded-md px-2 py-0.5 text-[10px] font-medium tracking-wide">
                 Candidate Portal
               </Badge>
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                 Welcome back, Applicant
               </h1>
-              <p className="mt-0.5 text-xs text-neutral-500 max-w-xl">
+              <p className="mt-0.5 text-xs text-muted-foreground max-w-xl">
                 Track your submission milestones, update personal data fields, and review onboarding documentation updates.
               </p>
             </div>
 
-            <Button asChild size="sm" className="rounded-xl bg-neutral-950 hover:bg-neutral-900 text-white shadow-sm font-medium shrink-0">
+            <Button asChild size="sm" className="rounded-xl shadow-sm font-medium shrink-0">
               <Link href="/applicant/profile" className="flex items-center gap-1.5">
                 Complete Profile
                 <ArrowUpRight className="size-3.5" />
@@ -107,11 +107,11 @@ export default function ApplicantDashboardPage() {
             {summaryCards.map((card) => {
               const Icon = card.icon
               return (
-                <Card key={card.label} className="rounded-2xl border-neutral-200/60 bg-white shadow-sm transition-all hover:shadow-md/5">
+                <Card key={card.label} className="transition-all hover:shadow-md/5">
                   <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-2">
                     <div className="space-y-1">
-                      <CardDescription className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider">{card.label}</CardDescription>
-                      <CardTitle className="text-2xl font-bold tracking-tight text-neutral-950">
+                      <CardDescription className="text-[10px] font-bold uppercase tracking-wider">{card.label}</CardDescription>
+                      <CardTitle className="text-2xl font-bold tracking-tight">
                         {card.value}
                       </CardTitle>
                     </div>
@@ -120,7 +120,7 @@ export default function ApplicantDashboardPage() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-[11px] font-medium text-neutral-400">{card.detail}</p>
+                    <p className="text-[11px] font-medium text-muted-foreground">{card.detail}</p>
                   </CardContent>
                 </Card>
               )
@@ -131,24 +131,24 @@ export default function ApplicantDashboardPage() {
           <div className="grid gap-4 grid-cols-1 lg:grid-cols-[1.2fr_0.8fr]">
             
             {/* Table Checklist */}
-            <Card className="rounded-2xl border-neutral-200/60 bg-white shadow-sm overflow-hidden">
-              <CardHeader className="border-b border-neutral-100 bg-neutral-50/40">
-                <CardTitle className="text-xs font-bold tracking-wide uppercase text-neutral-400">Application Pipeline Tracker</CardTitle>
+            <Card className="overflow-hidden">
+              <CardHeader className="border-b border-border bg-muted/40">
+                <CardTitle className="text-xs font-bold tracking-wide uppercase text-muted-foreground">Application Pipeline Tracker</CardTitle>
                 <CardDescription className="text-xs">Your progress status through verification milestones.</CardDescription>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
                   <Table>
-                    <TableHeader className="bg-neutral-50/20">
-                      <TableRow className="border-b border-neutral-100">
-                        <TableHead className="text-[11px] font-bold text-neutral-400 uppercase">Milestone Phase</TableHead>
-                        <TableHead className="text-[11px] font-bold text-neutral-400 uppercase w-32">Status</TableHead>
+                    <TableHeader className="bg-muted/20">
+                      <TableRow className="border-b border-border">
+                        <TableHead className="text-[11px] font-bold text-muted-foreground uppercase">Milestone Phase</TableHead>
+                        <TableHead className="text-[11px] font-bold text-muted-foreground uppercase w-32">Status</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {setupSteps.map((item) => (
-                        <TableRow key={item.step} className="border-b border-neutral-100/80 hover:bg-neutral-50/30">
-                          <TableCell className="font-semibold text-neutral-800 text-xs py-3">{item.step}</TableCell>
+                        <TableRow key={item.step} className="border-b border-border/80 hover:bg-muted/30">
+                          <TableCell className="font-semibold text-foreground text-xs py-3">{item.step}</TableCell>
                           <TableCell className="py-3">
                             <Badge 
                               variant="secondary" 
@@ -168,27 +168,27 @@ export default function ApplicantDashboardPage() {
                   </Table>
                 </div>
               </CardContent>
-              <CardFooter className="bg-neutral-50/30 py-3 border-t border-neutral-100">
-                <Button asChild variant="ghost" size="sm" className="text-xs font-bold text-neutral-600 hover:text-neutral-950">
+              <CardFooter className="bg-muted/30 py-3 border-t border-border">
+                <Button asChild variant="ghost" size="sm" className="text-xs font-bold text-muted-foreground hover:text-foreground">
                   <Link href="/applicant/profile">Manage Profile Documents</Link>
                 </Button>
               </CardFooter>
             </Card>
 
             {/* Weights Indicator */}
-            <Card className="rounded-2xl border-neutral-200/60 bg-white shadow-sm">
-              <CardHeader className="border-b border-neutral-100 bg-neutral-50/40">
-                <CardTitle className="text-xs font-bold tracking-wide uppercase text-neutral-400">Module Completion Weights</CardTitle>
+            <Card>
+              <CardHeader className="border-b border-border bg-muted/40">
+                <CardTitle className="text-xs font-bold tracking-wide uppercase text-muted-foreground">Module Completion Weights</CardTitle>
                 <CardDescription className="text-xs">Detailed completion metrics per requirement category.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 pt-4">
                 {setupSteps.map((step) => (
                   <div key={step.step} className="space-y-1.5">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-semibold text-neutral-700">{step.step}</span>
-                      <span className="font-bold text-neutral-500">{step.value}%</span>
+                      <span className="font-semibold text-foreground">{step.step}</span>
+                      <span className="font-bold text-muted-foreground">{step.value}%</span>
                     </div>
-                    <Progress value={step.value} className="h-1.5 rounded-full bg-neutral-100" />
+                    <Progress value={step.value} className="h-1.5 rounded-full" />
                   </div>
                 ))}
               </CardContent>
@@ -196,9 +196,9 @@ export default function ApplicantDashboardPage() {
           </div>
 
           {/* Action Tasks */}
-          <Card className="rounded-2xl border-neutral-200/60 bg-white shadow-sm">
-            <CardHeader className="border-b border-neutral-100 bg-neutral-50/40">
-              <CardTitle className="text-xs font-bold tracking-wide uppercase text-neutral-400">Outstanding Tasks Required</CardTitle>
+          <Card>
+            <CardHeader className="border-b border-border bg-muted/40">
+              <CardTitle className="text-xs font-bold tracking-wide uppercase text-muted-foreground">Outstanding Tasks Required</CardTitle>
               <CardDescription className="text-xs">Actions required before pipeline processing can continue.</CardDescription>
             </CardHeader>
             <CardContent className="pt-4">
@@ -206,11 +206,11 @@ export default function ApplicantDashboardPage() {
                 {checklist.map((action) => (
                   <div
                     key={action.task}
-                    className="rounded-xl border border-neutral-200/60 bg-white p-3.5 flex flex-col justify-between shadow-sm hover:border-neutral-300 transition-colors"
+                    className="rounded-xl border border-border bg-card p-3.5 flex flex-col justify-between shadow-sm hover:border-foreground/20 transition-colors"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-[9px] font-bold text-neutral-400 uppercase tracking-wider">{action.scope}</span>
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">{action.scope}</span>
                         <Badge 
                           variant="outline" 
                           className={`text-[9px] rounded-md font-bold px-1.5 py-0.5 ${
@@ -222,7 +222,7 @@ export default function ApplicantDashboardPage() {
                           {action.urgency}
                         </Badge>
                       </div>
-                      <p className="text-xs font-semibold leading-normal text-neutral-700">{action.task}</p>
+                      <p className="text-xs font-semibold leading-normal text-foreground">{action.task}</p>
                     </div>
                   </div>
                 ))}

@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { z } from 'zod';
+import {
+  FieldDescription,
+} from "@/components/ui/field"
 
 type RegisterRequest = components["schemas"]["ApplicantRegisterRequest"]
 
@@ -123,8 +126,8 @@ export default function RegisterForm({
           </CardDescription>
         </CardHeader>
 
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <CardContent className="space-y-6">
             <div>
               <label className="mb-2 block text-sm font-medium">
                 First Name <span className="text-destructive">*</span>
@@ -201,17 +204,16 @@ export default function RegisterForm({
 
             {error && <p className="text-sm text-destructive">{error}</p>}
           </CardContent>
-          <br></br>
 
           <CardFooter className="flex-col gap-4">
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? "Creating account..." : "Create account"}
             </Button>
-            <p className="text-center text-sm text-muted-foreground">
-              Already have an account? <Link href="/login" className="text-black hover:underline">
-                Log in
+            <FieldDescription className="text-center text-sm text-muted-foreground">
+              Already have an account? <Link href="/login" className="text-foreground no-underline! hover:underline!">
+                Login
               </Link>
-            </p>
+            </FieldDescription>
           </CardFooter>
         </form>
       </Card>

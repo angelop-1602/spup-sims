@@ -35,15 +35,15 @@ export function EditProfileModal({
         onClick={onCancel}
       />
 
-      <div className="relative z-10 w-full max-w-2xl mx-4 rounded-xl border border-neutral-200 bg-white shadow-xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-neutral-200">
-          <h2 className="text-sm font-semibold text-neutral-900">Edit Profile</h2>
+      <div className="relative z-10 w-full max-w-2xl mx-4 rounded-xl border border-border bg-card shadow-xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+          <h2 className="text-sm font-semibold text-foreground">Edit Profile</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={onCancel}
             disabled={isSaving}
-            className="h-7 w-7 p-0 text-neutral-400 hover:text-neutral-700"
+            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -77,8 +77,8 @@ export function EditProfileModal({
               onChange={(v) => setEditForm({ ...editForm, birthDate: v })}
             />
             <div className="space-y-1.5">
-              <Label className="text-xs text-neutral-500">Age</Label>
-              <p className="h-9 flex items-center text-sm font-medium text-neutral-900 px-3">
+              <Label className="text-xs text-muted-foreground">Age</Label>
+              <p className="h-9 flex items-center text-sm font-medium text-foreground px-3">
                 {calculateAge(editForm.birthDate)}
               </p>
             </div>
@@ -113,13 +113,13 @@ export function EditProfileModal({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-neutral-200 bg-neutral-50/50">
+        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/50">
           <Button
             variant="outline"
             size="sm"
             onClick={onCancel}
             disabled={isSaving}
-            className="h-8 text-xs px-4 border-neutral-200 text-neutral-700 hover:bg-neutral-100"
+            className="h-8 text-xs px-4"
           >
             Cancel
           </Button>
@@ -127,7 +127,7 @@ export function EditProfileModal({
             size="sm"
             onClick={onSave}
             disabled={isSaving}
-            className="h-8 text-xs px-4 bg-neutral-900 hover:bg-neutral-800 text-white"
+            className="h-8 text-xs px-4"
           >
             {isSaving && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
             Save Changes
@@ -172,7 +172,7 @@ function FormField({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs text-neutral-500">
+      <Label className="text-xs text-muted-foreground">
         {label}
         {required && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
