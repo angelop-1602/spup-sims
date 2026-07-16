@@ -9,7 +9,13 @@ import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import {
   useApiQuery,
   useApiMutation,
-  type components,
+  type EmployeeResponse,
+  type PagedResponseOfEmployeeResponse,
+  type CreateEmployeeRequest,
+  type DepartmentResponse,
+  type PagedResponseOfDepartmentResponse,
+  type PositionResponse,
+  type PagedResponseOfPositionResponse,
 } from "@/lib/api"
 import {
   Dialog,
@@ -34,14 +40,24 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ApiErrorView } from "@/components/ui/error-page"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-type Employee = components["schemas"]["EmployeeResponse"]
-type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
-type CreateEmployeeRequest = components["schemas"]["CreateEmployeeRequest"]
+type Employee = EmployeeResponse
+type PagedEmployees = PagedResponseOfEmployeeResponse
+type CreateEmployeeRequestWithDeps = CreateEmployeeRequest & {
+  departmentId: number | string
+  positionId: number | string
+}
 
 const PAGE_SIZE = 10
 
@@ -69,6 +85,8 @@ type EmployeeForm = {
   lastName: string
   email: string
   employeeNumber: string
+  departmentId: number | string | null
+  positionId: number | string | null
 }
 
 const EMPTY_FORM: EmployeeForm = {
@@ -76,9 +94,11 @@ const EMPTY_FORM: EmployeeForm = {
   lastName: "",
   email: "",
   employeeNumber: "",
+  departmentId: null,
+  positionId: null,
 }
 
-function toCreateRequest(form: EmployeeForm): CreateEmployeeRequest {
+function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
   return {
     employeeNumber: form.employeeNumber,
     profile: {
@@ -86,6 +106,8 @@ function toCreateRequest(form: EmployeeForm): CreateEmployeeRequest {
       lastName: form.lastName,
       personalEmail: form.email,
     },
+    departmentId: Number(form.departmentId),
+    positionId: Number(form.positionId),
   }
 }
 
@@ -140,6 +162,20 @@ export default function EmployeesPage() {
   const { mutate: deleteEmployee, loading: deleting } = useApiMutation()
   const { mutate: sendInvite } = useApiMutation()
 
+  // Fetch departments for dropdown
+  const { data: departmentsData } = useApiQuery<PagedResponseOfDepartmentResponse>(
+    "/api/v1/organization/departments",
+    { Page: 1, PageSize: 500, SortBy: "id" },
+  )
+  const departments = departmentsData?.data ?? []
+
+  // Fetch positions for dropdown
+  const { data: positionsData } = useApiQuery<PagedResponseOfPositionResponse>(
+    "/api/v1/organization/positions",
+    { Page: 1, PageSize: 500, SortBy: "id" },
+  )
+  const positions = positionsData?.data ?? []
+
   const employees = employeesPaged?.data ?? []
   const totalPages = Number(employeesPaged?.totalPages ?? 1)
   const totalRecords = employeesPaged?.totalRecords ?? 0
@@ -159,6 +195,8 @@ export default function EmployeesPage() {
       lastName: employee.lastName ?? "",
       email: employee.email ?? "",
       employeeNumber: employee.employeeNumber ?? "",
+      departmentId: (employee as any).departmentId ?? null,
+      positionId: (employee as any).positionId ?? null,
     })
     setFormError(null)
     setIsDialogOpen(true)
@@ -278,6 +316,8 @@ export default function EmployeesPage() {
                   <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-3 font-medium">Employee</th>
                     <th className="px-4 py-3 font-medium">Employee ID</th>
+                    <th className="px-4 py-3 font-medium">Department</th>
+                    <th className="px-4 py-3 font-medium">Position</th>
                     <th className="px-4 py-3 font-medium">Status</th>
                     <th className="px-4 py-3 font-medium text-right">Actions</th>
                   </tr>
@@ -302,6 +342,12 @@ export default function EmployeesPage() {
                           </div>
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">{employee.employeeNumber}</td>
+                        <td className="px-4 py-3">
+                          {(employee as any).department ?? "-"}
+                        </td>
+                        <td className="px-4 py-3">
+                          {(employee as any).position ?? "-"}
+                        </td>
                         <td className="px-4 py-3">
                           <span
                             className={
@@ -423,7 +469,7 @@ export default function EmployeesPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{selectedEmployee ? "Edit employee" : "New employee"}</DialogTitle>
-              <DialogDescription>Fill in the employee details below.</DialogDescription>
+              <DialogDescription>Fill in the employee details below. Department and Position are required.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid gap-4 sm:grid-cols-2">
@@ -467,6 +513,44 @@ export default function EmployeesPage() {
                   onChange={(e) => setFormState((s) => ({ ...s, employeeNumber: e.target.value }))}
                   placeholder="EMP-0001"
                 />
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="emp-department">Department <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={String(formState.departmentId ?? "")}
+                    onValueChange={(value) => setFormState((s) => ({ ...s, departmentId: value || null }))}
+                  >
+                    <SelectTrigger id="emp-department">
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept) => (
+                        <SelectItem key={String(dept.id)} value={String(dept.id)}>
+                          {dept.name ?? ""} ({dept.code ?? ""})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="emp-position">Position <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={String(formState.positionId ?? "")}
+                    onValueChange={(value) => setFormState((s) => ({ ...s, positionId: value || null }))}
+                  >
+                    <SelectTrigger id="emp-position">
+                      <SelectValue placeholder="Select position" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {positions.map((pos) => (
+                        <SelectItem key={String(pos.id)} value={String(pos.id)}>
+                          {pos.title ?? ""} ({pos.code ?? ""})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               {formError && (
                 <p className="text-sm text-destructive">{formError}</p>

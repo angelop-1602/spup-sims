@@ -53,11 +53,14 @@ interface InterviewSchedule {
   createdAt: string
 }
 
-type PagedRecords<TRecord> = Omit<
-  components["schemas"]["PagedResponseOfAcademicTermResponse"],
-  "data"
-> & {
+type PagedRecords<TRecord> = {
   data: TRecord[]
+  page: number | string
+  pageSize: number | string
+  totalRecords: number | string
+  totalPages: number | string
+  success?: boolean
+  message?: string
 }
 
 type ProfileRecord = ProfileValues
