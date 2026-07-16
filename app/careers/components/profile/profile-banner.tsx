@@ -7,7 +7,7 @@ interface ProfileBannerProps {
 }
 
 export function ProfileBanner({ profile, status, createdAt }: ProfileBannerProps) {
-  const statusStyle = STATUS_STYLES[status || "Submitted"] ?? "bg-neutral-100 text-neutral-600"
+  const statusStyle = STATUS_STYLES[status || "Submitted"] ?? "bg-muted text-muted-foreground"
   const createdString = new Date(createdAt || Date.now()).toLocaleDateString("en-US", {
     month: "short", day: "numeric", year: "numeric"
   })

@@ -7,10 +7,13 @@ import {
   Bell,
   ChevronsUpDown,
   LogOut,
+  Moon,
   Search,
   Settings,
+  Sun,
   User,
 } from "lucide-react"
+import { useTheme } from "next-themes"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -47,6 +50,7 @@ function getInitials(name: string) {
 export function AppTopbar() {
   const router = useRouter()
   const pathname = usePathname()
+  const { resolvedTheme, setTheme } = useTheme()
   const currentItem = navItems.find((item) => item.url === pathname) ?? HOME_ITEM
   const [open, setOpen] = React.useState(false)
   const displayName = "Applicant User"
@@ -97,6 +101,16 @@ export function AppTopbar() {
           </Breadcrumb>
 
         <div className="ml-auto flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+          >
+            <Sun className="h-5 w-5 scale-100 dark:scale-0" />
+            <Moon className="absolute h-5 w-5 scale-0 dark:scale-100" />
+            <span className="sr-only">Toggle theme</span>
+          </Button>
+
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-primary" />

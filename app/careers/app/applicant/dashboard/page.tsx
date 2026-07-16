@@ -156,7 +156,7 @@ export default function ApplicantDashboardPage() {
                                 item.status === "Completed" ? "bg-emerald-50 text-emerald-700 border-emerald-100" :
                                 item.status === "In Progress" ? "bg-blue-50 text-blue-700 border-blue-100" :
                                 item.status === "Pending" ? "bg-amber-50 text-amber-700 border-amber-100" :
-                                "bg-neutral-100 text-neutral-400 border-neutral-200/40"
+                                "bg-muted text-muted-foreground border-border"
                               }`}
                             >
                               {item.status}
@@ -216,7 +216,7 @@ export default function ApplicantDashboardPage() {
                           className={`text-[9px] rounded-md font-bold px-1.5 py-0.5 ${
                             action.urgency === "Required" ? "text-rose-600 bg-rose-50 border-rose-100" :
                             action.urgency === "Action Needed" ? "text-amber-600 bg-amber-50 border-amber-100" :
-                            "text-neutral-600 bg-neutral-50 border-neutral-200"
+                            "text-muted-foreground bg-muted border-border"
                           }`}
                         >
                           {action.urgency}

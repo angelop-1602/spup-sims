@@ -239,9 +239,9 @@ function PhoneField({
 
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs text-neutral-500">{label}</Label>
+      <Label className="text-xs text-muted-foreground">{label}</Label>
       <div className="flex">
-        <span className="h-9 flex items-center px-3 text-sm bg-neutral-100 border border-r-0 border-neutral-200 rounded-l-md text-neutral-500 select-none">
+        <span className="h-9 flex items-center px-3 text-sm bg-muted border border-r-0 border-border rounded-l-md text-muted-foreground select-none">
           {prefix}
         </span>
         <Input
