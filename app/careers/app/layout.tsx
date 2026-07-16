@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { Instrument_Serif, Poppins, Epilogue, Inter } from 'next/font/google';
+import { Instrument_Serif, Poppins, Epilogue, Inter, Geist } from 'next/font/google';
 import "./globals.css"
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
@@ -37,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-sans", geist.variable)}>
     <body className={`${instrumentSerif.variable} ${poppins.variable} ${epilogue.variable} ${inter.variable} font-sans antialiased`}>        {children}
       </body>
     </html>

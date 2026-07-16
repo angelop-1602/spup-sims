@@ -70,12 +70,6 @@ export function AppTopbar() {
       <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
         <SidebarTrigger />
           <span className="text-sm font-medium text-black">Applicant Workspace</span>
-        {/* <Button
-          variant="outline"
-          className="h-10 w-full justify-start text-muted-foreground md:max-w-sm"
-          onClick={() => setOpen(true)}
-        >
-        </Button> */}
 
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" size="icon" className="relative">
