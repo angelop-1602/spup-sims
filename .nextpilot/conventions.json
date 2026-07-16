@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "accepted": false,
+  "conventions": [
+    {
+      "name": "component organization",
+      "value": "components/ui shared UI components",
+      "confidence": "medium",
+      "evidence": [
+        "components/auth/hrm-auth-guard.tsx",
+        "components/auth/permission-guard.tsx",
+        "components/auth/sign-in-page.tsx",
+        "components/custom/dashboard/app-sidebar.tsx",
+        "components/custom/dashboard/chart-area-interactive.tsx",
+        "components/custom/dashboard/data-table.tsx",
+        "components/custom/dashboard/nav-documents.tsx",
+        "components/custom/dashboard/nav-main.tsx"
+      ]
+    },
+    {
+      "name": "data-access approach",
+      "value": "not detected",
+      "confidence": "low",
+      "evidence": []
+    },
+    {
+      "name": "error-handling style",
+      "value": "not detected",
+      "confidence": "low",
+      "evidence": []
+    },
+    {
+      "name": "folder conventions",
+      "value": "root router folders",
+      "confidence": "medium",
+      "evidence": [
+        "app",
+        "components",
+        "lib"
+      ]
+    },
+    {
+      "name": "import alias usage",
+      "value": "alias imports are used",
+      "confidence": "medium",
+      "evidence": [
+        "app/(auth)/login/page.tsx imports @/components/auth/sign-in-page",
+        "app/(auth)/login/page.tsx imports @/lib/authConfig",
+        "app/(auth)/login/page.tsx imports @/lib/hrmAccess",
+        "app/careers/page.tsx imports @/components/hrm/types",
+        "app/careers/page.tsx imports @/components/hrm/careers/FeaturedJobs",
+        "app/careers/page.tsx imports @/components/hrm/careers/JobDetailsModal",
+        "app/careers/page.tsx imports @/components/hrm/careers/ApplicationProcess",
+        "app/careers/page.tsx imports @/components/hrm/careers/Faq"
+      ]
+    },
+    {
+      "name": "naming style",
+      "value": "camel",
+      "confidence": "medium",
+      "evidence": [
+        "app/(auth)/login/page.tsx",
+        "app/api/[...path]/route.ts",
+        "app/careers/page.tsx",
+        "app/hrm/applicants/page.tsx",
+        "app/hrm/dashboard/page.tsx",
+        "app/hrm/departments/page.tsx",
+        "app/hrm/employees/modal.tsx",
+        "app/hrm/employees/page.tsx"
+      ]
+    },
+    {
+      "name": "server action placement",
+      "value": "no dominant server action file convention detected",
+      "confidence": "low",
+      "evidence": []
+    },
+    {
+      "name": "testing style",
+      "value": "not detected",
+      "confidence": "low",
+      "evidence": []
+    },
+    {
+      "name": "UI component usage",
+      "value": "lucide-react, shadcn-style-ui, shadcn/ui",
+      "confidence": "medium",
+      "evidence": [
+        "lucide-react",
+        "shadcn-style-ui",
+        "shadcn/ui"
+      ]
+    },
+    {
+      "name": "validation approach",
+      "value": "not detected",
+      "confidence": "low",
+      "evidence": []
+    }
+  ]
+}
