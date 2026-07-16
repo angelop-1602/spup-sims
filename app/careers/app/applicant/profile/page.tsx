@@ -6,12 +6,13 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-import type { ApplicantMePayload, ProfileUpdateForm, DocumentType } from "@/components/profile/types"
+import type { ApplicantMePayload, ProfileUpdateForm, DocumentType, DocumentEntry } from "@/components/profile/types"
 import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS } from "@/components/profile/types"
 import { ProfileBanner } from "@/components/profile/profile-banner"
 import { PersonalInfoSection } from "@/components/profile/personal-info-section"
 import { EditProfileModal } from "@/components/profile/edit-profile-modal"
 import { DocumentsChecklist } from "@/components/profile/documents-checklist"
+import { saveFile, getFile, deleteFile } from "@/lib/file-store"
 
 export default function ApplicantSelfProfilePage() {
   const router = useRouter()
@@ -20,6 +21,7 @@ export default function ApplicantSelfProfilePage() {
   const [error, setError] = React.useState<string | null>(null)
 
   // Document interaction states
+  const [documents, setDocuments] = React.useState<DocumentEntry[]>([])
   const [activeUploadKey, setActiveUploadKey] = React.useState<string | null>(null)
   const [activeDeleteKey, setActiveDeleteKey] = React.useState<string | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
@@ -99,6 +101,36 @@ export default function ApplicantSelfProfilePage() {
     }
   }, [router])
 
+  const fetchDocuments = React.useCallback(async () => {
+    try {
+      const token = localStorage.getItem("access_token")
+      if (!token) return
+
+      const response = await fetch("/api/v1/applicant/documents", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      })
+
+      if (!response.ok) {
+        console.warn(`Failed to fetch documents: ${response.status}`)
+        return
+      }
+
+      const payload = await response.json()
+
+      const entries = payload?.data ?? payload?.documents ?? payload
+
+      if (Array.isArray(entries)) {
+        setDocuments(entries)
+      }
+    } catch (err) {
+      console.warn("Error fetching documents:", err)
+    }
+  }, [])
+
   const handleSaveProfile = async () => {
     setSaveStatus(null)
 
@@ -144,6 +176,9 @@ export default function ApplicantSelfProfilePage() {
 
   const triggerFileSelection = (doc: DocumentType) => {
     setCurrentUploadingDoc(doc)
+    if (fileInputRef.current) {
+      fileInputRef.current.accept = doc.accept
+    }
     fileInputRef.current?.click()
   }
 
@@ -172,6 +207,8 @@ export default function ApplicantSelfProfilePage() {
       }
 
       await fetchMyProfile()
+      await fetchDocuments()
+      await saveFile(currentUploadingDoc.key, file)
       alert(`${currentUploadingDoc.label} uploaded successfully!`)
     } catch (err: any) {
       alert(err.message || "Failed to upload document.")
@@ -202,6 +239,8 @@ export default function ApplicantSelfProfilePage() {
       }
 
       await fetchMyProfile()
+      await fetchDocuments()
+      await deleteFile(doc.key)
       alert(`${doc.label} deleted successfully!`)
     } catch (err: any) {
       alert(err.message || "Failed to delete document.")
@@ -210,16 +249,56 @@ export default function ApplicantSelfProfilePage() {
     }
   }
 
-  const getDocUrl = (key: string): string | null | undefined => {
-    switch (key) {
-      case "resume": return data?.resumeUrl
-      default: return null
+  const getDocUrl = (apiName: string): string | null | undefined => {
+    const doc = documents.find((d) => d.requirementName === apiName)
+    return doc?.storagePath ? `/api/documents/${doc.storagePath}` : null
+  }
+
+  const [viewingDocKey, setViewingDocKey] = React.useState<string | null>(null)
+
+  const handleViewDocument = async (doc: DocumentType) => {
+    const docEntry = documents.find((d) => d.requirementName === doc.apiName)
+    if (!docEntry) return
+
+    const token = localStorage.getItem("access_token")
+    if (!token) {
+      router.push("/login?returnTo=/applicant/profile")
+      return
+    }
+
+    setViewingDocKey(doc.key)
+    try {
+      const localFile = await getFile(doc.key)
+      if (localFile) {
+        const blobUrl = URL.createObjectURL(localFile)
+        window.open(blobUrl, "_blank")
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
+        return
+      }
+
+      const response = await fetch(`/api/documents/${docEntry.storagePath}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      })
+
+      if (!response.ok) {
+        throw new Error("Document preview unavailable. Re-upload the file to enable preview.")
+      }
+
+      const blob = await response.blob()
+      const blobUrl = URL.createObjectURL(blob)
+      window.open(blobUrl, "_blank")
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
+    } catch (err: any) {
+      alert(err.message || "Failed to open document.")
+    } finally {
+      setViewingDocKey(null)
     }
   }
 
   React.useEffect(() => {
     fetchMyProfile()
-  }, [fetchMyProfile])
+    fetchDocuments()
+  }, [fetchMyProfile, fetchDocuments])
 
   if (isLoading) {
     return (
@@ -257,7 +336,6 @@ export default function ApplicantSelfProfilePage() {
         type="file"
         ref={fileInputRef}
         onChange={handleDocumentUpload}
-        accept=".pdf,.doc,.docx"
         className="hidden"
       />
 
@@ -297,9 +375,11 @@ export default function ApplicantSelfProfilePage() {
         ifApplicableDocuments={IF_APPLICABLE_DOCUMENTS}
         activeUploadKey={activeUploadKey}
         activeDeleteKey={activeDeleteKey}
+        viewingDocKey={viewingDocKey}
         getDocUrl={getDocUrl}
         onUploadClick={triggerFileSelection}
         onDelete={handleDocumentDelete}
+        onView={handleViewDocument}
       />
 
     </div>
