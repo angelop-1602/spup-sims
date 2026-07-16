@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import {
   Bell,
   ChevronsUpDown,
@@ -13,15 +14,6 @@ import {
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-// import {
-//   CommandDialog,
-//   CommandEmpty,
-//   CommandGroup,
-//   CommandInput,
-//   CommandItem,
-//   CommandList,
-//   CommandSeparator,
-// } from "@/components/ui/command"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +23,17 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarTrigger } from "@/components/ui/sidebar"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import { navItems } from "./app-sidebar"
+
+const HOME_ITEM = navItems[0]
 
 function getInitials(name: string) {
   return name
@@ -43,6 +46,8 @@ function getInitials(name: string) {
 
 export function AppTopbar() {
   const router = useRouter()
+  const pathname = usePathname()
+  const currentItem = navItems.find((item) => item.url === pathname) ?? HOME_ITEM
   const [open, setOpen] = React.useState(false)
   const displayName = "Applicant User"
   const roleLabel = "Role"
@@ -69,7 +74,27 @@ export function AppTopbar() {
     <>
       <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
         <SidebarTrigger />
-          <span className="text-sm font-medium text-foreground">Applicant Workspace</span>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                {currentItem.url === HOME_ITEM.url ? (
+                  <BreadcrumbPage>{HOME_ITEM.title}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink asChild>
+                    <Link href={HOME_ITEM.url}>{HOME_ITEM.title}</Link>
+                  </BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+              {currentItem.url !== HOME_ITEM.url && (
+                <>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>{currentItem.title}</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </>
+              )}
+            </BreadcrumbList>
+          </Breadcrumb>
 
         <div className="ml-auto flex items-center gap-2">
           <Button variant="ghost" size="icon" className="relative">

@@ -23,7 +23,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-type NavItem = {
+export type NavItem = {
   title: string
   icon: React.ElementType
   url: string
@@ -54,6 +54,8 @@ const applicantItems: NavItem[] = [
     url: "#",
   },
 ]
+
+export const navItems: NavItem[] = [...mainItems, ...applicantItems]
 
 function NavGroup({
   label,
