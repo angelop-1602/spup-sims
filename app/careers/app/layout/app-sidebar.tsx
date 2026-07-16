@@ -38,7 +38,7 @@ const mainItems: NavItem[] = [
   {
     title: "My Profile",
     icon: IdCard,
-    url: "#",
+    url: "/applicant/profile",
   },
 ]
 
