@@ -71,26 +71,6 @@ function DocumentRow({
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => onDelete(doc)}
-          disabled={!isUploaded || !isDeletable || isDeleting || isUploading}
-          className={`h-8 w-8 p-0 ${
-            isUploaded && isDeletable
-              ? "text-red-400 hover:text-red-600 hover:bg-red-50" 
-              : "text-neutral-300 cursor-not-allowed opacity-50"
-          }`}
-          title={!isDeletable ? "Required document — use Replace instead" : isUploaded ? "Delete Document" : "No document to delete"}
-        >
-          {isDeleting ? (
-            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
-          ) : (
-            <Trash2 className="h-4 w-4" />
-          )}
-          <span className="sr-only">Delete</span>
-        </Button>
-
-        <Button
-          variant="ghost"
-          size="sm"
           onClick={() => onUploadClick(doc)}
           disabled={isUploading || isDeleting}
           className="h-8 w-8 p-0 text-neutral-500 border-1 border-gray hover:text-neutral-800 hover:bg-neutral-100"
@@ -102,6 +82,26 @@ function DocumentRow({
             <Upload className="h-4 w-4" />
           )}
           <span className="sr-only">Upload</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => onDelete(doc)}
+          disabled={!isUploaded || !isDeletable || isDeleting || isUploading}
+          className={`h-8 w-8 p-0 ${
+            isUploaded && isDeletable
+              ? "text-red-400 hover:text-red-600 hover:bg-red-50" 
+              : "text-neutral-300 cursor-not-allowed opacity-50"
+          }`}
+          title={!isDeletable ? "Required document. Use Replace instead" : isUploaded ? "Delete Document" : "No document to delete"}
+        >
+          {isDeleting ? (
+            <Loader2 className="h-4 w-4 animate-spin text-neutral-400" />
+          ) : (
+            <Trash2 className="h-4 w-4" />
+          )}
+          <span className="sr-only">Delete</span>
         </Button>
 
       </div>
