@@ -13,21 +13,44 @@ import { loginRequest } from "@/lib/authConfig"
 import { clearCachedHrmAccess, verifyHrmAccess } from "@/lib/hrmAccess"
 
 const LOGIN_PENDING_KEY = "spup:sims:login-pending"
+const LOGIN_PENDING_EVENT = "spup:login-pending-change"
 
-function readPendingLogin() {
-  if (typeof window === "undefined") {
-    return false
+function getPendingLoginSnapshot() {
+  return window.sessionStorage.getItem(LOGIN_PENDING_KEY) === "1"
+}
+
+function getPendingLoginServerSnapshot() {
+  return false
+}
+
+function subscribeToPendingLogin(onStoreChange: () => void) {
+  const handleStorage = (event: StorageEvent) => {
+    if (event.storageArea === window.sessionStorage && event.key === LOGIN_PENDING_KEY) {
+      onStoreChange()
+    }
   }
 
-  return window.sessionStorage.getItem(LOGIN_PENDING_KEY) === "1"
+  window.addEventListener("storage", handleStorage)
+  window.addEventListener(LOGIN_PENDING_EVENT, onStoreChange)
+
+  return () => {
+    window.removeEventListener("storage", handleStorage)
+    window.removeEventListener(LOGIN_PENDING_EVENT, onStoreChange)
+  }
+}
+
+function notifyPendingLoginChanged() {
+  window.dispatchEvent(new Event(LOGIN_PENDING_EVENT))
 }
 
 function writePendingLogin() {
   window.sessionStorage.setItem(LOGIN_PENDING_KEY, "1")
+  notifyPendingLoginChanged()
 }
 
 function clearPendingLogin() {
   window.sessionStorage.removeItem(LOGIN_PENDING_KEY)
+  notifyPendingLoginChanged()
 }
 
 function getSafeReturnPath(returnTo: string | null) {
@@ -69,8 +92,11 @@ function LoginContent() {
   const { accounts, inProgress, instance } = useMsal()
   const isAuthenticated = useIsAuthenticated()
   const [errorMessage, setErrorMessage] = React.useState("")
-  const [hasPendingLogin, setHasPendingLogin] =
-    React.useState(readPendingLogin)
+  const hasPendingLogin = React.useSyncExternalStore(
+    subscribeToPendingLogin,
+    getPendingLoginSnapshot,
+    getPendingLoginServerSnapshot
+  )
   const [isSigningIn, setIsSigningIn] = React.useState(false)
   const [isVerifying, setIsVerifying] = React.useState(false)
   const account = accounts[0]
@@ -103,14 +129,12 @@ function LoginContent() {
 
       if (result.ok) {
         clearPendingLogin()
-        setHasPendingLogin(false)
         router.replace(returnTo)
         return
       }
 
       clearPendingLogin()
       clearCachedHrmAccess()
-      setHasPendingLogin(false)
       setIsVerifying(false)
       setErrorMessage(result.message)
     }
@@ -125,7 +149,6 @@ function LoginContent() {
   const handleLogin = async () => {
     setErrorMessage("")
     writePendingLogin()
-    setHasPendingLogin(true)
     setIsSigningIn(true)
     setIsVerifying(false)
 
@@ -137,7 +160,6 @@ function LoginContent() {
     } catch (error) {
       console.error(error)
       clearPendingLogin()
-      setHasPendingLogin(false)
       setIsSigningIn(false)
       setErrorMessage(getAuthErrorMessage(error))
     }
