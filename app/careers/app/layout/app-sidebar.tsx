@@ -44,9 +44,9 @@ const mainItems: NavItem[] = [
 
 const applicantItems: NavItem[] = [
   {
-    title: "Submissions",
+    title: "Applications",
     icon: ClipboardList,
-    url: "#",
+    url: "/applicant/job-applications",
   },
   {
     title: "Documents",
