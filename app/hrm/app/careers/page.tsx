@@ -22,6 +22,7 @@ import FaqSection from '@/components/hrm/careers/Faq';
 import JobBoardCTA from '@/components/hrm/careers/Cta';
 import { Instrument_Serif, Poppins, Epilogue, Inter } from 'next/font/google';
 
+
 const instrumentSerif = Instrument_Serif({
   subsets: ['latin'],
   weight: ['400'],

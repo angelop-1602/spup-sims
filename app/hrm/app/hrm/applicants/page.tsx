@@ -2,12 +2,18 @@
 
 import * as React from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Search, UserSearch, Eye, Plus } from "lucide-react"
-import { useApiQuery, useApiMutation, type components } from "@/lib/api"
+import { Plus } from "lucide-react"
+import { useApiQuery, useApiMutation } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
+import { ApplicantDateFilters } from "@/components/hrm/applicants/applicant-date-filters"
 import { ApplicantRowActions } from "@/components/hrm/applicants/applicant-row-actions"
+import { ApplicantStatusBadge } from "@/components/hrm/applicants/applicant-status-badge"
+import { DataPagination } from "@/components/hrm/data-pagination"
+import { DataSearchInput } from "@/components/hrm/data-search-input"
+import { DataTableState } from "@/components/hrm/data-table-state"
+import { DataToolbar } from "@/components/hrm/data-toolbar"
 import {
   Dialog,
   DialogContent,
@@ -16,9 +22,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { EmptyState } from "@/components/ui/empty-state"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
+import { Skeleton } from "@/components/ui/skeleton"
+import { TableSkeletonRows } from "@/components/ui/table-skeleton-rows"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { notifyCreated } from "@/lib/notifications"
 
 interface Applicant {
   id: number | string
@@ -47,19 +63,7 @@ type PagedResponseBase = {
 type ApplicantsPayload = PagedResponseBase & { data: Applicant[] }
 type ProfilesPayload = PagedResponseBase & { data: Profile[] }
 
-const STATUS_STYLES: Record<string, string> = {
-  Interview: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
-  Hired:     "bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20",
-  Rejected:  "bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20",
-  Pending:   "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border border-yellow-500/20",
-  Submitted: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20",
-}
-
 const STATUS_OPTIONS = ["Submitted", "Pending", "Interview", "Hired", "Rejected"]
-
-function getStatusStyle(status: string) {
-  return STATUS_STYLES[status] ?? "bg-muted text-muted-foreground border border-border"
-}
 
 function formatDate(dateString: string | null) {
   if (!dateString) return "—"
@@ -70,13 +74,16 @@ function formatDate(dateString: string | null) {
 
 const PAGE_SIZE = 20
 const EMPTY_APPLICANTS: Applicant[] = []
-
+const EMPTY_PROFILES: Profile[] = []
 export default function ApplicantsPage() {
   const router = useRouter()
   const { hasPermission } = useHrmAuth()
 
   const canCreate = hasPermission("hrms.recruitment.applicants.create")
   const canProcess = hasPermission("hrms.recruitment.applicants.process")
+  const canUpdate =
+    canProcess || hasPermission("hrms.recruitment.applicants.update")
+  const canDelete = hasPermission("hrms.recruitment.applicants.delete")
 
   const [search, setSearch] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
@@ -96,8 +103,6 @@ export default function ApplicantsPage() {
     }, 200)
     return () => clearTimeout(timeout)
   }, [search])
-
-  React.useEffect(() => { setPage(1) }, [dateFrom, dateTo])
 
   const {
     data: applicantsPayload,
@@ -122,10 +127,56 @@ export default function ApplicantsPage() {
   const { mutate: createApplicant, loading: creating } = useApiMutation()
 
   const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
-  const profiles = profilesPayload?.data ?? []
+  const profiles = profilesPayload?.data ?? EMPTY_PROFILES
   const totalPages = Number(applicantsPayload?.totalPages ?? 1)
   const totalRecords = Number(applicantsPayload?.totalRecords ?? 0)
-  const hasActiveFilters = Boolean(search || dateFrom || dateTo)
+  const hasActiveFilters = Boolean(search.trim() || dateFrom || dateTo)
+  const activeDateFilterCount = Number(Boolean(dateFrom)) + Number(Boolean(dateTo))
+  const profileNames = React.useMemo(
+    () =>
+      new Map(
+        profiles.map((profile) => [
+          String(profile.id),
+          `${profile.firstName} ${profile.lastName}`,
+        ]),
+      ),
+    [profiles],
+  )
+
+  function clearFilters() {
+    setSearch("")
+    setDebouncedSearch("")
+    setDateFrom("")
+    setDateTo("")
+    setPage(1)
+  }
+
+  function clearSearch() {
+    setSearch("")
+    setDebouncedSearch("")
+    setPage(1)
+  }
+
+  function updateDateFrom(value: string) {
+    setDateFrom(value)
+    setPage(1)
+  }
+
+  function updateDateTo(value: string) {
+    setDateTo(value)
+    setPage(1)
+  }
+
+  function viewApplicant(applicant: Applicant) {
+    router.push(
+      `/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`,
+    )
+  }
+
+  function openCreateDialog() {
+    setIsCreateOpen(true)
+    setCreateError(null)
+  }
 
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -138,181 +189,245 @@ export default function ApplicantsPage() {
         status: createForm.status,
       },
     })
-    if (!ok) { setCreateError("Unable to create applicant."); return }
+    if (!ok) {
+      setCreateError("Unable to create applicant.")
+      return
+    }
     await refreshApplicants()
     setIsCreateOpen(false)
     setCreateForm({ profileId: "", status: "Submitted" })
+    notifyCreated("Applicant record")
   }
 
   return (
     <PermissionGuard requiredPermission="hrms.recruitment.applicants.view">
       <div>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-normal">Applicants</h1>
-            <p className="mt-1 text-sm text-muted-foreground">Applicant records will appear here.</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {canCreate && (
-              <Button onClick={() => { setIsCreateOpen(true); setCreateError(null) }}>
-                <Plus className="mr-2 h-4 w-4" />
+        <h1 className="sr-only">Applicants</h1>
+        <DataToolbar
+          label="Applicant list controls"
+          search={
+            <Field>
+              <FieldLabel htmlFor="applicant-search">Search applicants</FieldLabel>
+              <DataSearchInput
+                id="applicant-search"
+                value={search}
+                onChange={(event) => {
+                  setSearch(event.target.value)
+                  setPage(1)
+                }}
+                onClear={clearSearch}
+                clearLabel="Clear applicant search"
+                placeholder="Application number or status"
+                autoComplete="off"
+              />
+            </Field>
+          }
+          filters={
+            <ApplicantDateFilters
+              idPrefix="applicant-desktop"
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+              onDateFromChange={updateDateFrom}
+              onDateToChange={updateDateTo}
+            />
+          }
+          mobileFilters={
+            <ApplicantDateFilters
+              idPrefix="applicant-mobile"
+              dateFrom={dateFrom}
+              dateTo={dateTo}
+              onDateFromChange={updateDateFrom}
+              onDateToChange={updateDateTo}
+              stacked
+            />
+          }
+          activeFilterCount={activeDateFilterCount}
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={clearFilters}
+          actions={
+            canCreate ? (
+              <Button onClick={openCreateDialog}>
+                <Plus aria-hidden="true" />
                 New applicant
               </Button>
-            )}
-            <input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => { setDateFrom(e.target.value); setPage(1) }}
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            />
-            <span className="text-sm text-muted-foreground">to</span>
-            <input
-              type="date"
-              value={dateTo}
-              min={dateFrom || undefined}
-              onChange={(e) => { setDateTo(e.target.value); setPage(1) }}
-              className="rounded-md border border-input bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            />
-            {(dateFrom || dateTo) && (
-              <button
-                type="button"
-                onClick={() => { setDateFrom(""); setDateTo(""); setPage(1) }}
-                className="text-xs text-muted-foreground hover:text-foreground"
-              >
-                Clear
-              </button>
-            )}
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-                placeholder="Search application no. or status"
-                className="w-64 rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              />
-            </div>
-          </div>
-        </div>
+            ) : undefined
+          }
+        />
 
-        <div className="mt-6 overflow-hidden rounded-lg border">
-          {isLoading ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading applicants…
-            </div>
-          ) : error ? (
-            <ApiErrorView error={error} onRetry={refreshApplicants} fullScreen />
-          ) : applicants.length === 0 ? (
-            <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-              <UserSearch className="h-8 w-8 text-muted-foreground" />
-              <p className="text-sm font-medium">
-                {hasActiveFilters ? "No applicants match your filters" : "No applicants yet"}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {hasActiveFilters
-                  ? "Try adjusting your search or date range."
-                  : "Applicants you add will show up here."}
-              </p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="px-4 py-3 font-medium">Application No.</th>
-                    <th className="px-4 py-3 font-medium">Applicant Name</th>
-                    <th className="px-4 py-3 font-medium">Status</th>
-                    <th className="px-4 py-3 font-medium">Date Applied</th>
-                    <th className="px-4 py-3 font-medium">Last Updated</th>
-                    <th className="px-4 py-3 font-medium text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applicants.map((applicant) => {
-                    const matchingProfile = profiles.find(
-                      (p) => String(p.id) === String(applicant.profileId),
-                    )
-                    const fullName = matchingProfile
-                      ? `${matchingProfile.firstName} ${matchingProfile.lastName}`
-                      : "No linked profile"
+        <DataTableState
+          className="mt-4"
+          loading={isLoading}
+          loadingLabel="Loading applicants"
+          error={error}
+          onRetry={refreshApplicants}
+          empty={applicants.length === 0}
+          emptyState={
+            <EmptyState
+              variant={hasActiveFilters ? "no-results" : "no-records"}
+              title={hasActiveFilters ? "No applicants match your filters" : "No applicants yet"}
+              description={
+                hasActiveFilters
+                  ? "Try adjusting your search or applied date range."
+                  : "Applicants you add will show up here."
+              }
+              className="min-h-72 border-0"
+              actions={
+                hasActiveFilters ? (
+                  <Button size="sm" variant="outline" onClick={clearFilters}>
+                    Clear filters
+                  </Button>
+                ) : canCreate ? (
+                  <Button size="sm" onClick={openCreateDialog}>
+                    <Plus aria-hidden="true" />
+                    New applicant
+                  </Button>
+                ) : undefined
+              }
+            />
+          }
+        >
+          <div className="hidden md:block">
+            <Table className="min-w-3xl text-sm">
+              <TableHeader>
+                <TableRow className="bg-muted/50 hover:bg-muted/50">
+                  <TableHead className="px-4">Application number</TableHead>
+                  <TableHead className="px-4">Applicant name</TableHead>
+                  <TableHead className="px-4">Status</TableHead>
+                  <TableHead className="px-4">Date applied</TableHead>
+                  <TableHead className="px-4">Last updated</TableHead>
+                  <TableHead className="px-4 text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  <TableSkeletonRows columns={6} rows={8} />
+                ) : (
+                  applicants.map((applicant) => {
+                    const fullName =
+                      profileNames.get(String(applicant.profileId)) ?? "No linked profile"
 
                     return (
-                      <tr key={applicant.id} className="border-b last:border-0 hover:bg-muted/30">
-                        <td className="px-4 py-3 font-medium">{applicant.applicationNumber}</td>
-                        <td className="px-4 py-3">{fullName}</td>
-                        <td className="px-4 py-3">
-                          <span className={"inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " + getStatusStyle(applicant.status)}>
-                            {applicant.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatDate(applicant.createdAt)}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatDate(applicant.updatedAt)}</td>
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="icon-sm"
-                              className="active:translate-y-0!"
-                              onClick={() => router.push(`/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`)}
-                              aria-label="View applicant"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                            </Button>
-                            {/* Edit/Delete only shown when user has update or delete permission */}
-                            {(canProcess || hasPermission("hrms.recruitment.applicants.update") || hasPermission("hrms.recruitment.applicants.delete")) && (
-                              <ApplicantRowActions applicant={applicant} onChanged={refreshApplicants} />
-                            )}
-                          </div>
-                        </td>
-                      </tr>
+                      <TableRow key={applicant.id}>
+                        <TableCell className="h-11 px-4 font-medium">
+                          {applicant.applicationNumber}
+                        </TableCell>
+                        <TableCell className="max-w-64 truncate px-4">
+                          {fullName}
+                        </TableCell>
+                        <TableCell className="px-4">
+                          <ApplicantStatusBadge status={applicant.status} />
+                        </TableCell>
+                        <TableCell className="px-4 text-muted-foreground">
+                          {formatDate(applicant.createdAt)}
+                        </TableCell>
+                        <TableCell className="px-4 text-muted-foreground">
+                          {formatDate(applicant.updatedAt)}
+                        </TableCell>
+                        <TableCell className="px-4 text-right">
+                          <ApplicantRowActions
+                            applicant={applicant}
+                            applicantLabel={applicant.applicationNumber}
+                            canEdit={canUpdate}
+                            canDelete={canDelete}
+                            idPrefix="desktop"
+                            onView={() => viewApplicant(applicant)}
+                            onChanged={refreshApplicants}
+                          />
+                        </TableCell>
+                      </TableRow>
                     )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-
-        {!isLoading && !error && applicants.length > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              Page {page} of {totalPages} · {totalRecords} applicant{totalRecords === 1 ? "" : "s"}
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(Number(totalPages), p + 1))}
-                disabled={page >= Number(totalPages)}
-                className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
-              >
-                Next
-              </button>
-            </div>
+                  })
+                )}
+              </TableBody>
+            </Table>
           </div>
-        )}
 
-        {/* Create applicant dialog */}
-        <Dialog open={isCreateOpen} onOpenChange={(open) => { setIsCreateOpen(open); if (!open) setCreateError(null) }}>
+          <ul role="list" className="divide-y md:hidden">
+            {isLoading
+              ? Array.from({ length: 5 }, (_, index) => (
+                  <li key={index} className="space-y-3 p-4" aria-hidden="true">
+                    <div className="flex items-center justify-between gap-3">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-5 w-20 rounded-full" />
+                    </div>
+                    <Skeleton className="h-4 w-44" />
+                    <Skeleton className="h-4 w-full" />
+                  </li>
+                ))
+              : applicants.map((applicant) => {
+                  const fullName =
+                    profileNames.get(String(applicant.profileId)) ?? "No linked profile"
+
+                  return (
+                    <li key={applicant.id} className="space-y-3 p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-medium break-words">
+                            {applicant.applicationNumber}
+                          </p>
+                          <p className="mt-1 truncate text-sm text-muted-foreground">
+                            {fullName}
+                          </p>
+                        </div>
+                        <ApplicantStatusBadge status={applicant.status} />
+                      </div>
+                      <dl className="grid grid-cols-2 gap-3 text-sm">
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Date applied</dt>
+                          <dd className="mt-0.5">{formatDate(applicant.createdAt)}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs text-muted-foreground">Last updated</dt>
+                          <dd className="mt-0.5">{formatDate(applicant.updatedAt)}</dd>
+                        </div>
+                      </dl>
+                      <div className="flex justify-end border-t pt-3">
+                        <ApplicantRowActions
+                          applicant={applicant}
+                          applicantLabel={applicant.applicationNumber}
+                          canEdit={canUpdate}
+                          canDelete={canDelete}
+                          idPrefix="mobile"
+                          onView={() => viewApplicant(applicant)}
+                          onChanged={refreshApplicants}
+                        />
+                      </div>
+                    </li>
+                  )
+                })}
+          </ul>
+        </DataTableState>
+
+        {!isLoading && !error && applicants.length > 0 ? (
+          <DataPagination
+            className="mt-4"
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalPages={totalPages}
+            totalRecords={totalRecords}
+            itemLabel={totalRecords === 1 ? "applicant" : "applicants"}
+            onPageChange={setPage}
+          />
+        ) : null}
+
+        <Dialog
+          open={isCreateOpen}
+          onOpenChange={(open) => {
+            setIsCreateOpen(open)
+            if (!open) setCreateError(null)
+          }}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>New applicant</DialogTitle>
               <DialogDescription>Register a new job applicant by linking to an existing profile.</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="create-profile">Profile</Label>
+              <Field>
+                <FieldLabel htmlFor="create-profile">Profile</FieldLabel>
                 <select
                   id="create-profile"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
                   value={createForm.profileId}
                   onChange={(e) => setCreateForm((s) => ({ ...s, profileId: e.target.value }))}
                   required
@@ -324,12 +439,12 @@ export default function ApplicantsPage() {
                     </option>
                   ))}
                 </select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="create-status">Initial status</Label>
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="create-status">Initial status</FieldLabel>
                 <select
                   id="create-status"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
                   value={createForm.status}
                   onChange={(e) => setCreateForm((s) => ({ ...s, status: e.target.value }))}
                 >
@@ -337,11 +452,13 @@ export default function ApplicantsPage() {
                     <option key={opt} value={opt}>{opt}</option>
                   ))}
                 </select>
-              </div>
-              {createError && <p className="text-sm text-destructive">{createError}</p>}
+              </Field>
+              <FieldError>{createError}</FieldError>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>Cancel</Button>
-                <Button type="submit" disabled={creating}>
+                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="min-w-32" disabled={creating}>
                   {creating ? "Creating…" : "Create applicant"}
                 </Button>
               </DialogFooter>

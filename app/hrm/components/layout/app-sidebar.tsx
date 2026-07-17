@@ -1,25 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import {
-  LayoutDashboard,
-  Users,
-  UserRoundPlus,
-  IdCard,
-  Settings,
-  FilePen,
-  Building,
-  Pin,
-  UserRoundCog,
-  UserLock,
-  FileSliders,
-  CloudDownload,
-} from "lucide-react"
+import { usePathname } from "next/navigation"
 
+import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -29,114 +16,27 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
-
-type NavItem = {
-  title: string
-  icon: React.ElementType
-  url: string
-  requiredPermission?: string
-}
-
-// Main section — always visible to all authenticated users
-const mainItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    icon: LayoutDashboard,
-    url: "/hrm/dashboard",
-  },
-  {
-    title: "My Portfolio",
-    icon: IdCard,
-    url: "/hrm/portfolio",
-  },
-]
-
-// Human Resource Management section — shown only when the user has at least one item visible
-const hrItems: NavItem[] = [
-  {
-    title: "Applicants",
-    icon: UserRoundPlus,
-    url: "/hrm/applicants",
-    // hrms.recruitment.applicants.view → HR Administrator (4), HR Staff (11), Department Head (6), Super Admin
-    requiredPermission: "hrms.recruitment.applicants.view",
-  },
-  {
-    title: "Employees",
-    icon: Users,
-    url: "/hrm/employees",
-    // hrms.employees.view → HR Administrator (4), HR Staff (11), Department Head (6), Super Admin
-    requiredPermission: "hrms.employees.view",
-  },
-  {
-    title: "Leave Applications",
-    icon: FilePen,
-    url: "#",
-    // hrms.leaveApplications.view → HR Administrator (4), HR Staff (11), Super Admin
-    requiredPermission: "hrms.leaveApplications.view",
-  },
-  {
-    title: "Departments",
-    icon: Building,
-    url: "/hrm/departments",
-    // org.departments.view → HR Administrator (4), Academic Admin (12), Department Head (6), Registrar (2), Super Admin
-    requiredPermission: "org.departments.view",
-  },
-  {
-    title: "Designations",
-    icon: Pin,
-    url: "#",
-    // org.designations.view → HR Administrator (4), Academic Admin (12), Super Admin
-    requiredPermission: "org.designations.view",
-  },
-]
-
-// Settings section — shown only when the user has at least one item visible
-const settingsItems: NavItem[] = [
-  {
-    title: "Leave Settings",
-    icon: FileSliders,
-    url: "/hrm/leave-settings",
-    // hrms.leaveTypes.view → HR Administrator (4), HR Staff (11), Super Admin
-    requiredPermission: "hrms.leaveTypes.view",
-  },
-  {
-    title: "Azure Users",
-    icon: CloudDownload,
-    url: "/hrm/azure-users",
-    // hrms.azure.users.view → HR Administrator (4), Super Admin
-    requiredPermission: "hrms.azure.users.view",
-  },
-  {
-    title: "User Management",
-    icon: UserRoundCog,
-    url: "#",
-    // identity.users.view → HR Administrator (4), Super Admin
-    requiredPermission: "identity.users.view",
-  },
-  {
-    title: "Roles & Permissions",
-    icon: UserLock,
-    url: "/hrm/roles-permissions",
-    // identity.roles.view → HR Administrator (4), Super Admin
-    requiredPermission: "identity.roles.view",
-  },
-]
+import {
+  HRM_NAV_GROUPS,
+  isHrmNavItemActive,
+  type HrmNavItem,
+} from "./hrm-navigation"
 
 function NavGroup({
   label,
   items,
   hasPermission,
+  pathname,
 }: {
   label: string
-  items: NavItem[]
+  items: HrmNavItem[]
   hasPermission: (permission: string) => boolean
+  pathname: string
 }) {
   const visibleItems = items.filter(
     (item) => !item.requiredPermission || hasPermission(item.requiredPermission)
   )
 
-  // Hide the entire group (label + menu) when no items are visible
   if (visibleItems.length === 0) return null
 
   return (
@@ -144,16 +44,20 @@ function NavGroup({
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          {visibleItems.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <Link href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {visibleItems.map((item) => {
+            const isActive = isHrmNavItemActive(pathname, item.url)
+
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
+                  <Link href={item.url} aria-current={isActive ? "page" : undefined}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
@@ -162,51 +66,34 @@ function NavGroup({
 
 export function AppSidebar() {
   const { hasPermission } = useHrmAuth()
+  const pathname = usePathname()
 
   return (
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader>
         <div className="flex h-14 items-center px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
             HR
           </div>
 
           <div className="ml-3 group-data-[collapsible=icon]:hidden">
-            <p className="text-sm font-semibold">SPUP SIMS</p>
-            <p className="text-xs text-muted-foreground">HRM Module</p>
+            <p className="text-sm font-semibold">SPUP HRM</p>
+            <p className="text-xs text-muted-foreground">Part of SIMS</p>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Main — always visible, no permission required */}
-        <NavGroup label="Main" items={mainItems} hasPermission={hasPermission} />
-
-        {/* HRM section — hidden entirely for Employee role */}
-        <NavGroup
-          label="Human Resource Management"
-          items={hrItems}
-          hasPermission={hasPermission}
-        />
-
-        {/* Settings section — hidden entirely for Employee and Department Head roles */}
-        <NavGroup
-          label="Settings"
-          items={settingsItems}
-          hasPermission={hasPermission}
-        />
+        {HRM_NAV_GROUPS.map((group) => (
+          <NavGroup
+            key={group.label}
+            label={group.label}
+            items={group.items}
+            hasPermission={hasPermission}
+            pathname={pathname}
+          />
+        ))}
       </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Settings />
-              <span>System Settings</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
 
       <SidebarRail />
     </Sidebar>

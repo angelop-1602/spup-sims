@@ -6,7 +6,7 @@ import { useApiQuery, useAuthorizedHeaders, request, type components } from "@/l
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PermissionGuard } from "@/components/auth/permission-guard"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 import {
   Dialog,
   DialogContent,

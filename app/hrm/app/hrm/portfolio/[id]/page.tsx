@@ -5,7 +5,7 @@ import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { EmployeePortfolioDetails } from "@/components/hrm/portfolio/employee-portfolio-details"
 import { useApiQuery, type components } from "@/lib/api"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 
 type EmployeeResponse = components["schemas"]["EmployeeResponse"]
 

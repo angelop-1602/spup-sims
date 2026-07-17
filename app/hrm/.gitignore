@@ -47,7 +47,3 @@ CLAUDE.md
 .mcp.json
 skills-lock.json
 
-# NextPilot generated files
-.nextpilot/cache/
-.nextpilot/history/
-.nextpilot/artifacts/
