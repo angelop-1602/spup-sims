@@ -1,10 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, AlertCircle, ArrowLeft, CheckCircle2, Trash2 } from "lucide-react"
+import { Loader2, AlertCircle, ArrowLeft, CheckCircle2, Trash2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -149,6 +148,7 @@ export default function ApplicantSelfProfilePage() {
     const requiredFields: { key: keyof ProfileUpdateForm; label: string }[] = [
       { key: "firstName", label: "First Name" },
       { key: "lastName", label: "Last Name" },
+      { key: "birthDate", label: "Date of Birth" },
       { key: "personalEmail", label: "Email" },
     ]
 
@@ -191,6 +191,7 @@ export default function ApplicantSelfProfilePage() {
 
       await fetchMyProfile()
       setIsEditModalOpen(false)
+      setStatusModal({ open: true, type: "success", title: "Profile Updated", message: "Your personal information has been updated successfully." })
     } catch (err: any) {
       setSaveStatus({ type: "error", message: err.message || "An error occurred while saving profile." })
     } finally {
@@ -330,6 +331,14 @@ export default function ApplicantSelfProfilePage() {
     fetchDocuments()
   }, [fetchMyProfile, fetchDocuments])
 
+  React.useEffect(() => {
+    if (!statusModal.open) return
+    const timer = setTimeout(() => {
+      setStatusModal((s) => ({ ...s, open: false }))
+    }, 4500)
+    return () => clearTimeout(timer)
+  }, [statusModal.open])
+
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[450px] gap-2 text-sm text-muted-foreground">
@@ -423,29 +432,29 @@ export default function ApplicantSelfProfilePage() {
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Status Modal (Success/Error) */}
-      <Dialog open={statusModal.open} onOpenChange={(open) => !open && setStatusModal((s) => ({ ...s, open: false }))}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {statusModal.type === "success" ? (
-                <CheckCircle2 className="h-5 w-5 text-green-600" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-destructive" />
-              )}
-              {statusModal.title}
-            </DialogTitle>
-            <DialogDescription>
-              {statusModal.message}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setStatusModal((s) => ({ ...s, open: false }))}>
-              OK
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Status Alert (Success/Error) */}
+      {statusModal.open && (
+        <div className="fixed top-4 right-4 z-50 w-full max-w-sm animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="flex items-start gap-3 rounded-xl border border-border bg-popover p-4 shadow-lg ring-1 ring-foreground/10">
+            {statusModal.type === "success" ? (
+              <CheckCircle2 className="h-5 w-5 shrink-0 text-green-600" />
+            ) : (
+              <AlertCircle className="h-5 w-5 shrink-0 text-destructive" />
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-medium text-foreground">{statusModal.title}</p>
+              <p className="mt-0.5 text-sm text-muted-foreground">{statusModal.message}</p>
+            </div>
+            <button
+              onClick={() => setStatusModal((s) => ({ ...s, open: false }))}
+              className="shrink-0 text-muted-foreground hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Dismiss</span>
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   )

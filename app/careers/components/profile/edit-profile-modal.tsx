@@ -70,6 +70,7 @@ export function EditProfileModal({
           />
           <DateField
             label="Date of Birth"
+            required
             value={editForm.birthDate}
             onChange={(v) => setEditForm({ ...editForm, birthDate: v })}
           />
@@ -173,10 +174,12 @@ function FormField({
 
 function DateField({
   label,
+  required = false,
   value,
   onChange,
 }: {
   label: string
+  required?: boolean
   value: string
   onChange: (value: string) => void
 }) {
@@ -186,7 +189,10 @@ function DateField({
   return (
     <div className="flex">
       <div className="flex-1">
-        <label className="mb-2 block text-sm font-medium">{label}</label>
+        <label className="mb-2 block text-sm font-medium">
+          {label}
+          {required && <span className="ml-0.5 text-destructive">*</span>}
+        </label>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
