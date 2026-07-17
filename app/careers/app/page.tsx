@@ -1,17 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowUpRight,
   Briefcase,
   FileText,
-  TrendingUp,
   X,
-  User,
-  ShieldCheck,
-  Bookmark,
-  ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
 import { Job, UserProfile, Application, JobPostingsApiResponse, mapApiJobToJob } from '@/components/landing/types';
@@ -30,11 +24,6 @@ export default function LandingPage() {
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
 
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedDepartment, setSelectedDepartment] = useState<string>('All');
-  const [selectedWorkplace, setSelectedWorkplace] = useState<string>('All');
-  const [selectedExperience, setSelectedExperience] = useState<string>('All');
-  const [showSavedOnly, setShowSavedOnly] = useState<boolean>(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -132,35 +121,6 @@ export default function LandingPage() {
     setApplications([newApplication, ...applications]);
     triggerToast(`Successfully applied to ${job.title}! Track status under 'My Applications'`);
   };
-
-  const handleResetFilters = () => {
-    setSearchQuery('');
-    setSelectedDepartment('All');
-    setSelectedWorkplace('All');
-    setSelectedExperience('All');
-    setShowSavedOnly(false);
-    triggerToast('All search filters reset.');
-  };
-
-  const departments = useMemo(() => {
-    return ['All', ...Array.from(new Set(jobs.map(j => j.department)))];
-  }, [jobs]);
-
-  const filteredJobs = useMemo(() => {
-    return jobs.filter((job) => {
-      const matchesSearch =
-        job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.description.toLowerCase().includes(searchQuery.toLowerCase());
-
-      const matchesDept = selectedDepartment === 'All' || job.department === selectedDepartment;
-      const matchesWorkplace = selectedWorkplace === 'All' || job.workplace === selectedWorkplace;
-      const matchesExperience = selectedExperience === 'All' || job.experienceLevel === selectedExperience;
-      const matchesSaved = !showSavedOnly || savedJobIds.includes(job.id);
-
-      return matchesSearch && matchesDept && matchesWorkplace && matchesExperience && matchesSaved;
-    });
-  }, [jobs, searchQuery, selectedDepartment, selectedWorkplace, selectedExperience, showSavedOnly, savedJobIds]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col antialiased selection:bg-neutral-900 selection:text-white">
