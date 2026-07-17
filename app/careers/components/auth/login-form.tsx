@@ -125,7 +125,7 @@ export default function LoginForm({
       const safeReturnTo =
         returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//") && !returnTo.startsWith("/\\")
           ? returnTo
-          : "/applicant/dashboard"
+          : "/"
       router.push(safeReturnTo)
       router.refresh()
     } catch (err) {

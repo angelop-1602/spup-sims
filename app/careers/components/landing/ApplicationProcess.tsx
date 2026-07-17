@@ -82,7 +82,7 @@ const applicationRequirements = [
 
 export default function ProcessTimeline() {
   return (
-    <section className="bg-white border-t border-neutral-200 pt-12 pb-0 w-full rounded-none">
+    <section id="process" className="bg-white border-t border-neutral-200 pt-12 pb-0 w-full rounded-none">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
   
         {/* Application Process Title */}

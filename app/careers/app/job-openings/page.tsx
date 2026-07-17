@@ -13,11 +13,14 @@ import {
   SlidersHorizontal,
 } from "lucide-react";
 import { Instrument_Serif, Poppins, Epilogue } from "next/font/google";
+import { useRouter } from "next/navigation";
 import {
   Job,
   JobPostingsApiResponse,
   mapApiJobToJob,
 } from "@/components/landing/types";
+import { AccountMenu } from "@/components/auth/account-menu";
+import { logout, useAuthStatus } from "@/hooks/use-auth-status";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -65,6 +68,12 @@ function SkeletonCard() {
 }
 
 export default function JobOpeningsPage() {
+  const router = useRouter();
+  const { status, profile } = useAuthStatus();
+  const displayName = profile
+    ? `${profile.profile.firstName} ${profile.profile.lastName}`.trim()
+    : "Applicant User";
+  const emailLabel = profile?.profile.personalEmail || "";
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -169,12 +178,32 @@ export default function JobOpeningsPage() {
               >
                 Job Openings
               </Link>
-              <a
-                href="/register"
-                className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-neutral-800 rounded-md transition-colors cursor-pointer shadow-sm"
+              <Link
+                href="/#process"
+                className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
               >
-                Login / Register
-              </a>
+                Application Process
+              </Link>
+              <Link
+                href="/#faqs"
+                className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors"
+              >
+                FAQs
+              </Link>
+              {status === "authenticated" ? (
+                <AccountMenu
+                  displayName={displayName}
+                  email={emailLabel}
+                  onLogout={() => logout(router)}
+                />
+              ) : (
+                <a
+                  href="/register"
+                  className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-neutral-800 rounded-md transition-colors cursor-pointer shadow-sm"
+                >
+                  Login / Register
+                </a>
+              )}
             </nav>
           </div>
         </div>

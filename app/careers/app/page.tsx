@@ -14,8 +14,17 @@ import JobDetailsModal from '@/components/landing/JobDetailsModal';
 import ProcessTimeline from '@/components/landing/ApplicationProcess';
 import FaqSection from '@/components/landing/Faq';
 import JobBoardCTA from '@/components/landing/Cta';
+import { useRouter } from 'next/navigation';
+import { AccountMenu } from '@/components/auth/account-menu';
+import { logout, useAuthStatus } from '@/hooks/use-auth-status';
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { status, profile: authProfile } = useAuthStatus();
+  const displayName = authProfile
+    ? `${authProfile.profile.firstName} ${authProfile.profile.lastName}`.trim()
+    : "Applicant User";
+  const emailLabel = authProfile?.profile.personalEmail || "";
   const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile' | 'faqs' >('explore');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsLoading, setJobsLoading] = useState<boolean>(true);
@@ -213,12 +222,20 @@ export default function LandingPage() {
                 FAQs
               </button>
 
-              <a 
-                href="/register" 
-                className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-50 dark:text-neutral-950 dark:hover:bg-neutral-200 rounded-md transition-colors cursor-pointer shadow-sm"
-              >
-                Login / Register
-              </a>
+              {status === "authenticated" ? (
+                <AccountMenu
+                  displayName={displayName}
+                  email={emailLabel}
+                  onLogout={() => logout(router)}
+                />
+              ) : (
+                <a
+                  href="/register"
+                  className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-neutral-800 rounded-md transition-colors cursor-pointer shadow-sm"
+                >
+                  Login / Register
+                </a>
+              )}
             </nav>
           </div>
         </div>
