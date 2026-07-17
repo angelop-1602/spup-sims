@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   AlertCircle,
@@ -43,6 +44,28 @@ const checklist = [
 ] as const
 
 export default function ApplicantDashboardPage() {
+  const [firstName, setFirstName] = useState<string>("Applicant")
+
+  useEffect(() => {
+    async function fetchName() {
+      try {
+        const token = localStorage.getItem("access_token")
+        if (!token) return
+        const res = await fetch("/api/v1/applicant/me", {
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` }
+        })
+        if (!res.ok) return
+        const payload = await res.json()
+        const profileData = payload?.data || payload
+        const name = profileData?.profile?.firstName
+        if (name) setFirstName(name)
+      } catch {
+        // Silently keep default "Applicant"
+      }
+    }
+    fetchName()
+  }, [])
+
   const summaryCards = [
     {
       label: "Application Status",
@@ -85,7 +108,7 @@ export default function ApplicantDashboardPage() {
               Candidate Portal
             </Badge>
             <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
-              Welcome back, Applicant
+              Welcome back, {firstName}!
             </h1>
             <p className="mt-0.5 text-sm text-muted-foreground max-w-xl">
               Track your submission milestones, update personal data fields, and review onboarding documentation updates.
