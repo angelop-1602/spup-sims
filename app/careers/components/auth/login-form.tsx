@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 import type { components } from "@/lib/api"
+import { ApiError, request } from "@/lib/api/client"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -81,15 +82,13 @@ export default function LoginForm({
 
     setForgotSubmitting(true)
     try {
-      const response = await fetch("/api/v1/applicant/forgot-password", {
+      const data = await request<{ message?: string }>("/api/v1/applicant/forgot-password", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: forgotEmail }),
+        body: { email: forgotEmail },
       })
-      const data = await response.json().catch(() => null)
       setForgotMessage(data?.message || "If the email exists, a password reset link has been sent.")
-    } catch {
-      setForgotError("An unexpected network error occurred.")
+    } catch (err) {
+      setForgotError(err instanceof ApiError ? err.message : "An unexpected network error occurred.")
     } finally {
       setForgotSubmitting(false)
     }
@@ -113,19 +112,10 @@ export default function LoginForm({
     setSubmitting(true)
     try {
       const body: LoginRequest = { email, password }
-      const response = await fetch("/api/v1/applicant/login", {
+      const data = await request<{ accessToken?: string }>("/api/v1/applicant/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
+        body,
       })
-
-      if (!response.ok) {
-        const problem = await response.json().catch(() => null)
-        setError(problem?.detail || problem?.title || "Login failed.")
-        return
-      }
-
-      const data = await response.json()
 
       if (data.accessToken) {
         localStorage.setItem("access_token", data.accessToken)
@@ -139,7 +129,7 @@ export default function LoginForm({
       router.push(safeReturnTo)
       router.refresh()
     } catch (err) {
-      setError("An unexpected network error occurred.")
+      setError(err instanceof ApiError ? err.message : "An unexpected network error occurred.")
     } finally {
       setSubmitting(false)
     }

@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/breadcrumb"
 import { navItems } from "./app-sidebar"
 import { Separator } from "@/components/ui/separator"
+import { useApplicantProfile } from "@/components/auth/applicant-auth-guard"
 
 const HOME_ITEM = navItems[0]
 
@@ -54,7 +55,10 @@ export function AppTopbar() {
   const { resolvedTheme, setTheme } = useTheme()
   const currentItem = navItems.find((item) => item.url === pathname) ?? HOME_ITEM
   const [open, setOpen] = React.useState(false)
-  const displayName = "Applicant User"
+  const { profile } = useApplicantProfile()
+  const displayName = profile
+    ? `${profile.profile.firstName} ${profile.profile.lastName}`.trim()
+    : "Applicant User"
   const roleLabel = "Role"
   const initials = getInitials(displayName) || "A"
 

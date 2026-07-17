@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useApplicantProfile } from "@/components/auth/applicant-auth-guard"
 
 const setupSteps = [
   { step: "Account Registration", status: "Completed", value: 100 },
@@ -43,6 +44,7 @@ const checklist = [
 ] as const
 
 export default function ApplicantDashboardPage() {
+  const { profile } = useApplicantProfile()
   const summaryCards = [
     {
       label: "Application Status",
@@ -85,7 +87,7 @@ export default function ApplicantDashboardPage() {
               Candidate Portal
             </Badge>
             <h1 className="text-xl sm:text-2xl font-semibold text-foreground">
-              Welcome back, Applicant
+              Welcome back, {profile?.profile.firstName || "Applicant"}
             </h1>
             <p className="mt-0.5 text-sm text-muted-foreground max-w-xl">
               Track your submission milestones, update personal data fields, and review onboarding documentation updates.
