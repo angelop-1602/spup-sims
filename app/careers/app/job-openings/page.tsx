@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
+  ArrowLeft,
   Briefcase,
   ArrowUpRight,
   Search,
@@ -196,9 +197,9 @@ export default function JobOpeningsPage() {
                 All Job Openings
               </h2>
               <p
-                className={`${epilogue.className} text-sm text-neutral-500 mt-2`}
+                className={`${epilogue.className} text-sm text-neutral-700 mt-2`}
               >
-                Browse every position currently accepting applications at SPUP.
+                Browse positions currently accepting applications at SPUP.
               </p>
             </div>
           </div>
@@ -216,7 +217,7 @@ export default function JobOpeningsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search by title, department, or keyword..."
-                  className={`${epilogue.className} w-full pl-10 pr-4 py-2.5 text-xs bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors`}
+                  className={`${epilogue.className} w-full pl-10 pr-4 py-2.5 text-xs text-black bg-neutral-50 border border-neutral-200 rounded-lg focus:outline-none focus:border-neutral-900 focus:ring-1 focus:ring-neutral-900 transition-colors`}
                 />
                 {searchQuery && (
                   <button
@@ -234,7 +235,7 @@ export default function JobOpeningsPage() {
                 <select
                   value={selectedDepartment}
                   onChange={(e) => setSelectedDepartment(e.target.value)}
-                  className={`${epilogue.className} text-xs bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-neutral-900 transition-colors cursor-pointer`}
+                  className={`${epilogue.className} text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-neutral-900 transition-colors cursor-pointer`}
                 >
                   {departments.map((d) => (
                     <option key={d} value={d}>
@@ -245,7 +246,7 @@ export default function JobOpeningsPage() {
                 <select
                   value={selectedWorkplace}
                   onChange={(e) => setSelectedWorkplace(e.target.value)}
-                  className={`${epilogue.className} text-xs bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-neutral-900 transition-colors cursor-pointer`}
+                  className={`${epilogue.className} text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-neutral-900 transition-colors cursor-pointer`}
                 >
                   <option value="All">All Workplace</option>
                   <option value="Onsite">Onsite</option>
@@ -255,13 +256,12 @@ export default function JobOpeningsPage() {
                 <select
                   value={selectedExperience}
                   onChange={(e) => setSelectedExperience(e.target.value)}
-                  className={`${epilogue.className} text-xs bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-neutral-900 transition-colors cursor-pointer`}
+                  className={`${epilogue.className} text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 rounded-lg px-3 py-2.5 focus:outline-none focus:border-neutral-900 transition-colors cursor-pointer`}
                 >
                   <option value="All">All Levels</option>
                   <option value="Entry Level">Entry Level</option>
                   <option value="Mid Level">Mid Level</option>
                   <option value="Senior Level">Senior Level</option>
-                  <option value="Director / Lead">Director / Lead</option>
                 </select>
                 {hasActiveFilters && (
                   <button
@@ -379,7 +379,7 @@ export default function JobOpeningsPage() {
                   className={`${epilogue.className} text-sm text-neutral-500 text-center max-w-md leading-relaxed`}
                 >
                   There are no open positions at the moment. Please check back
-                  soon &mdash; new opportunities are posted regularly.
+                  soon, new opportunities are posted regularly.
                 </p>
                 {hasActiveFilters ? (
                   <button
@@ -393,7 +393,7 @@ export default function JobOpeningsPage() {
                     href="/"
                     className={`${epilogue.className} mt-6 inline-flex items-center gap-2 px-5 py-2.5 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none`}
                   >
-                    <Briefcase className="w-3.5 h-3.5" />
+                    <ArrowLeft className="w-3.5 h-3.5" />
                     Back to Home
                   </Link>
                 )}
