@@ -12,6 +12,7 @@ import {
   UserLock,
   FileSliders,
   CloudDownload,
+  Briefcase,
 } from "lucide-react"
 
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
@@ -52,6 +53,13 @@ const mainItems: NavItem[] = [
 
 // Human Resource Management section — shown only when the user has at least one item visible
 const hrItems: NavItem[] = [
+  {
+    title: "Job Postings",
+    icon: Briefcase,
+    url: "/hrm/job-postings",
+    // hrms.recruitment.job-postings.view → HR Administrator (4), HR Staff (11), Super Admin
+    requiredPermission: "hrms.recruitment.job-postings.view",
+  },
   {
     title: "Applicants",
     icon: UserRoundPlus,
