@@ -76,7 +76,8 @@ export default function ApplicantsPage() {
   const { hasPermission } = useHrmAuth()
 
   const canCreate = hasPermission("hrms.recruitment.applicants.create")
-  const canProcess = hasPermission("hrms.recruitment.applicants.process")
+  const canUpdateApplicant = hasPermission("hrms.recruitment.applicants.update")
+  const canDeleteApplicant = hasPermission("hrms.recruitment.applicants.delete")
 
   const [search, setSearch] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
@@ -259,9 +260,14 @@ export default function ApplicantsPage() {
                             >
                               <Eye className="h-3.5 w-3.5" />
                             </Button>
-                            {/* Edit/Delete only shown when user has update or delete permission */}
-                            {(canProcess || hasPermission("hrms.recruitment.applicants.update") || hasPermission("hrms.recruitment.applicants.delete")) && (
-                              <ApplicantRowActions applicant={applicant} onChanged={refreshApplicants} />
+                            {/* Edit/Delete each require their own permission */}
+                            {(canUpdateApplicant || canDeleteApplicant) && (
+                              <ApplicantRowActions
+                                applicant={applicant}
+                                onChanged={refreshApplicants}
+                                canUpdate={canUpdateApplicant}
+                                canDelete={canDeleteApplicant}
+                              />
                             )}
                           </div>
                         </td>

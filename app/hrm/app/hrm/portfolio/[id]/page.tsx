@@ -4,6 +4,7 @@ import * as React from "react"
 import { ArrowLeft, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { EmployeePortfolioDetails } from "@/components/hrm/portfolio/employee-portfolio-details"
+import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useApiQuery, type components } from "@/lib/api"
 import { ApiErrorView } from "@/components/ui/error-page"
 
@@ -24,6 +25,7 @@ export default function ViewEmployeePortfolioPage({ params }: PageProps) {
   )
 
   return (
+    <PermissionGuard requiredPermission="hrms.employees.view">
     <div className="space-y-6">
       <Link
         href="/hrm/employees"
@@ -57,5 +59,6 @@ export default function ViewEmployeePortfolioPage({ params }: PageProps) {
         </div>
       )}
     </div>
+    </PermissionGuard>
   )
 }

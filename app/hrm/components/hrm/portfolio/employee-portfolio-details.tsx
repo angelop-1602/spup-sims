@@ -13,6 +13,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -32,6 +39,30 @@ function isPortfolioSectionId(id: string): id is PortfolioSectionId {
   return id in PORTFOLIO_TABLE_RENDERERS
 }
 
+// Backend enums serialize as numbers; map to their declared labels.
+const GENDER_LABELS: Record<number, string> = {
+  0: "Male",
+  1: "Female",
+}
+
+const CIVIL_STATUS_LABELS: Record<number, string> = {
+  0: "Single",
+  1: "Married",
+  2: "Separated",
+  3: "Widowed",
+  4: "Divorced",
+}
+
+function formatGender(value: number | string | null | undefined) {
+  if (value === null || value === undefined) return "—"
+  return GENDER_LABELS[Number(value)] ?? String(value)
+}
+
+function formatCivilStatus(value: number | string | null | undefined) {
+  if (value === null || value === undefined) return "—"
+  return CIVIL_STATUS_LABELS[Number(value)] ?? String(value)
+}
+
 type ProfileFields = {
   label: string
   value: string | number | null | undefined
@@ -49,6 +80,8 @@ type EditProfileForm = {
   middleName: string
   lastName: string
   suffix: string
+  gender: string
+  civilStatus: string
   mobileNumber: string
   phoneNumber: string
   religion: string
@@ -61,6 +94,8 @@ function toEditForm(profile: components["schemas"]["EmployeeResponse"]): EditPro
     middleName: (profile as Record<string, unknown>).middleName as string ?? "",
     lastName: profile.lastName ?? "",
     suffix: (profile as Record<string, unknown>).suffix as string ?? "",
+    gender: profile.gender != null ? String(profile.gender) : "",
+    civilStatus: profile.civilStatus != null ? String(profile.civilStatus) : "",
     mobileNumber: profile.mobileNumber ?? "",
     phoneNumber: profile.phoneNumber ?? "",
     religion: profile.religion ?? "",
@@ -110,6 +145,8 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
           middleName: editForm.middleName || null,
           lastName: editForm.lastName,
           suffix: editForm.suffix || null,
+          gender: editForm.gender ? Number(editForm.gender) : null,
+          civilStatus: editForm.civilStatus ? Number(editForm.civilStatus) : null,
           mobileNumber: editForm.mobileNumber || null,
           phoneNumber: editForm.phoneNumber || null,
           religion: editForm.religion || null,
@@ -162,6 +199,8 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
   }
   const personalFields: ProfileFields[] = [
     { label: "Age", value: profile.age ?? "—" },
+    { label: "Gender", value: formatGender(profile.gender) },
+    { label: "Civil status", value: formatCivilStatus(profile.civilStatus) },
     { label: "Mobile", value: profile.mobileNumber ?? "—" },
     { label: "Phone", value: profile.phoneNumber ?? "—" },
     { label: "Religion", value: profile.religion ?? "—" },
@@ -170,11 +209,15 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
   const portfolioFields: ProfileFields[] = [
     { label: "Employee number", value: profile.employeeNumber },
     { label: "Employee type", value: profile.employeeType ?? "—" },
-    { label: "Supervisor", value: profile.supervisor ?? "—" },
+    { label: "Department", value: profile.department ?? "—" },
+    { label: "Position", value: profile.position ?? "—" },
+    { label: "Employment status", value: profile.employmentStatus ?? "—" },
     { label: "Category", value: profile.employmentCategory ?? "—" },
     { label: "Date hired", value: profile.dateHired ?? "—" },
-    { label: "Regularized", value: profile.dateRegularized ?? "—" },
+    { label: "Date regularized", value: profile.dateRegularized ?? "—" },
+    { label: "Date separated", value: profile.dateSeparated ?? "—" },
     { label: "Active", value: profile.isActive ? "Yes" : "No" },
+    { label: "Shared profile", value: profile.shared ? "Yes" : "No" },
   ]
 
   return (
@@ -310,6 +353,44 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
                     onChange={(e) => setEditForm((f) => ({ ...f, suffix: e.target.value }))}
                     placeholder="Jr., Sr., III"
                   />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Gender</label>
+                  <Select
+                    value={editForm.gender}
+                    onValueChange={(value) => setEditForm((f) => ({ ...f, gender: value }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(GENDER_LABELS).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium">Civil status</label>
+                  <Select
+                    value={editForm.civilStatus}
+                    onValueChange={(value) => setEditForm((f) => ({ ...f, civilStatus: value }))}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select civil status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(CIVIL_STATUS_LABELS).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">

@@ -6,10 +6,8 @@ import {
   Users,
   UserRoundPlus,
   IdCard,
-  Settings,
   FilePen,
   Building,
-  Pin,
   UserRoundCog,
   UserLock,
   FileSliders,
@@ -19,7 +17,6 @@ import {
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -71,9 +68,10 @@ const hrItems: NavItem[] = [
   {
     title: "Leave Applications",
     icon: FilePen,
-    url: "#",
-    // hrms.leaveApplications.view → HR Administrator (4), HR Staff (11), Super Admin
-    requiredPermission: "hrms.leaveApplications.view",
+    url: "/hrm/leave-applications",
+    // hrms.leave.viewOwn → every employee; approvers additionally see the
+    // Department/HR approval tabs on the page itself.
+    requiredPermission: "hrms.leave.viewOwn",
   },
   {
     title: "Departments",
@@ -81,13 +79,6 @@ const hrItems: NavItem[] = [
     url: "/hrm/departments",
     // org.departments.view → HR Administrator (4), Academic Admin (12), Department Head (6), Registrar (2), Super Admin
     requiredPermission: "org.departments.view",
-  },
-  {
-    title: "Designations",
-    icon: Pin,
-    url: "#",
-    // org.designations.view → HR Administrator (4), Academic Admin (12), Super Admin
-    requiredPermission: "org.designations.view",
   },
 ]
 
@@ -110,7 +101,7 @@ const settingsItems: NavItem[] = [
   {
     title: "User Management",
     icon: UserRoundCog,
-    url: "#",
+    url: "/hrm/users",
     // identity.users.view → HR Administrator (4), Super Admin
     requiredPermission: "identity.users.view",
   },
@@ -196,17 +187,6 @@ export function AppSidebar() {
           hasPermission={hasPermission}
         />
       </SidebarContent>
-
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton>
-              <Settings />
-              <span>System Settings</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
 
       <SidebarRail />
     </Sidebar>

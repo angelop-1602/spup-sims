@@ -42,9 +42,13 @@ type Applicant = {
 export function ApplicantRowActions({
   applicant,
   onChanged,
+  canUpdate = true,
+  canDelete = true,
 }: {
   applicant: Applicant
   onChanged: () => void
+  canUpdate?: boolean
+  canDelete?: boolean
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [status, setStatus] = React.useState(applicant.status)
@@ -90,6 +94,7 @@ export function ApplicantRowActions({
 
   return (
     <>
+      {canUpdate && (
       <Dialog open={editOpen} onOpenChange={handleEditOpenChange}>
         <DialogTrigger asChild>
           <Button variant="outline" size="icon-sm" aria-label="Edit applicant">
@@ -135,7 +140,9 @@ export function ApplicantRowActions({
           </form>
         </DialogContent>
       </Dialog>
+      )}
 
+      {canDelete && (
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button variant="destructive" size="icon-sm" aria-label="Delete applicant">
@@ -159,6 +166,7 @@ export function ApplicantRowActions({
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      )}
     </>
   )
 }

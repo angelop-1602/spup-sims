@@ -44,10 +44,6 @@ type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
 type SchoolYear = components["schemas"]["SchoolYearResponse"]
 type PagedSchoolYears = components["schemas"]["PagedResponseOfSchoolYearResponse"]
 
-interface LeaveSettingsClientProps {
-  initialLeaveTypes: LeaveType[]
-}
-
 const currentYear = new Date().getFullYear().toString()
 
 function formatDays(value: number | string | undefined) {
@@ -74,17 +70,13 @@ function normalizeLeaveTypes(value: unknown): LeaveType[] {
   return []
 }
 
-export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettingsClientProps) {
+export default function LeaveSettingsClient() {
   const { hasPermission } = useHrmAuth()
 
   const canCreateType = hasPermission("hrms.leaveTypes.create")
   const canUpdateType = hasPermission("hrms.leaveTypes.update")
   const canDeleteType = hasPermission("hrms.leaveTypes.delete")
   const canAdjustBalance = hasPermission("hrms.leaveBalances.update")
-  const initialLeaveTypesList = React.useMemo(
-    () => normalizeLeaveTypes(initialLeaveTypes),
-    [initialLeaveTypes],
-  )
 
   const [selectedType, setSelectedType] = React.useState<LeaveType | null>(null)
   const [typeForm, setTypeForm] = React.useState({
@@ -98,7 +90,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   const [selectedEmployeeId, setSelectedEmployeeId] = React.useState<string>("")
   const [selectedSchoolYear, setSelectedSchoolYear] = React.useState<string>("")
   const [adjustForm, setAdjustForm] = React.useState({
-    leaveTypeId: initialLeaveTypesList[0]?.id ? String(initialLeaveTypesList[0].id) : "",
+    leaveTypeId: "",
     totalDays: "",
     reason: "Balance adjustment",
   })
@@ -110,8 +102,8 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   } = useApiQuery<LeaveType[]>("/api/v1/hrms/leave-types")
 
   const leaveTypes = React.useMemo(
-    () => normalizeLeaveTypes(apiLeaveTypes ?? initialLeaveTypesList),
-    [apiLeaveTypes, initialLeaveTypesList],
+    () => normalizeLeaveTypes(apiLeaveTypes),
+    [apiLeaveTypes],
   )
 
   const {
