@@ -35,6 +35,7 @@ export default function LandingPage() {
 
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<'home' | 'process' | 'faqs'>('home');
 
   useEffect(() => {
     const cachedIds = localStorage.getItem('edu_careers_saved_ids');
@@ -86,6 +87,38 @@ export default function LandingPage() {
     fetchJobs();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    const processEl = document.getElementById('process');
+    const faqsEl = document.getElementById('faqs');
+
+    if (!processEl || !faqsEl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+
+        if (visible.length > 0) {
+          const id = visible[0].target.id;
+          if (id === 'faqs') setActiveSection('faqs');
+          else if (id === 'process') setActiveSection('process');
+        } else {
+          const scrollY = window.scrollY + 120;
+          if (scrollY < processEl.offsetTop) setActiveSection('home');
+        }
+      },
+      { rootMargin: '-20% 0px -60% 0px' }
+    );
+
+    observer.observe(processEl);
+    observer.observe(faqsEl);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [jobs]);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -186,7 +219,7 @@ export default function LandingPage() {
                   setActiveTab('explore');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }} 
-                className={`text-[11px] font-semibold transition-colors cursor-pointer ${activeTab === 'explore' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+                className={`text-[11px] font-semibold transition-colors cursor-pointer ${activeSection === 'home' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
               >
                 Home
               </button>
@@ -199,8 +232,13 @@ export default function LandingPage() {
               </Link>
 
               <button 
-                onClick={() => setActiveTab('applications')} 
-                className={`text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
+                onClick={() => {
+                  setActiveTab('explore');
+                  setTimeout(() => {
+                    document.getElementById('process')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }}
+                className={`text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeSection === 'process' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
               >
                 Application Process
                 {applications.length > 0 && (
@@ -217,7 +255,7 @@ export default function LandingPage() {
                     document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 100);
                 }} 
-                className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+                className={`text-[11px] font-semibold transition-colors cursor-pointer ${activeSection === 'faqs' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
               >
                 FAQs
               </button>
@@ -304,11 +342,11 @@ export default function LandingPage() {
                       Browse Job Openings
                     </Link>
                     <Link 
-                      href="/register" 
+                      href={status === "authenticated" ? "/applicant/profile" : "/register"} 
                       className="font-epilogue inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      Setup Application Profile
+                      {status === "authenticated" ? "Edit my Application Profile" : "Setup Application Profile"}
                     </Link>
                   </div>
 
