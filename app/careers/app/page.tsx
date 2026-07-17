@@ -279,20 +279,20 @@ export default function LandingPage() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3 pt-5 justify-center">
-                    <a 
-                      href="#advanced-search-box" 
+                    <Link 
+                      href="/job-openings" 
                       className="font-poppins inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
                     >
                       <Briefcase className="w-3.5 h-3.5" />
                       Browse Job Openings
-                    </a>
-                    <button 
-                      onClick={() => setActiveTab('profile')} 
-                      className="font-epilogue inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer"
+                    </Link>
+                    <Link 
+                      href="/register" 
+                      className="font-epilogue inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
                     >
                       <FileText className="w-3.5 h-3.5" />
                       Setup Application Profile
-                    </button>
+                    </Link>
                   </div>
 
                 </div>
