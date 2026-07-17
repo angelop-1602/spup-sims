@@ -1,5 +1,6 @@
 "use client"
 
+import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import {
   AlertCircle,
@@ -45,6 +46,7 @@ const checklist = [
 
 export default function ApplicantDashboardPage() {
   const { profile } = useApplicantProfile()
+  
   const summaryCards = [
     {
       label: "Application Status",
