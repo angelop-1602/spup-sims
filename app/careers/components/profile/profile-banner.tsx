@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card"
 import { STATUS_STYLES, type ApplicantMePayload } from "./types"
 
 interface ProfileBannerProps {
@@ -13,7 +14,7 @@ export function ProfileBanner({ profile, status, createdAt }: ProfileBannerProps
   })
 
   return (
-    <div className="rounded-2xl border border-border bg-card p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <Card className="p-6 flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="flex items-center gap-4">
         <div className="h-16 w-16 shrink-0 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-lg font-semibold uppercase">
           {profile.firstName && profile.lastName
@@ -35,6 +36,6 @@ export function ProfileBanner({ profile, status, createdAt }: ProfileBannerProps
           </p>
         </div>
       </div>
-    </div>
+    </Card>
   )
 }

@@ -2,6 +2,7 @@
 
 import { PenLine } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
 import { calculateAge, type ApplicantMePayload } from "./types"
 
 interface PersonalInfoSectionProps {
@@ -11,7 +12,7 @@ interface PersonalInfoSectionProps {
 
 export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProps) {
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden shadow-sm">
+    <Card className="gap-0 py-0">
       <div className="bg-muted/75 px-4 py-2 border-b border-border flex justify-between items-center">
         <h2 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">Personal</h2>
 
@@ -82,6 +83,6 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
           <span className="col-span-2 text-foreground">{profile.address || "—"}</span>
         </div>
       </div>
-    </div>
+    </Card>
   )
 }
