@@ -36,6 +36,13 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Edit3, Loader2, Plus, Save, Trash2 } from "lucide-react"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox"
 
 type LeaveType = components["schemas"]["LeaveTypeResponse"]
 type LeaveBalance = components["schemas"]["LeaveBalanceResponse"]
@@ -47,8 +54,6 @@ type PagedSchoolYears = components["schemas"]["PagedResponseOfSchoolYearResponse
 interface LeaveSettingsClientProps {
   initialLeaveTypes: LeaveType[]
 }
-
-const currentYear = new Date().getFullYear().toString()
 
 function formatDays(value: number | string | undefined) {
   return String(value ?? 0)
@@ -74,6 +79,56 @@ function normalizeLeaveTypes(value: unknown): LeaveType[] {
   return []
 }
 
+function isMaternityLeaveType(leaveType: Pick<LeaveType, "name" | "code"> | null | undefined) {
+  const haystack = `${leaveType?.name ?? ""} ${leaveType?.code ?? ""}`.toLowerCase()
+  return haystack.includes("maternity")
+}
+
+function isPaternityLeaveType(leaveType: Pick<LeaveType, "name" | "code"> | null | undefined) {
+  const haystack = `${leaveType?.name ?? ""} ${leaveType?.code ?? ""}`.toLowerCase()
+  return haystack.includes("paternity")
+}
+
+function isEligibleForMaternityLeave(employee: Employee | null | undefined) {
+  const record = (employee as Record<string, unknown> | undefined) ?? {}
+  const genderValue = record.gender
+  const civilStatusValue = record.civilStatus
+
+  const numericGender = Number(genderValue)
+  const numericCivilStatus = Number(civilStatusValue)
+
+  const isFemale = numericGender === 1 || String(genderValue ?? "").trim().toLowerCase() === "female"
+  const isMarried = numericCivilStatus === 2 || String(civilStatusValue ?? "").trim().toLowerCase() === "married"
+
+  return isFemale && isMarried
+}
+
+function isEligibleForPaternityLeave(employee: Employee | null | undefined) {
+  const record = (employee as Record<string, unknown> | undefined) ?? {}
+  const genderValue = record.gender
+  const civilStatusValue = record.civilStatus
+
+  const numericGender = Number(genderValue)
+  const numericCivilStatus = Number(civilStatusValue)
+
+  const isMale = numericGender === 2 || String(genderValue ?? "").trim().toLowerCase() === "male"
+  const isMarried = numericCivilStatus === 2 || String(civilStatusValue ?? "").trim().toLowerCase() === "married"
+
+  return isMale && isMarried
+}
+
+function isEligibleForLeaveType(employee: Employee | null | undefined, leaveType: LeaveType | null | undefined) {
+  if (isMaternityLeaveType(leaveType)) {
+    return isEligibleForMaternityLeave(employee)
+  }
+
+  if (isPaternityLeaveType(leaveType)) {
+    return isEligibleForPaternityLeave(employee)
+  }
+
+  return true
+}
+
 export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettingsClientProps) {
   const { hasPermission } = useHrmAuth()
 
@@ -96,7 +151,10 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
     isActive: true,
   })
   const [selectedEmployeeId, setSelectedEmployeeId] = React.useState<string>("")
+  const [employeeSearchText, setEmployeeSearchText] = React.useState("")
   const [selectedSchoolYear, setSelectedSchoolYear] = React.useState<string>("")
+  const [balanceActionMessage, setBalanceActionMessage] = React.useState<string | null>(null)
+  const [overridePreviousInitializations, setOverridePreviousInitializations] = React.useState(false)
   const [adjustForm, setAdjustForm] = React.useState({
     leaveTypeId: initialLeaveTypesList[0]?.id ? String(initialLeaveTypesList[0].id) : "",
     totalDays: "",
@@ -126,6 +184,11 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   const employees = employeesPaged?.data ?? []
 
   const {
+    data: currentSchoolYear,
+    loading: loadingCurrentSchoolYear,
+  } = useApiQuery<SchoolYear>("/api/v1/academic/school-years/current")
+
+  const {
     data: schoolYearsPaged,
     loading: loadingSchoolYears,
   } = useApiQuery<PagedSchoolYears>("/api/v1/academic/school-years", {
@@ -139,16 +202,25 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
 
   React.useEffect(() => {
     if (!selectedEmployeeId && employees.length) {
-      setSelectedEmployeeId(String(employees[0].id ?? ""))
+      const firstEmployee = employees[0]
+      if (firstEmployee) {
+        setSelectedEmployeeId(String(firstEmployee.id ?? ""))
+        setEmployeeSearchText(firstEmployee.fullName || firstEmployee.firstName || firstEmployee.email || "")
+      }
     }
   }, [employees, selectedEmployeeId])
 
   React.useEffect(() => {
+    if (!selectedSchoolYear && currentSchoolYear?.id) {
+      setSelectedSchoolYear(String(currentSchoolYear.id))
+      return
+    }
+
     if (!selectedSchoolYear && schoolYears.length) {
       const activeSchoolYear = schoolYears.find((schoolYear) => schoolYear.isActive) ?? schoolYears[0]
       setSelectedSchoolYear(String(activeSchoolYear?.id ?? ""))
     }
-  }, [schoolYears, selectedSchoolYear])
+  }, [currentSchoolYear, schoolYears, selectedSchoolYear])
 
   React.useEffect(() => {
     if (!adjustForm.leaveTypeId && leaveTypes.length) {
@@ -175,6 +247,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   const { mutate: saveLeaveType, loading: savingLeaveType } = useApiMutation()
   const { mutate: deleteLeaveType, loading: deletingLeaveType } = useApiMutation()
   const { mutate: adjustLeaveBalance, loading: adjustingBalance } = useApiMutation()
+  const { mutate: initializeLeaveBalances, loading: initializingBalances } = useApiMutation()
 
   const resetTypeForm = () => {
     setSelectedType(null)
@@ -250,6 +323,21 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
       return
     }
 
+    const selectedLeaveType = leaveTypes.find(
+      (leaveType) => String(leaveType.id) === adjustForm.leaveTypeId,
+    )
+
+    if (selectedLeaveType && !isEligibleForLeaveType(selectedEmployee, selectedLeaveType)) {
+      const eligibilityMessage = isMaternityLeaveType(selectedLeaveType)
+        ? "Maternity leave is only available for female, married employees."
+        : isPaternityLeaveType(selectedLeaveType)
+          ? "Paternity leave is only available for male, married employees."
+          : "This leave type is not available for the selected employee."
+
+      setBalanceActionMessage(eligibilityMessage)
+      return
+    }
+
     const success = await adjustLeaveBalance({
       path: "/api/v1/hrms/leave-balances/adjust",
       method: "POST",
@@ -265,12 +353,134 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
     if (success) {
       await refreshLeaveBalances()
       setAdjustForm((current) => ({ ...current, totalDays: "" }))
+      setBalanceActionMessage("Leave balance adjusted successfully.")
     }
   }
 
   const selectedEmployee = employees.find(
     (employee) => String(employee.id) === selectedEmployeeId,
   )
+
+  const filteredEmployees = React.useMemo(() => {
+    const searchText = employeeSearchText.trim().toLowerCase()
+    if (!searchText) {
+      return employees
+    }
+
+    return employees.filter((employee) => {
+      const label = `${employee.fullName || ""} ${employee.firstName || ""} ${employee.lastName || ""} ${employee.email || ""}`.toLowerCase()
+      return label.includes(searchText)
+    })
+  }, [employeeSearchText, employees])
+
+  const selectedSchoolYearName = React.useMemo(() => {
+    if (currentSchoolYear?.name) {
+      return currentSchoolYear.name
+    }
+
+    if (selectedSchoolYear) {
+      return schoolYears.find((schoolYear) => String(schoolYear.id) === selectedSchoolYear)?.name ?? selectedSchoolYear
+    }
+
+    return "Current school year"
+  }, [currentSchoolYear, schoolYears, selectedSchoolYear])
+
+  const selectedLeaveType = React.useMemo(
+    () => leaveTypes.find((leaveType) => String(leaveType.id) === adjustForm.leaveTypeId) ?? null,
+    [adjustForm.leaveTypeId, leaveTypes],
+  )
+
+  const handleInitializeBalances = async () => {
+    if (!selectedSchoolYear) {
+      setBalanceActionMessage("No current school year is available yet.")
+      return
+    }
+
+    const activeLeaveTypes = leaveTypes.filter((leaveType) => Boolean(leaveType.isActive))
+    const specialLeaveTypes = activeLeaveTypes.filter(
+      (leaveType) => isMaternityLeaveType(leaveType) || isPaternityLeaveType(leaveType),
+    )
+    const regularLeaveTypes = activeLeaveTypes.filter(
+      (leaveType) => !isMaternityLeaveType(leaveType) && !isPaternityLeaveType(leaveType),
+    )
+
+    const leaveTypeDefaults = regularLeaveTypes.reduce<Record<string, number | string>>(
+      (accumulator, leaveType) => {
+        const days = Number(leaveType.maxDaysPerYear ?? 0)
+        if (leaveType.id && Number.isFinite(days) && days >= 0) {
+          accumulator[String(leaveType.id)] = days
+        }
+        return accumulator
+      },
+      {},
+    )
+
+    if (Object.keys(leaveTypeDefaults).length === 0 && specialLeaveTypes.length === 0) {
+      setBalanceActionMessage("No active leave types are available to initialize.")
+      return
+    }
+
+    const initializeSuccess = await initializeLeaveBalances({
+      path: "/api/v1/hrms/leave-balances/initialize",
+      method: "POST",
+      body: {
+        schoolYearId: Number(selectedSchoolYear),
+        leaveTypeDefaults,
+      },
+    })
+
+    if (!initializeSuccess) {
+      setBalanceActionMessage("Unable to initialize default leave balances.")
+      return
+    }
+
+    if (overridePreviousInitializations) {
+      for (const leaveType of specialLeaveTypes) {
+        for (const employee of employees) {
+          await adjustLeaveBalance({
+            path: "/api/v1/hrms/leave-balances/adjust",
+            method: "POST",
+            body: {
+              employeeId: Number(employee.id),
+              leaveTypeId: Number(leaveType.id),
+              schoolYearId: Number(selectedSchoolYear),
+              totalDays: 0,
+              reason: `Override previous ${leaveType.name ?? "leave"} initialization`,
+            },
+          })
+        }
+      }
+    }
+
+    for (const leaveType of specialLeaveTypes) {
+      const eligibleEmployees = employees.filter((employee) => isEligibleForLeaveType(employee, leaveType))
+      if (!eligibleEmployees.length) {
+        continue
+      }
+
+      const days = Number(leaveType.maxDaysPerYear ?? 0)
+      for (const employee of eligibleEmployees) {
+        await adjustLeaveBalance({
+          path: "/api/v1/hrms/leave-balances/adjust",
+          method: "POST",
+          body: {
+            employeeId: Number(employee.id),
+            leaveTypeId: Number(leaveType.id),
+            schoolYearId: Number(selectedSchoolYear),
+            totalDays: Number.isFinite(days) && days >= 0 ? days : undefined,
+            reason: `Initial ${leaveType.name ?? "leave"} allocation`,
+          },
+        })
+      }
+    }
+
+    await refreshLeaveBalances()
+    setBalanceActionMessage(
+      specialLeaveTypes.length > 0
+        ? `Leave balances initialized for ${selectedSchoolYearName}. Special leave was applied only to eligible employees.`
+        : `Leave balances initialized for ${selectedSchoolYearName}.`,
+    )
+  }
 
   return (
     <PermissionGuard requiredPermission="hrms.leaveTypes.view">
@@ -338,6 +548,16 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                   />
                   <Label htmlFor="requires-medical">Requires medical certificate</Label>
                 </div>
+                {isMaternityLeaveType({ name: typeForm.name, code: typeForm.code }) ? (
+                  <p className="text-sm text-muted-foreground">
+                    Maternity leave is only applicable to female, married employees.
+                  </p>
+                ) : null}
+                {isPaternityLeaveType({ name: typeForm.name, code: typeForm.code }) ? (
+                  <p className="text-sm text-muted-foreground">
+                    Paternity leave is only applicable to male, married employees.
+                  </p>
+                ) : null}
                 <div className="flex items-center gap-2">
                   <input
                     id="is-paid"
@@ -431,6 +651,12 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                         {leaveType.requiresMedicalCertificate ? (
                           <Badge variant="outline">Medical required</Badge>
                         ) : null}
+                        {isMaternityLeaveType(leaveType) ? (
+                          <Badge variant="outline">Female + married only</Badge>
+                        ) : null}
+                        {isPaternityLeaveType(leaveType) ? (
+                          <Badge variant="outline">Male + married only</Badge>
+                        ) : null}
                       </div>
                     </TableCell>
                     <TableCell className="space-x-2 text-right">
@@ -493,37 +719,49 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="employee">Employee</Label>
-                <select
-                  id="employee"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                <Combobox
                   value={selectedEmployeeId}
-                  onChange={(event) => setSelectedEmployeeId(event.target.value)}
+                  onValueChange={(value) => {
+                    const nextValue = value ?? ""
+                    setSelectedEmployeeId(nextValue)
+                    if (nextValue) {
+                      const employee = employees.find((item) => String(item.id) === nextValue)
+                      setEmployeeSearchText(
+                        employee?.fullName || employee?.firstName || employee?.email || "",
+                      )
+                    }
+                  }}
                 >
-                  {employees.map((employee) => (
-                    <option key={String(employee.id)} value={String(employee.id)}>
-                      {employee.fullName || employee.firstName || employee.email || "Employee"}
-                    </option>
-                  ))}
-                </select>
+                  <ComboboxInput
+                    id="employee"
+                    value={employeeSearchText}
+                    onChange={(event) => setEmployeeSearchText(event.target.value)}
+                    placeholder="Search employee"
+                    showTrigger
+                    showClear
+                  />
+                  <ComboboxContent>
+                    <ComboboxList>
+                      {filteredEmployees.map((employee) => {
+                        const label = employee.fullName || employee.firstName || employee.email || "Employee"
+                        return (
+                          <ComboboxItem key={String(employee.id)} value={String(employee.id)}>
+                            {label}
+                          </ComboboxItem>
+                        )
+                      })}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="school-year">School year</Label>
-                <select
+                <Input
                   id="school-year"
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  value={selectedSchoolYear}
-                  onChange={(event) => setSelectedSchoolYear(event.target.value)}
-                  disabled={loadingSchoolYears}
-                >
-                  {!loadingSchoolYears && schoolYears.length === 0 ? (
-                    <option value="">No school years available</option>
-                  ) : null}
-                  {schoolYears.map((schoolYear) => (
-                    <option key={String(schoolYear.id)} value={String(schoolYear.id)}>
-                      {schoolYear.name}
-                    </option>
-                  ))}
-                </select>
+                  value={loadingCurrentSchoolYear ? "Loading current school year..." : selectedSchoolYearName}
+                  readOnly
+                  className="bg-muted/50"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="leave-type">Leave type</Label>
@@ -544,6 +782,16 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                     </option>
                   ))}
                 </select>
+                {selectedLeaveType && isMaternityLeaveType(selectedLeaveType) ? (
+                  <p className="text-sm text-muted-foreground">
+                    Maternity leave is only applicable to female, married employees.
+                  </p>
+                ) : null}
+                {selectedLeaveType && isPaternityLeaveType(selectedLeaveType) ? (
+                  <p className="text-sm text-muted-foreground">
+                    Paternity leave is only applicable to male, married employees.
+                  </p>
+                ) : null}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="adjust-days">Total days</Label>
@@ -574,6 +822,27 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             </div>
             <div className="flex flex-wrap items-center gap-2">
               {canAdjustBalance && (
+                <div className="flex items-center gap-2 rounded-md border border-input px-3 py-2 text-sm">
+                  <input
+                    id="override-previous-initializations"
+                    type="checkbox"
+                    checked={overridePreviousInitializations}
+                    onChange={(event) => setOverridePreviousInitializations(event.target.checked)}
+                  />
+                  <Label htmlFor="override-previous-initializations">Override previous initializations</Label>
+                </div>
+              )}
+              {canAdjustBalance && (
+                <Button type="button" variant="secondary" onClick={handleInitializeBalances} disabled={initializingBalances || !selectedSchoolYear || leaveTypes.length === 0}>
+                  {initializingBalances ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Plus className="mr-2 h-4 w-4" />
+                  )}
+                  Initialize balances for all employees
+                </Button>
+              )}
+              {canAdjustBalance && (
                 <Button type="submit" disabled={adjustingBalance || !selectedEmployeeId}>
                   {adjustingBalance ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -584,6 +853,9 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 </Button>
               )}
             </div>
+            {balanceActionMessage ? (
+              <p className="text-sm text-muted-foreground">{balanceActionMessage}</p>
+            ) : null}
           </form>
 
           <div className="overflow-hidden rounded-lg border">
@@ -619,7 +891,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                     <TableCell>
                       <div className="space-y-1">
                         <p className="font-medium">{selectedEmployee?.firstName ?? "Employee"}</p>
-                        <p className="text-sm text-muted-foreground">{selectedSchoolYear}</p>
+                        <p className="text-sm text-muted-foreground">{selectedSchoolYearName}</p>
                       </div>
                     </TableCell>
                     <TableCell>
