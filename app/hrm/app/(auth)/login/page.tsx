@@ -99,6 +99,7 @@ function LoginContent() {
   )
   const [isSigningIn, setIsSigningIn] = React.useState(false)
   const [isVerifying, setIsVerifying] = React.useState(false)
+  const loginStartedRef = React.useRef(false)
   const account = accounts[0]
   const returnTo = getSafeReturnPath(searchParams.get("returnTo"))
   const isAuthBusy = inProgress !== InteractionStatus.None
@@ -147,6 +148,11 @@ function LoginContent() {
   }, [account, instance, isAuthBusy, isAuthenticated, returnTo, router])
 
   const handleLogin = async () => {
+    if (isAuthBusy || loginStartedRef.current) {
+      return
+    }
+
+    loginStartedRef.current = true
     setErrorMessage("")
     writePendingLogin()
     setIsSigningIn(true)
@@ -159,6 +165,7 @@ function LoginContent() {
       })
     } catch (error) {
       console.error(error)
+      loginStartedRef.current = false
       clearPendingLogin()
       setIsSigningIn(false)
       setErrorMessage(getAuthErrorMessage(error))
@@ -183,6 +190,7 @@ function LoginContent() {
       }
       errorMessage={errorMessage}
       isBusy={
+        isAuthBusy ||
         isSigningIn ||
         isVerifying ||
         (hasPendingLogin && (isAuthBusy || isAuthenticated))

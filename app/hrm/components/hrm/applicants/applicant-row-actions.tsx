@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Edit3, Trash2 } from "lucide-react"
+import { Edit3, Eye, MoreHorizontal, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -12,7 +12,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import {
   Dialog,
@@ -21,8 +20,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import {
   Select,
   SelectContent,
@@ -31,6 +37,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useApiMutation } from "@/lib/api"
+import { notifyDeleted, notifyUpdated } from "@/lib/notifications"
 
 const STATUS_OPTIONS = ["Submitted", "Pending", "Interview", "Hired", "Rejected"]
 
@@ -41,6 +48,11 @@ type Applicant = {
 
 export function ApplicantRowActions({
   applicant,
+  applicantLabel,
+  canDelete,
+  canEdit,
+  idPrefix,
+  onView,
   onChanged,
   canUpdate = true,
   canDelete = true,
@@ -51,8 +63,10 @@ export function ApplicantRowActions({
   canDelete?: boolean
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
+  const [deleteOpen, setDeleteOpen] = React.useState(false)
   const [status, setStatus] = React.useState(applicant.status)
   const [error, setError] = React.useState<Error | null>(null)
+  const [deleteError, setDeleteError] = React.useState<string | null>(null)
   const { mutate: saveRow, loading: saving } = useApiMutation()
   const { mutate: deleteRow, loading: deleting } = useApiMutation()
 
@@ -79,17 +93,26 @@ export function ApplicantRowActions({
       return
     }
 
-    onChanged()
+    await onChanged()
     setEditOpen(false)
+    notifyUpdated("Applicant record")
   }
 
   const handleDelete = async () => {
+    setDeleteError(null)
     const success = await deleteRow({
       path: `/api/v1/recruitment/employee-applicants/${applicant.id}`,
       method: "DELETE",
     })
 
-    if (success) onChanged()
+    if (!success) {
+      setDeleteError("Unable to delete this applicant record. Please try again.")
+      return
+    }
+
+    await onChanged()
+    setDeleteOpen(false)
+    notifyDeleted("Applicant record")
   }
 
   return (

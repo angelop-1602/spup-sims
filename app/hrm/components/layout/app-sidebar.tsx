@@ -14,6 +14,7 @@ import {
   CloudDownload,
 } from "lucide-react"
 
+import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import {
   Sidebar,
   SidebarContent,
@@ -118,16 +119,17 @@ function NavGroup({
   label,
   items,
   hasPermission,
+  pathname,
 }: {
   label: string
-  items: NavItem[]
+  items: HrmNavItem[]
   hasPermission: (permission: string) => boolean
+  pathname: string
 }) {
   const visibleItems = items.filter(
     (item) => !item.requiredPermission || hasPermission(item.requiredPermission)
   )
 
-  // Hide the entire group (label + menu) when no items are visible
   if (visibleItems.length === 0) return null
 
   return (
@@ -135,16 +137,20 @@ function NavGroup({
       <SidebarGroupLabel>{label}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          {visibleItems.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title}>
-                <Link href={item.url}>
-                  <item.icon />
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {visibleItems.map((item) => {
+            const isActive = isHrmNavItemActive(pathname, item.url)
+
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
+                  <Link href={item.url} aria-current={isActive ? "page" : undefined}>
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
@@ -153,39 +159,33 @@ function NavGroup({
 
 export function AppSidebar() {
   const { hasPermission } = useHrmAuth()
+  const pathname = usePathname()
 
   return (
     <Sidebar collapsible="icon" className="border-r">
       <SidebarHeader>
         <div className="flex h-14 items-center px-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+          <div className="flex size-9 items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground">
             HR
           </div>
 
           <div className="ml-3 group-data-[collapsible=icon]:hidden">
-            <p className="text-sm font-semibold">SPUP SIMS</p>
-            <p className="text-xs text-muted-foreground">HRM Module</p>
+            <p className="text-sm font-semibold">SPUP HRM</p>
+            <p className="text-xs text-muted-foreground">Part of SIMS</p>
           </div>
         </div>
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Main — always visible, no permission required */}
-        <NavGroup label="Main" items={mainItems} hasPermission={hasPermission} />
-
-        {/* HRM section — hidden entirely for Employee role */}
-        <NavGroup
-          label="Human Resource Management"
-          items={hrItems}
-          hasPermission={hasPermission}
-        />
-
-        {/* Settings section — hidden entirely for Employee and Department Head roles */}
-        <NavGroup
-          label="Settings"
-          items={settingsItems}
-          hasPermission={hasPermission}
-        />
+        {HRM_NAV_GROUPS.map((group) => (
+          <NavGroup
+            key={group.label}
+            label={group.label}
+            items={group.items}
+            hasPermission={hasPermission}
+            pathname={pathname}
+          />
+        ))}
       </SidebarContent>
 
       <SidebarRail />

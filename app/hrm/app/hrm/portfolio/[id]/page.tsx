@@ -6,7 +6,7 @@ import Link from "next/link"
 import { EmployeePortfolioDetails } from "@/components/hrm/portfolio/employee-portfolio-details"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useApiQuery, type components } from "@/lib/api"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 
 type EmployeeResponse = components["schemas"]["EmployeeResponse"]
 

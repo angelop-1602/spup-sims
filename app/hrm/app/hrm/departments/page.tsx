@@ -49,7 +49,7 @@ import {
   type UpdateDepartmentRequest,
 } from "@/lib/api"
 import { Label } from "@/components/ui/label"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 
 type DepartmentFormState = CreateDepartmentRequest & {
   parentDepartmentId?: number | string | null

@@ -49,7 +49,7 @@ import {
   type CreatePositionRequest,
   type UpdatePositionRequest,
 } from "@/lib/api"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 
 export default function PositionsPage() {
   const { hasPermission } = useHrmAuth()
