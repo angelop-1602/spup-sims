@@ -5,9 +5,9 @@ import * as React from "react"
 import { request } from "@/lib/api/client"
 import type { ApplicantMePayload } from "@/components/profile/types"
 
-export function logout(router: { push: (href: string) => void }) {
+export function logout(_router: { push: (href: string) => void }) {
   localStorage.removeItem("access_token")
-  router.push("/")
+  window.location.href = "/"
 }
 
 export function useAuthStatus() {
