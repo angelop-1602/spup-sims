@@ -199,7 +199,12 @@ export default function LandingPage() {
               </Link>
 
               <button 
-                onClick={() => setActiveTab('applications')} 
+                onClick={() => {
+                  setActiveTab('explore');
+                  setTimeout(() => {
+                    document.getElementById('process')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 100);
+                }}
                 className={`text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeTab === 'applications' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
               >
                 Application Process
