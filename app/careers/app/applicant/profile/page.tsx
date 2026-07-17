@@ -4,11 +4,12 @@ import * as React from "react"
 import { Loader2, AlertCircle, ArrowLeft, CheckCircle2, Trash2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
-import type { ApplicantMePayload, ProfileUpdateForm, DocumentType, DocumentEntry } from "@/components/profile/types"
-import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS } from "@/components/profile/types"
+import type { ApplicantMePayload, ProfileUpdateForm, DocumentType, DocumentEntry, DocKind } from "@/components/profile/types"
+import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS, getDocKind } from "@/components/profile/types"
 import { ProfileBanner } from "@/components/profile/profile-banner"
 import { PersonalInfoSection } from "@/components/profile/personal-info-section"
 import { EditProfileModal } from "@/components/profile/edit-profile-modal"
@@ -286,6 +287,14 @@ export default function ApplicantSelfProfilePage() {
   }
 
   const [viewingDocKey, setViewingDocKey] = React.useState<string | null>(null)
+  const [viewDocModal, setViewDocModal] = React.useState<{ open: boolean; url: string | null; label: string; kind: DocKind }>({
+    open: false, url: null, label: "", kind: "other"
+  })
+
+  const closeViewDocModal = () => {
+    if (viewDocModal.url) URL.revokeObjectURL(viewDocModal.url)
+    setViewDocModal({ open: false, url: null, label: "", kind: "other" })
+  }
 
   const handleViewDocument = async (doc: DocumentType) => {
     const docEntry = documents.find((d) => d.requirementName === doc.apiName)
@@ -300,25 +309,34 @@ export default function ApplicantSelfProfilePage() {
     setViewingDocKey(doc.key)
     try {
       const localFile = await getFile(doc.key)
+      let blob: Blob
       if (localFile) {
-        const blobUrl = URL.createObjectURL(localFile)
-        window.open(blobUrl, "_blank")
-        setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
+        blob = localFile
+      } else {
+        const response = await fetch(`/api/documents/${docEntry.storagePath}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        })
+
+        if (!response.ok) {
+          throw new Error("Document preview unavailable. Re-upload the file to enable preview.")
+        }
+
+        blob = await response.blob()
+      }
+
+      const kind = getDocKind(docEntry.fileName, blob.type)
+      const blobUrl = URL.createObjectURL(blob)
+
+      if (kind === "word") {
+        const link = document.createElement("a")
+        link.href = blobUrl
+        link.download = docEntry.fileName || doc.label
+        link.click()
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000)
         return
       }
 
-      const response = await fetch(`/api/documents/${docEntry.storagePath}`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      })
-
-      if (!response.ok) {
-        throw new Error("Document preview unavailable. Re-upload the file to enable preview.")
-      }
-
-      const blob = await response.blob()
-      const blobUrl = URL.createObjectURL(blob)
-      window.open(blobUrl, "_blank")
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
+      setViewDocModal({ open: true, url: blobUrl, label: doc.label, kind })
     } catch (err: any) {
       setStatusModal({ open: true, type: "error", title: "View Failed", message: err.message || "Failed to open document." })
     } finally {
@@ -431,6 +449,34 @@ export default function ApplicantSelfProfilePage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Document Preview Modal */}
+      <Dialog open={viewDocModal.open} onOpenChange={(open) => !open && closeViewDocModal()}>
+        <DialogContent
+          className={
+            viewDocModal.kind === "image"
+              ? "flex w-fit max-w-[90vw] flex-col"
+              : "flex h-[70vh] w-[95vw] max-w-6xl sm:max-w-6xl flex-col"
+          }
+        >
+          <DialogHeader>
+            <DialogTitle>{viewDocModal.label}</DialogTitle>
+          </DialogHeader>
+          {viewDocModal.url && viewDocModal.kind === "image" ? (
+            <img
+              src={viewDocModal.url}
+              alt={viewDocModal.label}
+              className="min-w-[320px] max-w-[85vw] max-h-[80vh] rounded-md border border-border object-contain"
+            />
+          ) : viewDocModal.url ? (
+            <iframe
+              src={`${viewDocModal.url}#view=Fit`}
+              title={viewDocModal.label}
+              className="w-full flex-1 rounded-md border border-border"
+            />
+          ) : null}
+        </DialogContent>
+      </Dialog>
 
       {/* Status Alert (Success/Error) */}
       {statusModal.open && (

@@ -68,6 +68,18 @@ export const STATUS_STYLES: Record<string, string> = {
   Submitted: "bg-purple-500/10 text-purple-600 border border-purple-500/20",
 }
 
+export type DocKind = "pdf" | "image" | "word" | "other"
+
+export function getDocKind(fileName: string, mimeType?: string): DocKind {
+  const type = (mimeType || "").toLowerCase()
+  const ext = fileName.split(".").pop()?.toLowerCase() || ""
+
+  if (type.includes("pdf") || ext === "pdf") return "pdf"
+  if (type.startsWith("image/") || ["jpg", "jpeg", "png", "gif", "webp"].includes(ext)) return "image"
+  if (type.includes("word") || type.includes("wordprocessingml") || ["doc", "docx"].includes(ext)) return "word"
+  return "other"
+}
+
 export function calculateAge(birthDateString: string | null | undefined): string {
   if (!birthDateString) return "—"
   const birthDate = new Date(birthDateString)
