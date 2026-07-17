@@ -190,7 +190,7 @@ export default function ApplicantSelfProfilePage() {
       }
 
       await fetchMyProfile()
-      setSaveStatus({ type: "success", message: "Profile updated successfully!" })
+      setIsEditModalOpen(false)
     } catch (err: any) {
       setSaveStatus({ type: "error", message: err.message || "An error occurred while saving profile." })
     } finally {

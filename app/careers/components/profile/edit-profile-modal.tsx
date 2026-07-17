@@ -1,10 +1,21 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, X, CheckCircle2, AlertCircle } from "lucide-react"
+import { CalendarIcon, AlertCircle, Loader2 } from "lucide-react"
+import { format } from "date-fns"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Calendar } from "@/components/ui/calendar"
 import { calculateAge, type ProfileUpdateForm } from "./types"
 
 interface EditProfileModalProps {
@@ -26,140 +37,103 @@ export function EditProfileModal({
   onCancel,
   onSave,
 }: EditProfileModalProps) {
-  if (!open) return null
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-        onClick={onCancel}
-      />
+    <Dialog open={open} onOpenChange={(next) => !next && !isSaving && onCancel()}>
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>Update your personal information below.</DialogDescription>
+        </DialogHeader>
 
-      <div className="relative z-10 w-full max-w-2xl mx-4 rounded-xl border border-border bg-card shadow-xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
-          <h2 className="text-sm font-semibold text-foreground">Edit Profile</h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onCancel}
-            disabled={isSaving}
-            className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div className="px-5 py-4 max-h-[60vh] overflow-y-auto">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-            <FormField
-              label="First Name"
-              required
-              value={editForm.firstName}
-              onChange={(v) => setEditForm({ ...editForm, firstName: v })}
-              hasError={saveStatus?.type === "error" && saveStatus.message.includes("First Name")}
-            />
-            <FormField
-              label="Middle Name"
-              value={editForm.middleName}
-              onChange={(v) => setEditForm({ ...editForm, middleName: v })}
-            />
-            <FormField
-              label="Last Name"
-              required
-              value={editForm.lastName}
-              onChange={(v) => setEditForm({ ...editForm, lastName: v })}
-              hasError={saveStatus?.type === "error" && saveStatus.message.includes("Last Name")}
-            />
-            <FormField
-              label="Date of Birth"
-              type="date"
-              value={editForm.birthDate}
-              onChange={(v) => setEditForm({ ...editForm, birthDate: v })}
-            />
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Age</Label>
-              <p className="h-9 flex items-center text-sm font-medium text-foreground px-3">
-                {calculateAge(editForm.birthDate)}
-              </p>
-            </div>
-            <FormField
-              label="Religion"
-              value={editForm.religion}
-              onChange={(v) => setEditForm({ ...editForm, religion: v })}
-            />
-            <FormField
-              label="Email"
-              type="email"
-              required
-              value={editForm.personalEmail}
-              onChange={(v) => setEditForm({ ...editForm, personalEmail: v })}
-              hasError={saveStatus?.type === "error" && saveStatus.message.includes("Email")}
-            />
-            <PhoneField
-              label="Phone"
-              prefix="+63-"
-              placeholder="78-000-0000"
-              maxDigits={9}
-              grouping={[2, 3, 4]}
-              value={editForm.phoneNumber}
-              onChange={(v) => setEditForm({ ...editForm, phoneNumber: v })}
-            />
-            <PhoneField
-              label="Mobile"
-              prefix="+63-"
-              placeholder="900-000-0000"
-              maxDigits={10}
-              grouping={[3, 3, 4]}
-              value={editForm.mobileNumber}
-              onChange={(v) => setEditForm({ ...editForm, mobileNumber: v })}
-            />
+        <div className="grid grid-cols-2 gap-x-4 gap-y-5">
+          <FormField
+            label="First Name"
+            required
+            placeholder="Juan"
+            value={editForm.firstName}
+            onChange={(v) => setEditForm({ ...editForm, firstName: v })}
+            hasError={saveStatus?.type === "error" && saveStatus.message.includes("First Name")}
+          />
+          <FormField
+            label="Middle Name"
+            placeholder="Santos"
+            value={editForm.middleName}
+            onChange={(v) => setEditForm({ ...editForm, middleName: v })}
+          />
+          <FormField
+            label="Last Name"
+            required
+            placeholder="Dela Cruz"
+            value={editForm.lastName}
+            onChange={(v) => setEditForm({ ...editForm, lastName: v })}
+            hasError={saveStatus?.type === "error" && saveStatus.message.includes("Last Name")}
+          />
+          <DateField
+            label="Date of Birth"
+            value={editForm.birthDate}
+            onChange={(v) => setEditForm({ ...editForm, birthDate: v })}
+          />
+          <FormField
+            label="Email"
+            type="email"
+            required
+            placeholder="juan.delacruz@email.com"
+            value={editForm.personalEmail}
+            onChange={(v) => setEditForm({ ...editForm, personalEmail: v })}
+            hasError={saveStatus?.type === "error" && saveStatus.message.includes("Email")}
+          />
+          <FormField
+            label="Religion"
+            placeholder="e.g. Roman Catholic"
+            value={editForm.religion}
+            onChange={(v) => setEditForm({ ...editForm, religion: v })}
+          />
+          <PhoneField
+            label="Phone"
+            prefix="+63-"
+            placeholder="78-000-0000"
+            maxDigits={9}
+            grouping={[2, 3, 4]}
+            value={editForm.phoneNumber}
+            onChange={(v) => setEditForm({ ...editForm, phoneNumber: v })}
+          />
+          <PhoneField
+            label="Mobile"
+            prefix="+63-"
+            placeholder="900-000-0000"
+            maxDigits={10}
+            grouping={[3, 3, 4]}
+            value={editForm.mobileNumber}
+            onChange={(v) => setEditForm({ ...editForm, mobileNumber: v })}
+          />
+          <div className="col-span-2">
             <FormField
               label="Address"
+              placeholder="123 Main St, Baguio City, Benguet"
               value={editForm.address}
               onChange={(v) => setEditForm({ ...editForm, address: v })}
             />
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-border bg-muted/50">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onCancel}
-            disabled={isSaving}
-            className="h-8 text-xs px-4"
-          >
+        {saveStatus?.type === "error" && (
+          <p className="flex items-center gap-2 text-sm font-medium text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {saveStatus.message}
+          </p>
+        )}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onCancel} disabled={isSaving}>
             Cancel
           </Button>
-          <Button
-            size="sm"
-            onClick={onSave}
-            disabled={isSaving}
-            className="h-8 text-xs px-4"
-          >
-            {isSaving && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
+          <Button onClick={onSave} disabled={isSaving}>
+            {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
             Save Changes
           </Button>
-        </div>
-
-        {saveStatus && (
-          <div
-            className={`flex items-center gap-2 px-5 py-2.5 text-xs font-medium ${
-              saveStatus.type === "success"
-                ? "bg-green-50 text-green-700 border-t border-green-200"
-                : "bg-red-50 text-red-700 border-t border-red-200"
-            }`}
-          >
-            {saveStatus.type === "success" ? (
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
-            ) : (
-              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-            )}
-            {saveStatus.message}
-          </div>
-        )}
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -167,6 +141,7 @@ function FormField({
   label,
   type = "text",
   required = false,
+  placeholder,
   value,
   onChange,
   hasError = false,
@@ -174,22 +149,77 @@ function FormField({
   label: string
   type?: string
   required?: boolean
+  placeholder?: string
   value: string
   onChange: (value: string) => void
   hasError?: boolean
 }) {
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">
+    <div>
+      <label className="mb-2 block text-sm font-medium">
         {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
-      </Label>
+        {required && <span className="ml-0.5 text-destructive">*</span>}
+      </label>
       <Input
         type={type}
         value={value}
+        placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-9 text-sm ${hasError ? "border-red-400 focus-visible:ring-red-200" : ""}`}
+        aria-invalid={hasError}
       />
+    </div>
+  )
+}
+
+function DateField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  const [open, setOpen] = React.useState(false)
+  const selected = value ? new Date(value) : undefined
+
+  return (
+    <div className="flex">
+      <div className="flex-1">
+        <label className="mb-2 block text-sm font-medium">{label}</label>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-start rounded-r-none font-normal"
+            >
+              <CalendarIcon className="h-4 w-4" />
+              {selected ? (
+                format(selected, "MMMM d, yyyy")
+              ) : (
+                <span className="text-muted-foreground">Pick a date</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0">
+            <Calendar
+              mode="single"
+              selected={selected}
+              captionLayout="dropdown"
+              onSelect={(date) => {
+                onChange(date ? format(date, "yyyy-MM-dd") : "")
+                setOpen(false)
+              }}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+      <div>
+        <label className="mb-2 block text-sm font-medium">Age</label>
+        <span className="flex h-9 w-14 items-center justify-center rounded-r-md border border-l-0 border-input bg-muted px-2.5 text-sm text-foreground select-none">
+          {calculateAge(value)}
+        </span>
+      </div>
     </div>
   )
 }
@@ -238,10 +268,10 @@ function PhoneField({
   const formatted = React.useMemo(() => formatDigits(rawDigits, grouping), [rawDigits, grouping])
 
   return (
-    <div className="space-y-1.5">
-      <Label className="text-xs text-muted-foreground">{label}</Label>
+    <div>
+      <label className="mb-2 block text-sm font-medium">{label}</label>
       <div className="flex">
-        <span className="h-9 flex items-center px-3 text-sm bg-muted border border-r-0 border-border rounded-l-md text-muted-foreground select-none">
+        <span className="flex h-9 items-center rounded-l-md border border-r-0 border-input bg-muted px-2.5 text-sm text-muted-foreground select-none">
           {prefix}
         </span>
         <Input
@@ -254,7 +284,7 @@ function PhoneField({
             const raw = e.target.value.replace(/\D/g, "").slice(0, maxDigits)
             onChange(raw ? `${prefix}${formatDigits(raw, grouping)}` : "")
           }}
-          className="h-9 text-sm rounded-l-none"
+          className="rounded-l-none"
         />
       </div>
     </div>
