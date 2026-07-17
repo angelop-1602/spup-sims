@@ -12,6 +12,7 @@ export class ApiError extends Error {
 
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
+  params?: Record<string, string | number | boolean | undefined | null>
   body?: unknown
 }
 
@@ -37,12 +38,22 @@ function isEnvelope(payload: unknown): payload is Envelope<unknown> {
  * login) return a flat body instead of the envelope, so non-enveloped
  * responses are passed through as-is rather than assumed to be malformed.
  */
-export async function request<T>(path: string, { method = "GET", body }: RequestOptions = {}): Promise<T> {
+export async function request<T>(path: string, { method = "GET", params, body }: RequestOptions = {}): Promise<T> {
   const token = localStorage.getItem("access_token")
   const headers: Record<string, string> = { "Content-Type": "application/json" }
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(path, {
+  const url = new URL(path, window.location.origin)
+  if (params) {
+    const search = new URLSearchParams()
+    for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || value === null) continue
+      search.set(key, String(value))
+    }
+    url.search = search.toString()
+  }
+
+  const response = await fetch(url.pathname + url.search, {
     method,
     headers,
     body: body === undefined ? undefined : JSON.stringify(body),
