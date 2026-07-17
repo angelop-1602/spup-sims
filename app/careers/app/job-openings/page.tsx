@@ -386,6 +386,7 @@ export default function JobOpeningsPage() {
                     onClick={resetFilters}
                     className={`${epilogue.className} mt-6 inline-flex items-center gap-2 px-5 py-2.5 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none cursor-pointer`}
                   >
+                    <X className="w-3.5 h-3.5"/>
                     Clear Filters
                   </button>
                 ) : (
