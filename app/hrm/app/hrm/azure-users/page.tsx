@@ -1,12 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, Search, CloudDownload, AlertCircle } from "lucide-react"
+import { Loader2, CloudDownload, AlertCircle } from "lucide-react"
 import { useApiQuery, useAuthorizedHeaders, request, type components } from "@/lib/api"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { PermissionGuard } from "@/components/auth/permission-guard"
-import { ApiErrorView } from "@/components/ui/api-error-view"
+import { TableTemplate } from "@/components/custom/table-template"
 import {
   Dialog,
   DialogContent,
@@ -130,72 +130,59 @@ export default function AzureEligibleUsersPage() {
 
   return (
     <PermissionGuard requiredPermission="hrms.azure.users.view">
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-normal">Azure Eligible Users</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Microsoft Entra ID faculty accounts eligible for HRMS onboarding.
-              These users hold an M365EDU or Faculty license and are not yet imported.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
+
+        {/* Table */}
+        <TableTemplate
+          label="Azure eligible users table"
+          search={{
+            value: search,
+            onChange: setSearch,
+            onClear: () => {
+              setSearch("")
+              setPage(1)
+            },
+            placeholder: "Search by name or email",
+            label: "Search eligible users",
+          }}
+          leadingActions={
+            selected.size > 0 ? (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelected(new Set())}
+              >
+                Clear selection ({selected.size})
+              </Button>
+            ) : undefined
+          }
+          actions={
             <Button
-              onClick={() => { setImportError(null); setImportConfirmOpen(true) }}
+              onClick={() => {
+                setImportError(null)
+                setImportConfirmOpen(true)
+              }}
               disabled={importing}
             >
               <CloudDownload className="mr-2 h-4 w-4" />
-              {selected.size > 0 ? `Import ${selected.size} selected` : "Import all"}
+              {selected.size > 0
+                ? `Import ${selected.size} selected`
+                : "Import all"}
             </Button>
-          </div>
-        </div>
-
-        {/* Inline feedback */}
-        {importError && (
-          <div className="flex items-center gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            {importError}
-          </div>
-        )}
-
-        {/* Search */}
-        <div className="flex items-center gap-3">
-          <div className="relative w-full sm:w-72">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name or email"
-              className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            />
-          </div>
-          {selected.size > 0 && (
-            <button
-              type="button"
-              onClick={() => setSelected(new Set())}
-              className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
-            >
-              Clear selection ({selected.size})
-            </button>
-          )}
-        </div>
-
-        {/* Table */}
-        <div className="overflow-hidden rounded-lg border">
-          {loading ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Fetching eligible users from Microsoft Entra ID…
-            </div>
-          ) : error ? (
-            <ApiErrorView error={error} onRetry={refresh} />
-          ) : users.length === 0 ? (
+          }
+          loading={loading}
+          loadingLabel="Fetching eligible users from Microsoft Entra ID"
+          loadingSkeleton={{ columns: 5, rows: 8 }}
+          error={error}
+          onRetry={refresh}
+          empty={users.length === 0}
+          emptyState={
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
               <CloudDownload className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">
-                {debouncedSearch ? "No users match your search" : "No eligible users found"}
+                {debouncedSearch
+                  ? "No users match your search"
+                  : "No eligible users found"}
               </p>
               <p className="text-sm text-muted-foreground">
                 {debouncedSearch
@@ -203,8 +190,24 @@ export default function AzureEligibleUsersPage() {
                   : "All eligible faculty accounts may already be imported."}
               </p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
+          }
+          pagination={
+            !loading && !error && users.length > 0
+              ? {
+                  page,
+                  pageSize: PAGE_SIZE,
+                  totalPages,
+                  totalRecords,
+                  itemLabel:
+                    totalRecords === 1
+                      ? "eligible user"
+                      : "eligible users",
+                  onPageChange: setPage,
+                }
+              : undefined
+          }
+        >
+          <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -258,36 +261,8 @@ export default function AzureEligibleUsersPage() {
                   ))}
                 </tbody>
               </table>
-            </div>
-          )}
-        </div>
-
-        {/* Pagination */}
-        {!loading && !error && users.length > 0 && (
-          <div className="flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              Page {page} of {totalPages} · {totalRecords} eligible user{totalRecords === 1 ? "" : "s"}
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
-              >
-                Next
-              </button>
-            </div>
           </div>
-        )}
+        </TableTemplate>
 
         {/* Import confirm dialog */}
         <AlertDialog open={importConfirmOpen} onOpenChange={setImportConfirmOpen}>
@@ -360,7 +335,6 @@ export default function AzureEligibleUsersPage() {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-      </div>
     </PermissionGuard>
   )
 }

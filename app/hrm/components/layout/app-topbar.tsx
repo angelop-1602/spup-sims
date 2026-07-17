@@ -39,14 +39,26 @@ function getInitials(name: string) {
     .join("")
 }
 
+function formatRoleLabel(role: string) {
+  return role
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
+}
+
 export function AppTopbar() {
   const [open, setOpen] = React.useState(false)
   const router = useRouter()
   const { accounts, instance } = useMsal()
-  const { hasPermission } = useHrmAuth()
+  const { currentUser, hasPermission, roles } = useHrmAuth()
   const account = accounts[0]
   const displayName = account?.name ?? account?.username ?? "User"
-  const roleLabel = account ? "Authenticated" : "Not signed in"
+  const roleLabel = currentUser?.isSuperAdmin
+    ? "Super Administrator"
+    : roles.length > 0
+      ? roles.map(formatRoleLabel).join(", ")
+      : account
+        ? "No role assigned"
+        : "Not signed in"
   const initials = getInitials(displayName) || "U"
   const navigationItems = HRM_NAV_GROUPS.flatMap((group) => group.items).filter(
     (item) => !item.requiredPermission || hasPermission(item.requiredPermission)
@@ -75,7 +87,7 @@ export function AppTopbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur md:px-6">
+      <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur print:hidden md:px-6">
         <SidebarTrigger />
 
         <AppBreadcrumbs className="flex-1" />
@@ -119,7 +131,9 @@ export function AppTopbar() {
 
                 <div className="hidden text-left md:block">
                   <p className="text-sm font-medium leading-none">{displayName}</p>
-                  <p className="text-xs text-muted-foreground">{roleLabel}</p>
+                  <p className="max-w-40 truncate text-xs text-muted-foreground">
+                    {roleLabel}
+                  </p>
                 </div>
 
                 <ChevronsUpDown className="hidden size-4 text-muted-foreground md:block" />

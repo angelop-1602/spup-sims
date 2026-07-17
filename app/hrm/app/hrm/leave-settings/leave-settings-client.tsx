@@ -24,6 +24,8 @@ import { useApiQuery, useApiMutation, type components } from "@/lib/api"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { ApiErrorView } from "@/components/ui/api-error-view"
+import { TableTemplate } from "@/components/custom/table-template"
+import { TableSkeletonRows } from "@/components/ui/table-skeleton-rows"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -50,10 +52,6 @@ type Employee = components["schemas"]["EmployeeResponse"]
 type PagedEmployees = components["schemas"]["PagedResponseOfEmployeeResponse"]
 type SchoolYear = components["schemas"]["SchoolYearResponse"]
 type PagedSchoolYears = components["schemas"]["PagedResponseOfSchoolYearResponse"]
-
-interface LeaveSettingsClientProps {
-  initialLeaveTypes: LeaveType[]
-}
 
 function formatDays(value: number | string | undefined) {
   return String(value ?? 0)
@@ -129,7 +127,7 @@ function isEligibleForLeaveType(employee: Employee | null | undefined, leaveType
   return true
 }
 
-export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettingsClientProps) {
+export default function LeaveSettingsClient() {
   const { hasPermission } = useHrmAuth()
 
   const canCreateType = hasPermission("hrms.leaveTypes.create")
@@ -148,7 +146,6 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   })
   const [selectedEmployeeId, setSelectedEmployeeId] = React.useState<string>("")
   const [employeeSearchText, setEmployeeSearchText] = React.useState("")
-  const [selectedSchoolYear, setSelectedSchoolYear] = React.useState<string>("")
   const [balanceActionMessage, setBalanceActionMessage] = React.useState<string | null>(null)
   const [overridePreviousInitializations, setOverridePreviousInitializations] = React.useState(false)
   const [adjustForm, setAdjustForm] = React.useState({
@@ -170,24 +167,20 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
 
   const {
     data: employeesPaged,
-    loading: loadingEmployees,
     error: employeesError,
   } = useApiQuery<PagedEmployees>("/api/v1/hrms/employees", {
     Page: 1,
     PageSize: 100,
   })
 
-  const employees = employeesPaged?.data ?? []
+  const employees = React.useMemo(() => employeesPaged?.data ?? [], [employeesPaged])
 
   const {
     data: currentSchoolYear,
     loading: loadingCurrentSchoolYear,
   } = useApiQuery<SchoolYear>("/api/v1/academic/school-years/current")
 
-  const {
-    data: schoolYearsPaged,
-    loading: loadingSchoolYears,
-  } = useApiQuery<PagedSchoolYears>("/api/v1/academic/school-years", {
+  const { data: schoolYearsPaged } = useApiQuery<PagedSchoolYears>("/api/v1/academic/school-years", {
     Page: 1,
     PageSize: 100,
     SortBy: "startDate",
@@ -195,40 +188,13 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   })
 
   const schoolYears = React.useMemo(() => schoolYearsPaged?.data ?? [], [schoolYearsPaged])
+  const activeSchoolYear = schoolYears.find((schoolYear) => schoolYear.isActive) ?? schoolYears[0]
+  const effectiveEmployeeId = selectedEmployeeId || String(employees[0]?.id ?? "")
+  const selectedSchoolYear = String(currentSchoolYear?.id ?? activeSchoolYear?.id ?? "")
+  const selectedLeaveTypeId = adjustForm.leaveTypeId || String(leaveTypes[0]?.id ?? "")
 
-  React.useEffect(() => {
-    if (!selectedEmployeeId && employees.length) {
-      const firstEmployee = employees[0]
-      if (firstEmployee) {
-        setSelectedEmployeeId(String(firstEmployee.id ?? ""))
-        setEmployeeSearchText(firstEmployee.fullName || firstEmployee.firstName || firstEmployee.email || "")
-      }
-    }
-  }, [employees, selectedEmployeeId])
-
-  React.useEffect(() => {
-    if (!selectedSchoolYear && currentSchoolYear?.id) {
-      setSelectedSchoolYear(String(currentSchoolYear.id))
-      return
-    }
-
-    if (!selectedSchoolYear && schoolYears.length) {
-      const activeSchoolYear = schoolYears.find((schoolYear) => schoolYear.isActive) ?? schoolYears[0]
-      setSelectedSchoolYear(String(activeSchoolYear?.id ?? ""))
-    }
-  }, [currentSchoolYear, schoolYears, selectedSchoolYear])
-
-  React.useEffect(() => {
-    if (!adjustForm.leaveTypeId && leaveTypes.length) {
-      setAdjustForm((current) => ({
-        ...current,
-        leaveTypeId: String(leaveTypes[0].id),
-      }))
-    }
-  }, [leaveTypes, adjustForm.leaveTypeId])
-
-  const leaveBalancesPath = selectedEmployeeId
-    ? `/api/v1/hrms/leave-balances/employee/${selectedEmployeeId}/school-year/${selectedSchoolYear}`
+  const leaveBalancesPath = effectiveEmployeeId
+    ? `/api/v1/hrms/leave-balances/employee/${effectiveEmployeeId}/school-year/${selectedSchoolYear}`
     : undefined
 
   const {
@@ -237,7 +203,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
     refresh: refreshLeaveBalances,
     error: leaveBalancesError,
   } = useApiQuery<LeaveBalance[]>(leaveBalancesPath, undefined, {
-    enabled: Boolean(selectedEmployeeId && selectedSchoolYear),
+    enabled: Boolean(effectiveEmployeeId && selectedSchoolYear),
   })
 
   const { mutate: saveLeaveType, loading: savingLeaveType } = useApiMutation()
@@ -315,12 +281,12 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   const handleAdjustSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!selectedEmployeeId || !adjustForm.leaveTypeId || !adjustForm.reason.trim()) {
+    if (!effectiveEmployeeId || !selectedLeaveTypeId || !adjustForm.reason.trim()) {
       return
     }
 
     const selectedLeaveType = leaveTypes.find(
-      (leaveType) => String(leaveType.id) === adjustForm.leaveTypeId,
+      (leaveType) => String(leaveType.id) === selectedLeaveTypeId,
     )
 
     if (selectedLeaveType && !isEligibleForLeaveType(selectedEmployee, selectedLeaveType)) {
@@ -338,8 +304,8 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
       path: "/api/v1/hrms/leave-balances/adjust",
       method: "POST",
       body: {
-        employeeId: Number(selectedEmployeeId),
-        leaveTypeId: Number(adjustForm.leaveTypeId),
+        employeeId: Number(effectiveEmployeeId),
+        leaveTypeId: Number(selectedLeaveTypeId),
         schoolYearId: Number(selectedSchoolYear),
         totalDays: Number(adjustForm.totalDays) || undefined,
         reason: adjustForm.reason.trim(),
@@ -354,7 +320,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   }
 
   const selectedEmployee = employees.find(
-    (employee) => String(employee.id) === selectedEmployeeId,
+    (employee) => String(employee.id) === effectiveEmployeeId,
   )
 
   const filteredEmployees = React.useMemo(() => {
@@ -382,8 +348,8 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   }, [currentSchoolYear, schoolYears, selectedSchoolYear])
 
   const selectedLeaveType = React.useMemo(
-    () => leaveTypes.find((leaveType) => String(leaveType.id) === adjustForm.leaveTypeId) ?? null,
-    [adjustForm.leaveTypeId, leaveTypes],
+    () => leaveTypes.find((leaveType) => String(leaveType.id) === selectedLeaveTypeId) ?? null,
+    [leaveTypes, selectedLeaveTypeId],
   )
 
   const handleInitializeBalances = async () => {
@@ -600,7 +566,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             </div>
           </form>
 
-          <div className="overflow-hidden rounded-lg border">
+          <TableTemplate label="Leave types table">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -611,14 +577,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
               </TableHeader>
               <TableBody>
                 {loadingLeaveTypes && (
-                  <TableRow>
-                    <TableCell colSpan={3} className="p-6 text-center">
-                      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Loading leave types...
-                      </span>
-                    </TableCell>
-                  </TableRow>
+                  <TableSkeletonRows columns={3} rows={6} />
                 )}
                 {!loadingLeaveTypes && leaveTypes.length === 0 && (
                   <TableRow>
@@ -659,11 +618,11 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                       {canUpdateType && (
                         <Button
                           variant="outline"
-                          size="sm"
+                          size="icon-sm"
                           onClick={() => handleTypeEdit(leaveType)}
+                          aria-label={`Edit ${leaveType.name}`}
                         >
-                          <Edit3 className="mr-2 h-4 w-4" />
-                          Edit
+                          <Edit3 aria-hidden="true" className="h-4 w-4" />
                         </Button>
                       )}
                       {canDeleteType && (
@@ -671,11 +630,11 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                         <AlertDialogTrigger asChild>
                           <Button
                             variant="destructive"
-                            size="sm"
+                            size="icon-sm"
                             disabled={deletingLeaveType}
+                            aria-label={`Delete ${leaveType.name}`}
                           >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                            <Trash2 aria-hidden="true" className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -699,7 +658,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </TableTemplate>
         </CardContent>
       </Card>
 
@@ -716,7 +675,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
               <div className="space-y-2">
                 <Label htmlFor="employee">Employee</Label>
                 <Combobox
-                  value={selectedEmployeeId}
+                  value={effectiveEmployeeId}
                   onValueChange={(value) => {
                     const nextValue = value ?? ""
                     setSelectedEmployeeId(nextValue)
@@ -764,7 +723,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 <select
                   id="leave-type"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  value={adjustForm.leaveTypeId}
+                  value={selectedLeaveTypeId}
                   onChange={(event) =>
                     setAdjustForm((current) => ({
                       ...current,
@@ -839,7 +798,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 </Button>
               )}
               {canAdjustBalance && (
-                <Button type="submit" disabled={adjustingBalance || !selectedEmployeeId}>
+                <Button type="submit" disabled={adjustingBalance || !effectiveEmployeeId}>
                   {adjustingBalance ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   ) : (
@@ -854,7 +813,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             ) : null}
           </form>
 
-          <div className="overflow-hidden rounded-lg border">
+          <TableTemplate label="Employee leave balances table">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -866,14 +825,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
               </TableHeader>
               <TableBody>
                 {loadingBalances && (
-                  <TableRow>
-                    <TableCell colSpan={4} className="p-6 text-center">
-                      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Loading balances...
-                      </span>
-                    </TableCell>
-                  </TableRow>
+                  <TableSkeletonRows columns={4} rows={6} />
                 )}
                 {!loadingBalances && leaveBalances?.length === 0 && (
                   <TableRow>
@@ -911,7 +863,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </TableTemplate>
           {employeesError || leaveBalancesError ? (
             <ApiErrorView error={(employeesError ?? leaveBalancesError)!} fullScreen />
           ) : null}

@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { Plus } from "lucide-react"
-import { useApiQuery, useApiMutation } from "@/lib/api"
-import { Button } from "@/components/ui/button"
-import { PermissionGuard } from "@/components/auth/permission-guard"
-import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
-import { ApplicantDateFilters } from "@/components/hrm/applicants/applicant-date-filters"
-import { ApplicantRowActions } from "@/components/hrm/applicants/applicant-row-actions"
-import { ApplicantStatusBadge } from "@/components/hrm/applicants/applicant-status-badge"
-import { DataPagination } from "@/components/hrm/data-pagination"
-import { DataSearchInput } from "@/components/hrm/data-search-input"
-import { DataTableState } from "@/components/hrm/data-table-state"
-import { DataToolbar } from "@/components/hrm/data-toolbar"
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { Plus } from "lucide-react";
+import { useApiQuery, useApiMutation } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { PermissionGuard } from "@/components/auth/permission-guard";
+import { useHrmAuth } from "@/components/auth/hrm-auth-guard";
+import { ApplicantDateFilters } from "@/components/hrm/applicants/applicant-date-filters";
+import { ApplicantRowActions } from "@/components/hrm/applicants/applicant-row-actions";
+import { ApplicantStatusBadge } from "@/components/hrm/applicants/applicant-status-badge";
+import {
+  TableTemplate,
+  TableTemplateColumnHeader as DataTableColumnHeader,
+  type TableTemplateSortDirection as DataTableSortDirection,
+} from "@/components/custom/table-template";
+import { ApplicantStatusFilter } from "@/features/applicants/components/applicant-status-filter";
 import {
   Dialog,
   DialogContent,
@@ -21,11 +23,11 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { EmptyState } from "@/components/ui/empty-state"
-import { Field, FieldError, FieldLabel } from "@/components/ui/field"
-import { Skeleton } from "@/components/ui/skeleton"
-import { TableSkeletonRows } from "@/components/ui/table-skeleton-rows"
+} from "@/components/ui/dialog";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeletonRows } from "@/components/ui/table-skeleton-rows";
 import {
   Table,
   TableBody,
@@ -33,103 +35,143 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { notifyCreated } from "@/lib/notifications"
+} from "@/components/ui/table";
+import { notifyCreated } from "@/lib/notifications";
 
 interface Applicant {
-  id: number | string
-  profileId: number | string
-  applicationNumber: string
-  status: string
-  createdAt: string
-  updatedAt: string | null
+  id: number | string;
+  profileId: number | string;
+  applicationNumber: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string | null;
 }
 
 interface Profile {
-  id: number | string
-  firstName: string
-  lastName: string
+  id: number | string;
+  firstName: string;
+  lastName: string;
 }
 
 type PagedResponseBase = {
-  page: number | string
-  pageSize: number | string
-  totalRecords: number | string
-  totalPages: number | string
-  success?: boolean
-  message?: string
-}
+  page: number | string;
+  pageSize: number | string;
+  totalRecords: number | string;
+  totalPages: number | string;
+  success?: boolean;
+  message?: string;
+};
 
-type ApplicantsPayload = PagedResponseBase & { data: Applicant[] }
-type ProfilesPayload = PagedResponseBase & { data: Profile[] }
+type ApplicantsPayload = PagedResponseBase & { data: Applicant[] };
+type ProfilesPayload = PagedResponseBase & { data: Profile[] };
 
-const STATUS_OPTIONS = ["Submitted", "Pending", "Interview", "Hired", "Rejected"]
+const STATUS_OPTIONS = [
+  "Submitted",
+  "Pending",
+  "Interview",
+  "Hired",
+  "Rejected",
+];
+const STATUS_FILTER_OPTIONS = STATUS_OPTIONS.map((status) => ({
+  label: status,
+  value: status,
+}));
+
+type ApplicantSortColumn =
+  | "applicationNumber"
+  | "applicantName"
+  | "createdAt"
+  | "updatedAt";
 
 function formatDate(dateString: string | null) {
-  if (!dateString) return "—"
+  if (!dateString) return "—";
   return new Date(dateString).toLocaleDateString("en-US", {
-    year: "numeric", month: "short", day: "numeric",
-  })
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 }
 
-const PAGE_SIZE = 20
-const EMPTY_APPLICANTS: Applicant[] = []
-const EMPTY_PROFILES: Profile[] = []
+const DEFAULT_PAGE_SIZE = 25;
+const PAGE_SIZE_OPTIONS = [10, 25, 50] as const;
+const EMPTY_APPLICANTS: Applicant[] = [];
+const EMPTY_PROFILES: Profile[] = [];
 export default function ApplicantsPage() {
-  const router = useRouter()
-  const { hasPermission } = useHrmAuth()
+  const router = useRouter();
+  const { hasPermission } = useHrmAuth();
 
-  const canCreate = hasPermission("hrms.recruitment.applicants.create")
-  const canUpdateApplicant = hasPermission("hrms.recruitment.applicants.update")
-  const canDeleteApplicant = hasPermission("hrms.recruitment.applicants.delete")
+  const canCreate = hasPermission("hrms.recruitment.applicants.create");
+  const canProcess = hasPermission("hrms.recruitment.applicants.process");
+  const canUpdate =
+    canProcess || hasPermission("hrms.recruitment.applicants.update");
+  const canDelete = hasPermission("hrms.recruitment.applicants.delete");
 
-  const [search, setSearch] = React.useState("")
-  const [debouncedSearch, setDebouncedSearch] = React.useState("")
-  const [dateFrom, setDateFrom] = React.useState("")
-  const [dateTo, setDateTo] = React.useState("")
-  const [page, setPage] = React.useState(1)
+  const [search, setSearch] = React.useState("");
+  const [debouncedSearch, setDebouncedSearch] = React.useState("");
+  const [dateFrom, setDateFrom] = React.useState("");
+  const [dateTo, setDateTo] = React.useState("");
+  const [selectedStatuses, setSelectedStatuses] = React.useState<string[]>([]);
+  const [sortColumn, setSortColumn] =
+    React.useState<ApplicantSortColumn | null>("createdAt");
+  const [sortDirection, setSortDirection] =
+    React.useState<DataTableSortDirection | null>("desc");
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(DEFAULT_PAGE_SIZE);
 
   // Create dialog
-  const [isCreateOpen, setIsCreateOpen] = React.useState(false)
-  const [createForm, setCreateForm] = React.useState({ profileId: "", status: "Submitted" })
-  const [createError, setCreateError] = React.useState<string | null>(null)
+  const [isCreateOpen, setIsCreateOpen] = React.useState(false);
+  const [createForm, setCreateForm] = React.useState({
+    profileId: "",
+    status: "Submitted",
+  });
+  const [createError, setCreateError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const timeout = setTimeout(() => {
-      setDebouncedSearch(search.trim())
-      setPage(1)
-    }, 200)
-    return () => clearTimeout(timeout)
-  }, [search])
+      setDebouncedSearch(search.trim());
+      setPage(1);
+    }, 200);
+    return () => clearTimeout(timeout);
+  }, [search]);
 
   const {
     data: applicantsPayload,
     loading: isLoading,
     error,
     refresh: refreshApplicants,
-  } = useApiQuery<ApplicantsPayload>("/api/v1/recruitment/employee-applicants", {
-    Page: page,
-    PageSize: PAGE_SIZE,
-    Search: debouncedSearch || undefined,
-    DateFrom: dateFrom || undefined,
-    DateTo: dateTo || undefined,
-    Descending: true,
-    SchoolYearId: 1,
-  })
+  } = useApiQuery<ApplicantsPayload>(
+    "/api/v1/recruitment/employee-applicants",
+    {
+      Page: page,
+      PageSize: pageSize,
+      Search: debouncedSearch || undefined,
+      DateFrom: dateFrom || undefined,
+      DateTo: dateTo || undefined,
+      SortBy:
+        sortColumn && sortColumn !== "applicantName"
+          ? sortColumn
+          : undefined,
+      Descending: sortDirection === "desc",
+      SchoolYearId: 1,
+      Status:
+        selectedStatuses.length === 1 ? selectedStatuses[0] : undefined,
+    },
+  );
 
-  const { data: profilesPayload } = useApiQuery<ProfilesPayload>("/api/v1/core/profiles", {
-    Page: 1,
-    PageSize: 100,
-  })
+  const { data: profilesPayload } = useApiQuery<ProfilesPayload>(
+    "/api/v1/core/profiles",
+    {
+      Page: 1,
+      PageSize: 100,
+    },
+  );
 
-  const { mutate: createApplicant, loading: creating } = useApiMutation()
+  const { mutate: createApplicant, loading: creating } = useApiMutation();
 
-  const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS
-  const profiles = profilesPayload?.data ?? EMPTY_PROFILES
-  const totalPages = Number(applicantsPayload?.totalPages ?? 1)
-  const totalRecords = Number(applicantsPayload?.totalRecords ?? 0)
-  const hasActiveFilters = Boolean(search.trim() || dateFrom || dateTo)
-  const activeDateFilterCount = Number(Boolean(dateFrom)) + Number(Boolean(dateTo))
+  const applicants = applicantsPayload?.data ?? EMPTY_APPLICANTS;
+  const profiles = profilesPayload?.data ?? EMPTY_PROFILES;
+  const totalPages = Number(applicantsPayload?.totalPages ?? 1);
+  const totalRecords = Number(applicantsPayload?.totalRecords ?? 0);
   const profileNames = React.useMemo(
     () =>
       new Map(
@@ -139,46 +181,108 @@ export default function ApplicantsPage() {
         ]),
       ),
     [profiles],
-  )
+  );
+  const visibleApplicants = React.useMemo(
+    () => {
+      // The current API accepts one Status value and has no applicant-name sort.
+      // Apply those multi-value/name operations to the loaded page without
+      // inventing unsupported query parameters.
+      const filteredApplicants =
+        selectedStatuses.length > 1
+        ? applicants.filter((applicant) =>
+            selectedStatuses.includes(applicant.status),
+          )
+        : applicants;
+
+      if (sortColumn !== "applicantName" || !sortDirection) {
+        return filteredApplicants;
+      }
+
+      const directionMultiplier = sortDirection === "asc" ? 1 : -1;
+
+      return [...filteredApplicants].sort((leftApplicant, rightApplicant) => {
+        const leftName =
+          profileNames.get(String(leftApplicant.profileId)) ?? "";
+        const rightName =
+          profileNames.get(String(rightApplicant.profileId)) ?? "";
+
+        return leftName.localeCompare(rightName) * directionMultiplier;
+      });
+    },
+    [
+      applicants,
+      profileNames,
+      selectedStatuses,
+      sortColumn,
+      sortDirection,
+    ],
+  );
+  const hasActiveFilters = Boolean(
+    search.trim() || dateFrom || dateTo || selectedStatuses.length,
+  );
+  const activeFilterCount =
+    Number(Boolean(dateFrom)) +
+    Number(Boolean(dateTo)) +
+    selectedStatuses.length;
 
   function clearFilters() {
-    setSearch("")
-    setDebouncedSearch("")
-    setDateFrom("")
-    setDateTo("")
-    setPage(1)
+    setSearch("");
+    setDebouncedSearch("");
+    setDateFrom("");
+    setDateTo("");
+    setSelectedStatuses([]);
+    setPage(1);
   }
 
   function clearSearch() {
-    setSearch("")
-    setDebouncedSearch("")
-    setPage(1)
+    setSearch("");
+    setDebouncedSearch("");
+    setPage(1);
   }
 
   function updateDateFrom(value: string) {
-    setDateFrom(value)
-    setPage(1)
+    setDateFrom(value);
+    setPage(1);
   }
 
   function updateDateTo(value: string) {
-    setDateTo(value)
-    setPage(1)
+    setDateTo(value);
+    setPage(1);
+  }
+
+  function updateStatuses(statuses: string[]) {
+    setSelectedStatuses(statuses);
+    setPage(1);
+  }
+
+  function updateSort(
+    column: ApplicantSortColumn,
+    direction: DataTableSortDirection | null,
+  ) {
+    setSortColumn(direction ? column : null);
+    setSortDirection(direction);
+    setPage(1);
+  }
+
+  function updatePageSize(nextPageSize: number) {
+    setPageSize(nextPageSize);
+    setPage(1);
   }
 
   function viewApplicant(applicant: Applicant) {
     router.push(
       `/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`,
-    )
+    );
   }
 
   function openCreateDialog() {
-    setIsCreateOpen(true)
-    setCreateError(null)
+    setIsCreateOpen(true);
+    setCreateError(null);
   }
 
   async function handleCreate(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setCreateError(null)
+    e.preventDefault();
+    setCreateError(null);
     const ok = await createApplicant({
       path: "/api/v1/recruitment/employee-applicants",
       method: "POST",
@@ -186,60 +290,53 @@ export default function ApplicantsPage() {
         profileId: Number(createForm.profileId),
         status: createForm.status,
       },
-    })
+    });
     if (!ok) {
-      setCreateError("Unable to create applicant.")
-      return
+      setCreateError("Unable to create applicant.");
+      return;
     }
-    await refreshApplicants()
-    setIsCreateOpen(false)
-    setCreateForm({ profileId: "", status: "Submitted" })
-    notifyCreated("Applicant record")
+    await refreshApplicants();
+    setIsCreateOpen(false);
+    setCreateForm({ profileId: "", status: "Submitted" });
+    notifyCreated("Applicant record");
   }
 
   return (
     <PermissionGuard requiredPermission="hrms.recruitment.applicants.view">
-      <div>
+      <>
         <h1 className="sr-only">Applicants</h1>
-        <DataToolbar
-          label="Applicant list controls"
-          search={
-            <Field>
-              <FieldLabel htmlFor="applicant-search">Search applicants</FieldLabel>
-              <DataSearchInput
-                id="applicant-search"
-                value={search}
-                onChange={(event) => {
-                  setSearch(event.target.value)
-                  setPage(1)
-                }}
-                onClear={clearSearch}
-                clearLabel="Clear applicant search"
-                placeholder="Application number or status"
-                autoComplete="off"
-              />
-            </Field>
-          }
+        <TableTemplate
+          label="Applicants table"
+          search={{
+            inputId: "applicant-search",
+            value: search,
+            onChange: (value) => {
+              setSearch(value);
+              setPage(1);
+            },
+            onClear: clearSearch,
+            placeholder: "Search application number",
+            label: "Search applicants",
+          }}
           filters={
-            <ApplicantDateFilters
-              idPrefix="applicant-desktop"
-              dateFrom={dateFrom}
-              dateTo={dateTo}
-              onDateFromChange={updateDateFrom}
-              onDateToChange={updateDateTo}
-            />
+            <div className="space-y-6">
+              <ApplicantDateFilters
+                idPrefix="applicant-filters"
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+                onDateFromChange={updateDateFrom}
+                onDateToChange={updateDateTo}
+                stacked
+              />
+              <ApplicantStatusFilter
+                idPrefix="applicant-status"
+                statuses={STATUS_OPTIONS}
+                selectedStatuses={selectedStatuses}
+                onSelectedStatusesChange={updateStatuses}
+              />
+            </div>
           }
-          mobileFilters={
-            <ApplicantDateFilters
-              idPrefix="applicant-mobile"
-              dateFrom={dateFrom}
-              dateTo={dateTo}
-              onDateFromChange={updateDateFrom}
-              onDateToChange={updateDateTo}
-              stacked
-            />
-          }
-          activeFilterCount={activeDateFilterCount}
+          activeFilterCount={activeFilterCount}
           hasActiveFilters={hasActiveFilters}
           onClearFilters={clearFilters}
           actions={
@@ -250,22 +347,22 @@ export default function ApplicantsPage() {
               </Button>
             ) : undefined
           }
-        />
-
-        <DataTableState
-          className="mt-4"
           loading={isLoading}
           loadingLabel="Loading applicants"
           error={error}
           onRetry={refreshApplicants}
-          empty={applicants.length === 0}
+          empty={visibleApplicants.length === 0}
           emptyState={
             <EmptyState
               variant={hasActiveFilters ? "no-results" : "no-records"}
-              title={hasActiveFilters ? "No applicants match your filters" : "No applicants yet"}
+              title={
+                hasActiveFilters
+                  ? "No applicants match your filters"
+                  : "No applicants yet"
+              }
               description={
                 hasActiveFilters
-                  ? "Try adjusting your search or applied date range."
+                  ? "Try adjusting your search, status, or applied date range."
                   : "Applicants you add will show up here."
               }
               className="min-h-72 border-0"
@@ -283,16 +380,104 @@ export default function ApplicantsPage() {
               }
             />
           }
+          pagination={
+            totalRecords > 0
+              ? {
+                  page,
+                  pageSize,
+                  totalPages,
+                  totalRecords,
+                  itemLabel:
+                    totalRecords === 1 ? "applicant" : "applicants",
+                  onPageChange: setPage,
+                  onPageSizeChange: updatePageSize,
+                  pageSizeOptions: PAGE_SIZE_OPTIONS,
+                  summary:
+                    selectedStatuses.length > 1 ? (
+                      <p
+                        className="text-sm text-muted-foreground"
+                        aria-live="polite"
+                      >
+                        <span className="text-foreground">
+                          {visibleApplicants.length}
+                        </span>{" "}
+                        matching rows on this page of{" "}
+                        <span className="text-foreground">
+                          {totalRecords}
+                        </span>{" "}
+                        applicants
+                      </p>
+                    ) : undefined,
+                }
+              : undefined
+          }
         >
           <div className="hidden md:block">
-            <Table className="min-w-3xl text-sm">
+            <Table className="min-w-3xl text-sm bg-card">
               <TableHeader>
                 <TableRow className="bg-muted/50 hover:bg-muted/50">
-                  <TableHead className="px-4">Application number</TableHead>
-                  <TableHead className="px-4">Applicant name</TableHead>
-                  <TableHead className="px-4">Status</TableHead>
-                  <TableHead className="px-4">Date applied</TableHead>
-                  <TableHead className="px-4">Last updated</TableHead>
+                  <TableHead className="px-4">
+                    <DataTableColumnHeader
+                      label="Application number"
+                      sortDirection={
+                        sortColumn === "applicationNumber"
+                          ? sortDirection
+                          : null
+                      }
+                      onSortChange={(direction) =>
+                        updateSort("applicationNumber", direction)
+                      }
+                      ascendingLabel="Application number A to Z"
+                      descendingLabel="Application number Z to A"
+                    />
+                  </TableHead>
+                  <TableHead className="px-4">
+                    <DataTableColumnHeader
+                      label="Applicant name"
+                      sortDirection={
+                        sortColumn === "applicantName" ? sortDirection : null
+                      }
+                      onSortChange={(direction) =>
+                        updateSort("applicantName", direction)
+                      }
+                      ascendingLabel="Applicant name A to Z"
+                      descendingLabel="Applicant name Z to A"
+                    />
+                  </TableHead>
+                  <TableHead className="px-4">
+                    <DataTableColumnHeader
+                      label="Status"
+                      filterOptions={STATUS_FILTER_OPTIONS}
+                      selectedValues={selectedStatuses}
+                      onSelectedValuesChange={updateStatuses}
+                    />
+                  </TableHead>
+                  <TableHead className="px-4">
+                    <DataTableColumnHeader
+                      label="Date applied"
+                      sortDirection={
+                        sortColumn === "createdAt" ? sortDirection : null
+                      }
+                      onSortChange={(direction) =>
+                        updateSort("createdAt", direction)
+                      }
+                      ascendingLabel="Oldest applications first"
+                      descendingLabel="Newest applications first"
+                    />
+                  </TableHead>
+                  <TableHead className="px-4">
+                    <DataTableColumnHeader
+                      label="Last updated"
+                      sortDirection={
+                        sortColumn === "updatedAt" ? sortDirection : null
+                      }
+                      onSortChange={(direction) =>
+                        updateSort("updatedAt", direction)
+                      }
+                      ascendingLabel="Oldest updates first"
+                      descendingLabel="Newest updates first"
+                    />
+                  </TableHead>
                   <TableHead className="px-4 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -300,45 +485,41 @@ export default function ApplicantsPage() {
                 {isLoading ? (
                   <TableSkeletonRows columns={6} rows={8} />
                 ) : (
-                  applicants.map((applicant) => {
+                  visibleApplicants.map((applicant) => {
                     const fullName =
-                      profileNames.get(String(applicant.profileId)) ?? "No linked profile"
+                      profileNames.get(String(applicant.profileId)) ??
+                      "No linked profile";
 
                     return (
-                      <tr key={applicant.id} className="border-b last:border-0 hover:bg-muted/30">
-                        <td className="px-4 py-3 font-medium">{applicant.applicationNumber}</td>
-                        <td className="px-4 py-3">{fullName}</td>
-                        <td className="px-4 py-3">
-                          <span className={"inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " + getStatusStyle(applicant.status)}>
-                            {applicant.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatDate(applicant.createdAt)}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatDate(applicant.updatedAt)}</td>
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="icon-sm"
-                              className="active:translate-y-0!"
-                              onClick={() => router.push(`/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`)}
-                              aria-label="View applicant"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                            </Button>
-                            {/* Edit/Delete each require their own permission */}
-                            {(canUpdateApplicant || canDeleteApplicant) && (
-                              <ApplicantRowActions
-                                applicant={applicant}
-                                onChanged={refreshApplicants}
-                                canUpdate={canUpdateApplicant}
-                                canDelete={canDeleteApplicant}
-                              />
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
+                      <TableRow key={applicant.id}>
+                        <TableCell className="h-11 px-4 font-medium">
+                          {applicant.applicationNumber}
+                        </TableCell>
+                        <TableCell className="max-w-64 truncate px-4">
+                          {fullName}
+                        </TableCell>
+                        <TableCell className="px-4">
+                          <ApplicantStatusBadge status={applicant.status} />
+                        </TableCell>
+                        <TableCell className="px-4 text-muted-foreground">
+                          {formatDate(applicant.createdAt)}
+                        </TableCell>
+                        <TableCell className="px-4 text-muted-foreground">
+                          {formatDate(applicant.updatedAt)}
+                        </TableCell>
+                        <TableCell className="px-4 text-right">
+                          <ApplicantRowActions
+                            applicant={applicant}
+                            applicantLabel={applicant.applicationNumber}
+                            canEdit={canUpdate}
+                            canDelete={canDelete}
+                            idPrefix="desktop"
+                            onView={() => viewApplicant(applicant)}
+                            onChanged={refreshApplicants}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    );
                   })
                 )}
               </TableBody>
@@ -357,9 +538,10 @@ export default function ApplicantsPage() {
                     <Skeleton className="h-4 w-full" />
                   </li>
                 ))
-              : applicants.map((applicant) => {
+              : visibleApplicants.map((applicant) => {
                   const fullName =
-                    profileNames.get(String(applicant.profileId)) ?? "No linked profile"
+                    profileNames.get(String(applicant.profileId)) ??
+                    "No linked profile";
 
                   return (
                     <li key={applicant.id} className="space-y-3 p-4">
@@ -376,12 +558,20 @@ export default function ApplicantsPage() {
                       </div>
                       <dl className="grid grid-cols-2 gap-3 text-sm">
                         <div>
-                          <dt className="text-xs text-muted-foreground">Date applied</dt>
-                          <dd className="mt-0.5">{formatDate(applicant.createdAt)}</dd>
+                          <dt className="text-xs text-muted-foreground">
+                            Date applied
+                          </dt>
+                          <dd className="mt-0.5">
+                            {formatDate(applicant.createdAt)}
+                          </dd>
                         </div>
                         <div>
-                          <dt className="text-xs text-muted-foreground">Last updated</dt>
-                          <dd className="mt-0.5">{formatDate(applicant.updatedAt)}</dd>
+                          <dt className="text-xs text-muted-foreground">
+                            Last updated
+                          </dt>
+                          <dd className="mt-0.5">
+                            {formatDate(applicant.updatedAt)}
+                          </dd>
                         </div>
                       </dl>
                       <div className="flex justify-end border-t pt-3">
@@ -396,34 +586,24 @@ export default function ApplicantsPage() {
                         />
                       </div>
                     </li>
-                  )
+                  );
                 })}
           </ul>
-        </DataTableState>
-
-        {!isLoading && !error && applicants.length > 0 ? (
-          <DataPagination
-            className="mt-4"
-            page={page}
-            pageSize={PAGE_SIZE}
-            totalPages={totalPages}
-            totalRecords={totalRecords}
-            itemLabel={totalRecords === 1 ? "applicant" : "applicants"}
-            onPageChange={setPage}
-          />
-        ) : null}
+        </TableTemplate>
 
         <Dialog
           open={isCreateOpen}
           onOpenChange={(open) => {
-            setIsCreateOpen(open)
-            if (!open) setCreateError(null)
+            setIsCreateOpen(open);
+            if (!open) setCreateError(null);
           }}
         >
           <DialogContent>
             <DialogHeader>
               <DialogTitle>New applicant</DialogTitle>
-              <DialogDescription>Register a new job applicant by linking to an existing profile.</DialogDescription>
+              <DialogDescription>
+                Register a new job applicant by linking to an existing profile.
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
               <Field>
@@ -432,7 +612,9 @@ export default function ApplicantsPage() {
                   id="create-profile"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
                   value={createForm.profileId}
-                  onChange={(e) => setCreateForm((s) => ({ ...s, profileId: e.target.value }))}
+                  onChange={(e) =>
+                    setCreateForm((s) => ({ ...s, profileId: e.target.value }))
+                  }
                   required
                 >
                   <option value="">Select a profile…</option>
@@ -449,16 +631,24 @@ export default function ApplicantsPage() {
                   id="create-status"
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
                   value={createForm.status}
-                  onChange={(e) => setCreateForm((s) => ({ ...s, status: e.target.value }))}
+                  onChange={(e) =>
+                    setCreateForm((s) => ({ ...s, status: e.target.value }))
+                  }
                 >
                   {STATUS_OPTIONS.map((opt) => (
-                    <option key={opt} value={opt}>{opt}</option>
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
                   ))}
                 </select>
               </Field>
               <FieldError>{createError}</FieldError>
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsCreateOpen(false)}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" className="min-w-32" disabled={creating}>
@@ -468,7 +658,7 @@ export default function ApplicantsPage() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+      </>
     </PermissionGuard>
-  )
+  );
 }

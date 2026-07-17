@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Loader2, Search, Users, Eye, Edit3, Trash2, UserPlus, Send } from "lucide-react"
+import { Loader2, Users, Eye, Edit3, Trash2, UserPlus, Send } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
+import { TableRowActions } from "@/components/custom/table-row-actions"
+import { TableTemplate } from "@/components/custom/table-template"
 import {
   useApiQuery,
   useApiMutation,
@@ -32,11 +34,9 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { ApiErrorView } from "@/components/ui/api-error-view"
 import {
   Select,
   SelectContent,
@@ -44,11 +44,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
 
 type Employee = EmployeeResponse
 type PagedEmployees = PagedResponseOfEmployeeResponse
@@ -129,6 +124,7 @@ export default function EmployeesPage() {
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null)
+  const [employeePendingDelete, setEmployeePendingDelete] = useState<Employee | null>(null)
   const [formState, setFormState] = useState<EmployeeForm>(EMPTY_FORM)
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -224,7 +220,10 @@ export default function EmployeesPage() {
       path: `/api/v1/hrms/employees/${employee.id}`,
       method: "DELETE",
     })
-    if (ok) await refresh()
+    if (ok) {
+      await refresh()
+      setEmployeePendingDelete(null)
+    }
   }
 
   async function handleSendInvite(employee: Employee) {
@@ -245,70 +244,69 @@ export default function EmployeesPage() {
 
   return (
     <PermissionGuard requiredPermission="hrms.employees.view">
-      <div>
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-normal">Employees</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Employee details will appear below.
-            </p>
-          </div>
-          {canCreate && (
-            <Button onClick={openCreateDialog}>
-              <UserPlus className="mr-2 h-4 w-4" />
-              New employee
-            </Button>
-          )}
-        </div>
 
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-64">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search employees by name"
-              className="w-full rounded-md border border-input bg-background py-2 pl-8 pr-3 text-sm outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            />
-          </div>
-          {hasActiveFilters && (
-            <button
-              type="button"
-              onClick={() => { setSearch(""); setPage(1) }}
-              className="text-sm font-medium text-muted-foreground underline-offset-2 hover:underline"
-            >
-              Clear filters
-            </button>
-          )}
-        </div>
-
-        {inviteError && (
-          <div className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {inviteError}
-          </div>
-        )}
-
-        <div className="mt-4 overflow-hidden rounded-lg border">
-          {loading ? (
-            <div className="flex items-center justify-center gap-2 py-16 text-sm text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Loading employees…
-            </div>
-          ) : error ? (
-            <ApiErrorView error={error} onRetry={refresh} fullScreen />
-          ) : employees.length === 0 ? (
+        <TableTemplate
+          label="Employees table"
+          className="mt-4"
+          search={{
+            value: search,
+            onChange: setSearch,
+            onClear: () => {
+              setSearch("")
+              setPage(1)
+            },
+            placeholder: "Search employees by name",
+            label: "Search employees",
+          }}
+          actions={
+            canCreate ? (
+              <Button onClick={openCreateDialog}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                New employee
+              </Button>
+            ) : undefined
+          }
+          hasActiveFilters={hasActiveFilters}
+          onClearFilters={() => {
+            setSearch("")
+            setPage(1)
+          }}
+          loading={loading}
+          loadingLabel="Loading employees"
+          loadingSkeleton={{ columns: 6, rows: 8 }}
+          error={error}
+          onRetry={refresh}
+          empty={employees.length === 0}
+          emptyState={
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
               <Users className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">
-                {hasActiveFilters ? "No employees match your filters" : "No employees yet"}
+                {hasActiveFilters
+                  ? "No employees match your filters"
+                  : "No employees yet"}
               </p>
               <p className="text-sm text-muted-foreground">
-                {hasActiveFilters ? "Try a different name." : "Employees you add will show up here."}
+                {hasActiveFilters
+                  ? "Try a different name."
+                  : "Employees you add will show up here."}
               </p>
             </div>
-          ) : (
-            <div className="overflow-x-auto">
+          }
+          pagination={
+            !loading && !error && employees.length > 0
+              ? {
+                  page,
+                  pageSize: PAGE_SIZE,
+                  totalPages,
+                  totalRecords: Number(totalRecords),
+                  itemLabel:
+                    Number(totalRecords) === 1 ? "employee" : "employees",
+                  onPageChange: setPage,
+                }
+              : undefined
+          }
+        >
+          <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
@@ -361,110 +359,89 @@ export default function EmployeesPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end gap-2">
-                            {/* View */}
-                            <Button
-                              variant="outline"
-                              size="icon-sm"
-                              onClick={() => router.push(`/hrm/portfolio/${employee.id}`)}
-                              aria-label="View portfolio"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            {/* Edit — only HR-level users who can create employees */}
-                            {canManageOthers && (
-                              <Button
-                                variant="outline"
-                                size="icon-sm"
-                                onClick={() => openEditDialog(employee)}
-                                aria-label="Edit employee"
-                              >
-                                <Edit3 className="h-4 w-4" />
-                              </Button>
-                            )}
-                            {/* Send invitation — only HR-level users, only when portfolio is empty */}
-                            {canManageOthers && emptyPortfolio && (
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="icon-sm"
-                                    onClick={() => handleSendInvite(employee)}
-                                    disabled={isSending || alreadyInvited}
-                                    aria-label="Send portfolio invitation"
-                                  >
-                                    {isSending ? (
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                      <Send className={alreadyInvited ? "h-4 w-4 text-green-600" : "h-4 w-4"} />
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  {alreadyInvited ? "Invitation sent" : "Send portfolio invitation"}
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                            {/* Delete */}
-                            {canDelete && (
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button variant="destructive" size="icon-sm" aria-label="Delete employee">
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Delete employee</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      This will archive <strong>{employee.fullName}</strong>. This action cannot be undone.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction onClick={() => handleDelete(employee)} disabled={deleting}>
-                                      {deleting ? "Deleting…" : "Delete"}
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            )}
-                          </div>
+                          <TableRowActions
+                            label={`Actions for ${employee.fullName}`}
+                            actions={[
+                              {
+                                label: "View portfolio",
+                                icon: <Eye aria-hidden="true" className="h-4 w-4" />,
+                                onSelect: () => router.push(`/hrm/portfolio/${employee.id}`),
+                              },
+                              ...(canManageOthers
+                                ? [
+                                    {
+                                      label: "Edit employee",
+                                      icon: <Edit3 aria-hidden="true" className="h-4 w-4" />,
+                                      onSelect: () => openEditDialog(employee),
+                                    },
+                                  ]
+                                : []),
+                              ...(canManageOthers && emptyPortfolio
+                                ? [
+                                    {
+                                      label: alreadyInvited
+                                        ? "Invitation sent"
+                                        : "Send portfolio invitation",
+                                      icon: isSending ? (
+                                        <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <Send
+                                          aria-hidden="true"
+                                          className={alreadyInvited ? "h-4 w-4 text-green-600" : "h-4 w-4"}
+                                        />
+                                      ),
+                                      onSelect: () => handleSendInvite(employee),
+                                      disabled: isSending || alreadyInvited,
+                                    },
+                                  ]
+                                : []),
+                              ...(canDelete
+                                ? [
+                                    {
+                                      label: "Delete employee",
+                                      icon: <Trash2 aria-hidden="true" className="h-4 w-4" />,
+                                      onSelect: () => setEmployeePendingDelete(employee),
+                                      variant: "destructive" as const,
+                                    },
+                                  ]
+                                : []),
+                            ]}
+                          />
                         </td>
                       </tr>
                     )
                   })}
                 </tbody>
               </table>
-            </div>
-          )}
-        </div>
-
-        {!loading && !error && employees.length > 0 && (
-          <div className="mt-4 flex flex-col items-center justify-between gap-3 sm:flex-row">
-            <p className="text-sm text-muted-foreground">
-              Page {page} of {totalPages} · {totalRecords} employee{totalRecords === 1 ? "" : "s"}
-            </p>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className="rounded-md border px-3 py-1.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 hover:bg-muted/50"
-              >
-                Next
-              </button>
-            </div>
           </div>
-        )}
+        </TableTemplate>
+
+        <AlertDialog
+          open={Boolean(employeePendingDelete)}
+          onOpenChange={(open) => {
+            if (!open && !deleting) setEmployeePendingDelete(null)
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete employee</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will archive <strong>{employeePendingDelete?.fullName}</strong>. This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  if (employeePendingDelete) void handleDelete(employeePendingDelete)
+                }}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting…" : "Delete"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Create / Edit dialog */}
         <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) setFormError(null) }}>
@@ -568,7 +545,6 @@ export default function EmployeesPage() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
     </PermissionGuard>
   )
 }

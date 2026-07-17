@@ -51,7 +51,7 @@ import {
   type CreateJobPostingRequest,
   type UpdateJobPostingRequest,
 } from "@/lib/api"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 
 // Mirrors SIS.Domain.Platform.JobPostingStatus
 const STATUS_LABEL: Record<number, string> = {
@@ -117,8 +117,6 @@ export default function JobPostingsPage() {
     }, 200)
     return () => clearTimeout(timeout)
   }, [search])
-
-  React.useEffect(() => { setPage(1) }, [statusFilter])
 
   const handleError = React.useCallback((err: Error) => setError(err.message), [])
 
@@ -269,7 +267,10 @@ export default function JobPostingsPage() {
               <button
                 key={filter.value}
                 type="button"
-                onClick={() => setStatusFilter(filter.value)}
+                onClick={() => {
+                  setStatusFilter(filter.value)
+                  setPage(1)
+                }}
                 className={
                   "rounded-full border px-3 py-1 text-xs font-medium transition-colors " +
                   (statusFilter === filter.value

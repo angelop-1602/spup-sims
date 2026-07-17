@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Edit3, Eye, MoreHorizontal, Trash2 } from "lucide-react"
+import { Edit3, Eye, Trash2 } from "lucide-react"
+import { TableRowActions } from "@/components/custom/table-row-actions"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -21,13 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import {
   Select,
@@ -54,13 +48,14 @@ export function ApplicantRowActions({
   idPrefix,
   onView,
   onChanged,
-  canUpdate = true,
-  canDelete = true,
 }: {
   applicant: Applicant
-  onChanged: () => void
-  canUpdate?: boolean
-  canDelete?: boolean
+  applicantLabel: string
+  canDelete: boolean
+  canEdit: boolean
+  idPrefix: string
+  onView: () => void
+  onChanged: () => void | Promise<void>
 }) {
   const [editOpen, setEditOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
@@ -117,79 +112,121 @@ export function ApplicantRowActions({
 
   return (
     <>
-      {canUpdate && (
-      <Dialog open={editOpen} onOpenChange={handleEditOpenChange}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="icon-sm" aria-label="Edit applicant">
-            <Edit3 className="h-3.5 w-3.5" />
-          </Button>
-        </DialogTrigger>
+      <TableRowActions
+        label={`Actions for ${applicantLabel}`}
+        actions={[
+          {
+            label: "View profile",
+            icon: <Eye aria-hidden="true" />,
+            onSelect: onView,
+          },
+          ...(canEdit
+            ? [
+                {
+                  label: "Edit status",
+                  icon: <Edit3 aria-hidden="true" />,
+                  onSelect: () => handleEditOpenChange(true),
+                },
+              ]
+            : []),
+          ...(canDelete
+            ? [
+                {
+                  label: "Delete applicant",
+                  icon: <Trash2 aria-hidden="true" />,
+                  onSelect: () => setDeleteOpen(true),
+                  variant: "destructive" as const,
+                },
+              ]
+            : []),
+        ]}
+      />
 
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit applicant</DialogTitle>
-            <DialogDescription>Update this applicant&apos;s status.</DialogDescription>
-          </DialogHeader>
+      {canEdit ? (
+        <Dialog open={editOpen} onOpenChange={handleEditOpenChange}>
 
-          <form onSubmit={handleSave} className="space-y-4">
-            <div>
-              <label className="mb-2 block text-sm font-medium">
-                Status <span className="text-destructive">*</span>
-              </label>
-              <Select value={status} onValueChange={setStatus} required>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent position="popper" side="bottom" avoidCollisions={false}>
-                  {STATUS_OPTIONS.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {option}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit applicant</DialogTitle>
+              <DialogDescription>Update this applicant&apos;s status.</DialogDescription>
+            </DialogHeader>
 
-            {error && <p className="text-sm text-destructive">{error.message}</p>}
+            <form onSubmit={handleSave} className="space-y-4">
+              <Field data-invalid={Boolean(error)}>
+                <FieldLabel htmlFor={`${idPrefix}-applicant-status-${applicant.id}`}>
+                  Status
+                </FieldLabel>
+                <Select value={status} onValueChange={setStatus} required>
+                  <SelectTrigger
+                    id={`${idPrefix}-applicant-status-${applicant.id}`}
+                    className="h-10 w-full px-3 text-sm"
+                    aria-invalid={Boolean(error)}
+                  >
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent position="popper" side="bottom" avoidCollisions={false}>
+                    {STATUS_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FieldError>{error?.message}</FieldError>
+              </Field>
 
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={saving}>
-                {saving ? "Saving..." : "Save"}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
-      )}
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="min-w-28" disabled={saving}>
+                  {saving ? "Saving..." : "Save changes"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      ) : null}
 
-      {canDelete && (
-      <AlertDialog>
-        <AlertDialogTrigger asChild>
-          <Button variant="destructive" size="icon-sm" aria-label="Delete applicant">
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </AlertDialogTrigger>
+      {canDelete ? (
+        <AlertDialog
+          open={deleteOpen}
+          onOpenChange={(open) => {
+            if (deleting) return
+            setDeleteOpen(open)
+            if (!open) setDeleteError(null)
+          }}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete applicant record?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This permanently removes {applicantLabel} and cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
 
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete applicant</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently remove this applicant record.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
+            {deleteError ? (
+              <p role="alert" className="text-sm text-destructive">
+                {deleteError}
+              </p>
+            ) : null}
 
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} disabled={deleting}>
-              {deleting ? "Deleting..." : "Delete"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-      )}
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={(event) => {
+                  event.preventDefault()
+                  void handleDelete()
+                }}
+                disabled={deleting}
+              >
+                {deleting ? "Deleting..." : "Delete applicant"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      ) : null}
     </>
   )
 }

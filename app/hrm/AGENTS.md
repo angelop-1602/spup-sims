@@ -1,36 +1,50 @@
+# HRM Module Instructions
+
+Before working anywhere under `app/hrm`, read and follow the repository-wide instructions in [`../../AGENTS.md`](../../AGENTS.md). This file contains only HRM-specific additions or overrides; the root instructions continue to apply unless this file explicitly says otherwise.
+
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+
 <!-- END:nextjs-agent-rules -->
 
-<!-- nextpilot:start -->
+## HRM File and Folder Structure
 
-## NextPilot Agent Instructions
+Before adding or moving files under this module, read
+[`docs/file-structure.md`](docs/file-structure.md).
 
-NextPilot is installed as this project's Next.js development intelligence and validation tool.
+- Keep Next.js special files in `app/` focused on routing, route parameters,
+  metadata, supported authorization composition, and page composition.
+- Put route-only implementation in the route segment's private `_components/`
+  or `_lib/` directory.
+- Put new or meaningfully reworked HRM capability code in
+  `features/<capability>/`; do not move legacy files during an unrelated task.
+- Reserve `components/hrm/` for UI genuinely shared by multiple HRM
+  capabilities and `components/ui/` for domain-independent primitives.
+- Reuse `lib/api/` and generated OpenAPI types. When an endpoint contract is
+  generic, keep the documented adapter type inside the owning feature.
+- Keep Client Component boundaries narrow. Protected browser requests continue
+  through the MSAL-aware API client unless a server authentication design is
+  explicitly approved.
+- Do not invent database code, Server Actions, services, schemas, shared
+  packages, or tests that the current project does not require or support.
+- Use specific kebab-case filenames; avoid catch-all `helpers.ts`, `common.ts`,
+  broad `types.ts`, or unrelated `utils.ts` files.
+- Dependencies flow from routes to features to shared UI/infrastructure.
+  Features must not import route implementation files or another feature's
+  private internals.
+- If a requested implementation conflicts with the documented structure, stop
+  and explain the conflict before introducing a new pattern. Update the
+  structure document after an approved architecture change.
 
-Before making meaningful changes:
+## Table Row Actions
 
-1. Inspect the existing project structure and conventions.
-2. Use available NextPilot MCP tools to inspect relevant routes, components, symbols, dependencies, and diagnostics.
-3. Read documentation matching the installed Next.js version before changing framework-specific behavior.
-4. Reuse existing components, utilities, validation schemas, and data-access patterns instead of creating duplicates.
-5. Prefer Server Components unless client-side state, browser APIs, event handlers, or React client hooks are required.
-6. Validate all untrusted input and enforce authorization inside protected mutations.
-7. Never expose credentials, tokens, private environment variables, or raw database records to Client Components.
-8. Run `npx --no-install nextpilot doctor --root .` after meaningful changes.
-
-Useful CLI commands:
-
-```bash
-npx --no-install nextpilot inspect --root .
-npx --no-install nextpilot routes --root .
-npx --no-install nextpilot inspect-route <route> --root .
-npx --no-install nextpilot inspect-component <file> --root .
-npx --no-install nextpilot doctor --root .
-```
-
-When NextPilot MCP is available, prefer its structured tools for project inspection. Use the CLI for validation, automation, and CI.
-
-<!-- nextpilot:end -->
+- Count only the row actions currently visible after permission checks and
+  row-specific conditions. Render one to three actions directly as icon-only
+  buttons; use an overflow dropdown only when four or more actions are visible.
+- Give every icon-only action a descriptive accessible name and a tooltip when
+  using the shared `TableRowActions` component. Keep destructive actions visually
+  distinct and require `AlertDialog` confirmation where the action is not easily
+  reversible.

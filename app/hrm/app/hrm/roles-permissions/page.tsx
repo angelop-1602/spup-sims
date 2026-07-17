@@ -4,11 +4,13 @@ import * as React from "react"
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
+import { TableTemplate } from "@/components/custom/table-template"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ApiErrorView } from "@/components/ui/api-error-view"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Textarea } from "@/components/ui/textarea"
 import {
   Select,
@@ -322,11 +324,13 @@ export default function RolesPage() {
 
       {listLoading && (
         <Card>
-          <CardContent className="flex items-center justify-center py-12">
-            <div className="flex items-center gap-3 text-muted-foreground">
-              <Loader2 className="h-5 w-5 animate-spin" />
-              <span>Loading identity data...</span>
-            </div>
+          <CardContent className="space-y-4 py-6" aria-busy="true">
+            <span className="sr-only" role="status">
+              Loading identity data
+            </span>
+            <Skeleton className="h-9 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-64 w-full" />
           </CardContent>
         </Card>
       )}
@@ -414,7 +418,7 @@ export default function RolesPage() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border">
+                <TableTemplate label="Assigned user roles table">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -462,12 +466,12 @@ export default function RolesPage() {
                               {canUpdateUsers && (
                               <Button
                                 variant="destructive"
-                                size="sm"
+                                size="icon-sm"
                                 onClick={() => removeRoleFromUser(role.id)}
                                 disabled={saving}
+                                aria-label={`Remove ${getRoleLabel(role)}`}
                               >
-                                <Trash2 className="mr-1 h-3 w-3" />
-                                Remove
+                                <Trash2 aria-hidden="true" className="h-4 w-4" />
                               </Button>
                               )}
                             </TableCell>
@@ -476,7 +480,7 @@ export default function RolesPage() {
                       )}
                     </TableBody>
                   </Table>
-                </div>
+                </TableTemplate>
               </CardContent>
             </Card>
           </TabsContent>
@@ -547,7 +551,7 @@ export default function RolesPage() {
                   </div>
                 </div>
 
-                <div className="rounded-lg border">
+                <TableTemplate label="Assigned role permissions table">
                   <Table>
                     <TableHeader>
 
@@ -600,12 +604,12 @@ export default function RolesPage() {
                               {canDeletePerm && (
                               <Button
                                 variant="destructive"
-                                size="sm"
+                                size="icon-sm"
                                 onClick={() => removePermissionFromRole(permission.id)}
                                 disabled={saving}
+                                aria-label={`Remove ${getPermissionLabel(permission)}`}
                               >
-                                <Trash2 className="mr-1 h-3 w-3" />
-                                Remove
+                                <Trash2 aria-hidden="true" className="h-4 w-4" />
                               </Button>
                               )}
                             </TableCell>
@@ -614,7 +618,7 @@ export default function RolesPage() {
                       )}
                     </TableBody>
                   </Table>
-                </div>
+                </TableTemplate>
               </CardContent>
             </Card>
           </TabsContent>
