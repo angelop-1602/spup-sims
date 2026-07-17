@@ -342,11 +342,11 @@ export default function LandingPage() {
                       Browse Job Openings
                     </Link>
                     <Link 
-                      href="/register" 
+                      href={status === "authenticated" ? "/applicant/profile" : "/register"} 
                       className="font-epilogue inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 text-xs font-bold px-5 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none"
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      Setup Application Profile
+                      {status === "authenticated" ? "Edit my Application Profile" : "Setup Application Profile"}
                     </Link>
                   </div>
 
