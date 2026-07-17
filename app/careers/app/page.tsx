@@ -14,7 +14,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import Link from 'next/link';
-import { Job, UserProfile, Application, INITIAL_JOBS } from '@/components/landing/types';
+import { Job, UserProfile, Application, JobPostingsApiResponse, mapApiJobToJob } from '@/components/landing/types';
 import FeaturedJobs from '@/components/landing/FeaturedJobs';
 import JobDetailsModal from '@/components/landing/JobDetailsModal';
 import ProcessTimeline from '@/components/landing/ApplicationProcess';
@@ -23,7 +23,8 @@ import JobBoardCTA from '@/components/landing/Cta';
 
 export default function LandingPage() {
   const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile' | 'faqs' >('explore');
-  const [jobs] = useState<Job[]>(INITIAL_JOBS);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [jobsLoading, setJobsLoading] = useState<boolean>(true);
 
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -66,6 +67,27 @@ export default function LandingPage() {
       localStorage.setItem('edu_careers_applications', JSON.stringify(applications));
     }
   }, [applications]);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function fetchJobs() {
+      setJobsLoading(true);
+      try {
+        const res = await fetch('/api/v1/applicant/job-postings');
+        if (!res.ok) throw new Error('Failed to fetch');
+        const json: JobPostingsApiResponse = await res.json();
+        if (!cancelled && json.success && json.data?.data) {
+          setJobs(json.data.data.map(mapApiJobToJob));
+        }
+      } catch {
+        if (!cancelled) setJobs([]);
+      } finally {
+        if (!cancelled) setJobsLoading(false);
+      }
+    }
+    fetchJobs();
+    return () => { cancelled = true; };
+  }, []);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -200,17 +222,12 @@ export default function LandingPage() {
                 Home
               </button>
 
-              <button 
-                onClick={() => {
-                  setActiveTab('explore');
-                  setTimeout(() => {
-                    document.getElementById('workspace-layout')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }, 100);
-                }} 
+              <Link 
+                href="/job-openings"
                 className="text-[11px] font-semibold text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
               >
                 Job Openings
-              </button>
+              </Link>
 
               <button 
                 onClick={() => setActiveTab('applications')} 
@@ -326,6 +343,7 @@ export default function LandingPage() {
         <FeaturedJobs
           activeTab={activeTab}
           jobs={jobs}
+          loading={jobsLoading}
           savedJobIds={savedJobIds}
           onToggleSave={handleToggleSave}
           onSelectJob={setSelectedJob}

@@ -15,6 +15,126 @@ export interface Job {
   benefits: string[];
 }
 
+export interface ApiJobPosting {
+  id: number | string;
+  title: string;
+  department?: string;
+  departmentName?: string;
+  unitName?: string;
+  location?: string;
+  employmentType?: string;
+  type?: string;
+  workplace?: string;
+  salary?: string;
+  salaryRange?: string;
+  postedDate?: string;
+  datePosted?: string;
+  createdAt?: string;
+  deadline?: string;
+  applicationDeadline?: string;
+  closingDate?: string;
+  experienceLevel?: string;
+  experienceRequired?: string;
+  description?: string;
+  summary?: string;
+  responsibilities?: string | string[];
+  requirements?: string | string[];
+  qualifications?: string | string[];
+  benefits?: string | string[];
+  perks?: string | string[];
+}
+
+export interface JobPostingsApiResponse {
+  success: boolean;
+  message: string;
+  data: {
+    data: ApiJobPosting[];
+    page: number;
+    pageSize: number;
+    totalRecords: number;
+    totalPages: number;
+  };
+}
+
+export interface SingleJobPostingApiResponse {
+  success: boolean;
+  message: string;
+  data: ApiJobPosting;
+}
+
+function toArray(value: string | string[] | undefined): string[] {
+  if (!value) return [];
+  if (Array.isArray(value)) return value;
+  return value.split(/\n|•|- /).map((s) => s.trim()).filter(Boolean);
+}
+
+export function mapApiJobToJob(apiJob: ApiJobPosting): Job {
+  const typeMap: Record<string, Job['type']> = {
+    'full-time': 'Full-time',
+    'fulltime': 'Full-time',
+    'part-time': 'Part-time',
+    'parttime': 'Part-time',
+    'contract': 'Contract',
+    'temporary': 'Temporary',
+  };
+
+  const workplaceMap: Record<string, Job['workplace']> = {
+    'onsite': 'Onsite',
+    'on-site': 'Onsite',
+    'hybrid': 'Hybrid',
+    'remote': 'Remote',
+  };
+
+  const experienceMap: Record<string, Job['experienceLevel']> = {
+    'entry level': 'Entry Level',
+    'entry-level': 'Entry Level',
+    'junior': 'Entry Level',
+    'mid level': 'Mid Level',
+    'mid-level': 'Mid Level',
+    'senior level': 'Senior Level',
+    'senior-level': 'Senior Level',
+    'senior': 'Senior Level',
+    'director / lead': 'Director / Lead',
+    'director': 'Director / Lead',
+    'lead': 'Director / Lead',
+  };
+
+  const rawType = (apiJob.employmentType || apiJob.type || '').toLowerCase();
+  const rawWorkplace = (apiJob.workplace || '').toLowerCase();
+  const rawExperience = (apiJob.experienceLevel || apiJob.experienceRequired || '').toLowerCase();
+
+  const postedRaw = apiJob.postedDate || apiJob.datePosted || apiJob.createdAt || '';
+  const deadlineRaw = apiJob.deadline || apiJob.applicationDeadline || apiJob.closingDate || '';
+
+  const formatDate = (d: string) => {
+    if (!d) return '';
+    try {
+      return new Date(d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    } catch {
+      return d;
+    }
+  };
+
+  const dept = apiJob.department || apiJob.departmentName || apiJob.unitName || '';
+
+  return {
+    id: String(apiJob.id),
+    title: apiJob.title || 'Untitled Position',
+    department: dept,
+    location: apiJob.location || 'Tuguegarao City, Cagayan',
+    type: typeMap[rawType] || 'Full-time',
+    workplace: workplaceMap[rawWorkplace] || 'Onsite',
+    salary: apiJob.salary || apiJob.salaryRange || 'Undisclosed',
+    postedDate: formatDate(postedRaw),
+    deadline: formatDate(deadlineRaw),
+    experienceLevel: experienceMap[rawExperience] || 'Mid Level',
+    description: apiJob.description || apiJob.summary || '',
+    responsibilities: toArray(apiJob.responsibilities),
+    requirements: toArray(apiJob.requirements || apiJob.qualifications),
+    benefits: toArray(apiJob.benefits || apiJob.perks),
+  };
+}
+
 export interface UserProfile {
   fullName: string;
   email: string;
@@ -37,134 +157,3 @@ export interface Application {
   profileSnapshot: UserProfile;
 }
 
-export const INITIAL_JOBS: Job[] = [
-  {
-    id: 'job-01',
-    title: 'College Instructor (AI & Data Analytics)',
-    department: 'School of Information Technology and Engineering',
-    location: 'Tuguegarao City, Cagayan',
-    type: 'Full-time',
-    workplace: 'Onsite',
-    salary: 'Undisclosed',
-    postedDate: '2026-06-25',
-    deadline: '2026-08-15',
-    experienceLevel: 'Mid Level',
-    description: 'The School of Information Technology and Engineering invites applications for a Full-time Faculty position. We are seeking progressive educators with dedicated industry or academic background in Artificial Intelligence, Retrieval-Augmented Generation (RAG) models, Data Analytics, or Full-Stack Web Architectures to mentor our undergraduate students.',
-    responsibilities: [
-      'Teach undergraduate courses in Information Technology, focusing on machine learning foundations, programming, and capstone analytics projects.',
-      'Serve as an academic adviser and research panelist for undergraduate IT capstone projects and systems development.',
-      'Contribute to the continuous improvement of the IT curriculum aligned with current global tech landscapes.',
-      'Participate actively in university institutional research initiatives, community extensions, and committee tasks.',
-      'Coordinate with industry partners to foster student internship assignments and technology bootcamp alignment.'
-    ],
-    requirements: [
-      'Master’s Degree in Information Technology, Computer Science, or a closely related field (Ph.D. or aligned units preferred).',
-      'Demonstrated proficiency in modern web stacks (e.g., PHP/Laravel, JavaScript) or AI/Data programming frameworks.',
-      'A strong commitment to high-quality instruction, holistic student development, and the institutional mission.',
-      'Excellent interpersonal communication skills and readiness to work within a values-driven academic community.'
-    ],
-    benefits: [
-      'Competitive institutional salary scale with premium leveling for Master’s/Doctoral holders.',
-      'Comprehensive health coverage, SSS, PhilHealth, and Pag-IBIG institutional supplements.',
-      'Generous tuition waiver and remission benefits for continuing advanced graduate studies.',
-      'Paid institutional recess, faculty developmental leaves, and annual retreat privileges.',
-      'Access to research publication incentives and fully supported professional training workshops.'
-    ]
-  },
-  {
-    id: 'job-02',
-    title: 'Basic Education Unit (BEU) Guidance Counselor',
-    department: 'Guidance Office',
-    location: 'Tuguegarao City, Cagayan',
-    type: 'Full-time',
-    workplace: 'Onsite',
-    salary: 'Undisclosed',
-    postedDate: '2026-06-28',
-    deadline: '2026-07-30',
-    experienceLevel: 'Entry Level',
-    description: 'We are seeking an empathetic, values-centered Registered Guidance Counselor (RGC) to handle student development, psychological appraisal, and comprehensive counseling frameworks for our Basic Education Unit (BEU). This individual will implement programs centered around holistic student success and mental wellness.',
-    responsibilities: [
-      'Deliver proactive individual and group counseling sessions to Grade School or High School students within the Basic Education Unit.',
-      'Administer, interpret, and document standard psychological tests and academic appraisal profiles.',
-      'Organize and facilitate structured homeroom guidance modules, career orientation seminars, and anti-bullying campaigns.',
-      'Conduct regular parent-teacher consultation frameworks regarding student adjustment challenges and behavioral diagnostics.',
-      'Collaborate with the BEU principal and faculty coordinators regarding student loading, scheduling adjustments, and special cases.'
-    ],
-    requirements: [
-      'Bachelor’s or Master’s degree in Guidance and Counseling, Psychology, or Clinical Counseling.',
-      'Must be a Registered Guidance Counselor (RGC) under the Philippine Professional Regulation Commission (PRC).',
-      'Strong active listening, crisis intervention, and conflict-resolution capabilities.',
-      'Exceptional organization skills for handling delicate confidential student appraisal files and case work indicators.'
-    ],
-    benefits: [
-      'Standard institutional health allowances and comprehensive government statutory inclusions.',
-      'Generous annual paid vacation, sick leaves, and holiday breaks tied directly to the academic calendar cycle.',
-      'Full administrative support and allocation for PRC license renewals and PGCA conference attendance.',
-      'Subsidized institutional meals and access to on-campus physical wellness amenities.'
-    ]
-  },
-  {
-    id: 'job-03',
-    title: 'Community Development Extension Coordinator',
-    department: 'Community Development Center',
-    location: 'Tuguegarao City, Cagayan',
-    type: 'Full-time',
-    workplace: 'Onsite',
-    salary: 'Undisclosed',
-    postedDate: '2026-06-20',
-    deadline: '2026-07-25',
-    experienceLevel: 'Mid Level',
-    description: 'The Community Development Center (CDC) is looking for an organized, community-driven Coordinator to manage and deploy the university’s flagship extension initiatives. This role bridges academe and grassroots community building by organizing outreach programs, livelihood allocations, and community mapping structures across adopted communities.',
-    responsibilities: [
-      'Liaise directly with community leaders and stakeholders to design sustainable extension program proposals.',
-      'Utilize community mapping profiles and trackers to analyze localized development indicators and plan program interventions.',
-      'Coordinate and log extension schedules, logistics, and deployment requirements across university departments.',
-      'Draft thorough, data-supported progress reports and impact assessment summaries for the CDC Director.',
-      'Supervise and guide student volunteers and faculty representatives during off-campus outreach deployments.'
-    ],
-    requirements: [
-      'Bachelor’s degree in Social Work, Community Development, Development Communication, Sociology, or related fields.',
-      '2+ years of field experience handling community organization, civic mobilization, or NGO workflows.',
-      'Outstanding proficiency in narrative report drafting, programmatic documentation, and basic data compilation.',
-      'Excellent vernacular communication skills (Ilocano/Ibanag is a significant asset for field engagements).'
-    ],
-    benefits: [
-      'Full medical coverage with institutional clinic access and health maintenance supplements.',
-      'Complete field insurance coverage and full transportation/logistics allocation during off-campus deployments.',
-      'Opportunities for fully supported professional advancement via national community extension symposia.',
-      'Subsidized professional development courses and standard statutory holiday components.'
-    ]
-  },
-  {
-    id: 'job-04',
-    title: 'University Registrar Administrative Specialist',
-    department: 'Office of the University Registrar',
-    location: 'Tuguegarao City, Cagayan',
-    type: 'Full-time',
-    workplace: 'Onsite',
-    salary: 'Undisclosed',
-    postedDate: '2026-06-18',
-    deadline: '2026-08-01',
-    experienceLevel: 'Mid Level',
-    description: 'Join our essential administrative infrastructure. The Registrar Administrative Specialist provides efficient documentation processing, maintains secure academic records databases, organizes enrollment listings, and handles verification workflows for student credentials and graduation clearances.',
-    responsibilities: [
-      'Process, maintain, and archive student transcripts of records (TOR), certifications, diplomas, and enrollment logs.',
-      'Verify student loading configurations, course substitutions, and general evaluation checklists against curriculum guidelines.',
-      'Manage input and validation workflows inside the centralized Student Information System database infrastructure.',
-      'Assist with terminal evaluation processing for graduation candidates and coordinate statutory reporting to CHED or DepEd.',
-      'Provide courteous, efficient counter assistance to students, alumni, and external agencies requesting academic verification.'
-    ],
-    requirements: [
-      'Bachelor’s degree in Information Technology, Business Administration, Office Administration, or related disciplines.',
-      '2+ years of administrative experience, preferably inside an educational institution registrar or admissions desk.',
-      'High-level mastery of data entry software, electronic spreadsheet architectures, and database records organization.',
-      'Superb attention to details, high data integrity compliance, and ability to multitask calmly under tight enrollment windows.'
-    ],
-    benefits: [
-      'Stable academic environment with clear career growth tracks and performance incentive frameworks.',
-      'Comprehensive retirement contribution match and health premium additions.',
-      'Full tuition waiver programs for continuing education classes taken within the institution.',
-      'Paid winter recess and comprehensive institutional break leave benefits.'
-    ]
-  }
-];
