@@ -9,6 +9,7 @@ import {
   Pagination,
   PaginationContent,
   PaginationItem,
+  PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
@@ -95,7 +96,7 @@ export default function ApplicantJobApplications() {
         <p className="mt-1 text-sm text-muted-foreground">Track the status of the positions you&apos;ve applied for.</p>
       </div>
 
-      <Card className="overflow-hidden">
+      <Card className="overflow-hidden py-0">
           <CardContent className="p-0">
             {isLoading ? (
               <div className="space-y-3 p-6">
@@ -116,7 +117,7 @@ export default function ApplicantJobApplications() {
               </div>
             ) : (
               <Table>
-                <TableHeader>
+                <TableHeader className="bg-muted/50">
                   <TableRow>
                     <TableHead className="pl-6">Job Posting</TableHead>
                     <TableHead>Status</TableHead>
@@ -160,6 +161,20 @@ export default function ApplicantJobApplications() {
                       }}
                     />
                   </PaginationItem>
+                  {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                    <PaginationItem key={pageNumber}>
+                      <PaginationLink
+                        href="#"
+                        isActive={pageNumber === page}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          setPage(pageNumber)
+                        }}
+                      >
+                        {pageNumber}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
                   <PaginationItem>
                     <PaginationNext
                       href="#"

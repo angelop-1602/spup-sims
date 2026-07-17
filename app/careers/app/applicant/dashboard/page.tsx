@@ -80,7 +80,7 @@ export default function ApplicantDashboardPage() {
 
   return (
     <div className="flex min-h-screen w-full text-foreground antialiased">
-      <main className="flex-1 py-4 sm:py-6 lg:py-8 w-full space-y-6">
+      <main className="flex-1 w-full space-y-6">
 
         {/* Header Title Section */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

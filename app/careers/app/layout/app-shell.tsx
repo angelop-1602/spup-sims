@@ -15,11 +15,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SidebarInset>
         <AppTopbar />
         
-          <div className="min-h-screen bg-muted/30">
-            <main className="p-4 md:p-6">
-              <div className="mx-auto w-full max-w-7xl">
-                {children}
-              </div>
+          <div className="min-h-screen w-full bg-muted/30">
+            <main className="w-full p-4 md:p-6">
+              {children}
             </main>
           </div>
         </SidebarInset>

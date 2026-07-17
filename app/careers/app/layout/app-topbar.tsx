@@ -59,7 +59,7 @@ export function AppTopbar() {
   const displayName = profile
     ? `${profile.profile.firstName} ${profile.profile.lastName}`.trim()
     : "Applicant User"
-  const roleLabel = "Role"
+  const emailLabel = profile?.profile.personalEmail || ""
   const initials = getInitials(displayName) || "A"
 
   React.useEffect(() => {
@@ -134,7 +134,7 @@ export function AppTopbar() {
                   <p className="text-sm font-medium leading-none">
                     {displayName}
                   </p>
-                  <p className="text-xs text-muted-foreground">{roleLabel}</p>
+                  <p className="text-xs text-muted-foreground">{emailLabel}</p>
                 </div>
 
                 <ChevronsUpDown className="hidden h-4 w-4 text-muted-foreground md:block" />
