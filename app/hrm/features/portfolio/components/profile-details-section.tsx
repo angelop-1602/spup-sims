@@ -4,6 +4,27 @@ import { formatPortfolioDate } from "../utils/format-portfolio-date"
 
 type Employee = components["schemas"]["EmployeeResponse"]
 
+const GENDER_LABELS: Record<number, string> = {
+  0: "Male",
+  1: "Female",
+}
+
+const CIVIL_STATUS_LABELS: Record<number, string> = {
+  0: "Single",
+  1: "Married",
+  2: "Separated",
+  3: "Widowed",
+  4: "Divorced",
+}
+
+function formatEnumLabel(
+  value: number | string | null | undefined,
+  labels: Record<number, string>,
+) {
+  if (value == null) return undefined
+  return labels[Number(value)] ?? String(value)
+}
+
 type DetailField = {
   label: string
   value: string | number | null | undefined
@@ -34,6 +55,11 @@ export function ProfileDetailsSection({ profile }: { profile: Employee }) {
     { label: "Full name", value: profile.fullName },
     { label: "Email", value: profile.email },
     { label: "Age", value: profile.age },
+    { label: "Gender", value: formatEnumLabel(profile.gender, GENDER_LABELS) },
+    {
+      label: "Civil status",
+      value: formatEnumLabel(profile.civilStatus, CIVIL_STATUS_LABELS),
+    },
     { label: "Mobile number", value: profile.mobileNumber },
     { label: "Phone number", value: profile.phoneNumber },
     { label: "Religion", value: profile.religion },
@@ -49,7 +75,9 @@ export function ProfileDetailsSection({ profile }: { profile: Employee }) {
     { label: "Employment category", value: String(profile.employmentCategory) },
     { label: "Date hired", value: formatPortfolioDate(profile.dateHired) },
     { label: "Regularization date", value: formatPortfolioDate(profile.dateRegularized) },
+    { label: "Separation date", value: formatPortfolioDate(profile.dateSeparated) },
     { label: "Active status", value: profile.isActive ? "Active" : "Inactive" },
+    { label: "Shared profile", value: profile.shared ? "Yes" : "No" },
   ]
 
   return (

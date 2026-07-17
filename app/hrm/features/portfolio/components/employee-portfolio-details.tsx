@@ -15,6 +15,13 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   request,
   useApiMutation,
   useAuthorizedHeaders,
@@ -33,6 +40,19 @@ import { ProfileDetailsSection } from "./profile-details-section"
 
 type Employee = components["schemas"]["EmployeeResponse"]
 
+const GENDER_OPTIONS = [
+  { value: "0", label: "Male" },
+  { value: "1", label: "Female" },
+] as const
+
+const CIVIL_STATUS_OPTIONS = [
+  { value: "0", label: "Single" },
+  { value: "1", label: "Married" },
+  { value: "2", label: "Separated" },
+  { value: "3", label: "Widowed" },
+  { value: "4", label: "Divorced" },
+] as const
+
 type EmployeePortfolioDetailsProps = {
   profile: Employee
   onProfileUpdated?: () => void | Promise<void>
@@ -46,6 +66,8 @@ type EditProfileForm = {
   middleName: string
   lastName: string
   suffix: string
+  gender: string
+  civilStatus: string
   mobileNumber: string
   phoneNumber: string
   religion: string
@@ -58,6 +80,9 @@ function toEditForm(profile: Employee): EditProfileForm {
     middleName: profile.middleName ?? "",
     lastName: profile.lastName ?? "",
     suffix: profile.suffix ?? "",
+    gender: profile.gender != null ? String(profile.gender) : "",
+    civilStatus:
+      profile.civilStatus != null ? String(profile.civilStatus) : "",
     mobileNumber: profile.mobileNumber ?? "",
     phoneNumber: profile.phoneNumber ?? "",
     religion: profile.religion ?? "",
@@ -111,6 +136,10 @@ export function EmployeePortfolioDetails({
           middleName: editForm.middleName || null,
           lastName: editForm.lastName,
           suffix: editForm.suffix || null,
+          gender: editForm.gender ? Number(editForm.gender) : null,
+          civilStatus: editForm.civilStatus
+            ? Number(editForm.civilStatus)
+            : null,
           mobileNumber: editForm.mobileNumber || null,
           phoneNumber: editForm.phoneNumber || null,
           religion: editForm.religion || null,
@@ -255,6 +284,49 @@ export function EmployeePortfolioDetails({
                       }))
                     }
                   />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`${formId}-gender`}>Gender</Label>
+                  <Select
+                    value={editForm.gender}
+                    onValueChange={(value) =>
+                      setEditForm((form) => ({ ...form, gender: value }))
+                    }
+                  >
+                    <SelectTrigger id={`${formId}-gender`} className="w-full">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {GENDER_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor={`${formId}-civil-status`}>Civil status</Label>
+                  <Select
+                    value={editForm.civilStatus}
+                    onValueChange={(value) =>
+                      setEditForm((form) => ({ ...form, civilStatus: value }))
+                    }
+                  >
+                    <SelectTrigger
+                      id={`${formId}-civil-status`}
+                      className="w-full"
+                    >
+                      <SelectValue placeholder="Select civil status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CIVIL_STATUS_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor={`${formId}-mobile-number`}>Mobile number</Label>
