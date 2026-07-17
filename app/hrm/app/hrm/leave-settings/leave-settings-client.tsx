@@ -136,10 +136,6 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   const canUpdateType = hasPermission("hrms.leaveTypes.update")
   const canDeleteType = hasPermission("hrms.leaveTypes.delete")
   const canAdjustBalance = hasPermission("hrms.leaveBalances.update")
-  const initialLeaveTypesList = React.useMemo(
-    () => normalizeLeaveTypes(initialLeaveTypes),
-    [initialLeaveTypes],
-  )
 
   const [selectedType, setSelectedType] = React.useState<LeaveType | null>(null)
   const [typeForm, setTypeForm] = React.useState({
@@ -156,7 +152,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   const [balanceActionMessage, setBalanceActionMessage] = React.useState<string | null>(null)
   const [overridePreviousInitializations, setOverridePreviousInitializations] = React.useState(false)
   const [adjustForm, setAdjustForm] = React.useState({
-    leaveTypeId: initialLeaveTypesList[0]?.id ? String(initialLeaveTypesList[0].id) : "",
+    leaveTypeId: "",
     totalDays: "",
     reason: "Balance adjustment",
   })
@@ -168,8 +164,8 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
   } = useApiQuery<LeaveType[]>("/api/v1/hrms/leave-types")
 
   const leaveTypes = React.useMemo(
-    () => normalizeLeaveTypes(apiLeaveTypes ?? initialLeaveTypesList),
-    [apiLeaveTypes, initialLeaveTypesList],
+    () => normalizeLeaveTypes(apiLeaveTypes),
+    [apiLeaveTypes],
   )
 
   const {

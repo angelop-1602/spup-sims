@@ -60,7 +60,7 @@ export default function PositionsPage() {
 
   const [formState, setFormState] = React.useState<CreatePositionRequest>({
     code: "",
-    title: "",
+    name: "",
     description: null,
     isAcademic: false,
     isActive: true,
@@ -83,7 +83,7 @@ export default function PositionsPage() {
 
   const resetForm = React.useCallback(() => {
     setSelectedPosition(null)
-    setFormState({ code: "", title: "", description: null, isAcademic: false, isActive: true })
+    setFormState({ code: "", name: "", description: null, isAcademic: false, isActive: true })
   }, [])
 
   const openCreateDialog = () => {
@@ -95,7 +95,7 @@ export default function PositionsPage() {
     setSelectedPosition(position)
     setFormState({
       code: position.code ?? "",
-      title: position.title ?? "",
+      name: position.name ?? "",
       description: position.description ?? null,
       isAcademic: position.isAcademic ?? false,
       isActive: position.isActive ?? true,
@@ -116,7 +116,7 @@ export default function PositionsPage() {
 
     const body: CreatePositionRequest | UpdatePositionRequest = {
       code: formState.code,
-      title: formState.title,
+      name: formState.name,
       description: formState.description,
       isAcademic: formState.isAcademic,
       isActive: formState.isActive,
@@ -215,7 +215,7 @@ export default function PositionsPage() {
                   <TableRow key={String(position.id)}>
                     <TableCell>{position.id}</TableCell>
                     <TableCell>{position.code ?? "-"}</TableCell>
-                    <TableCell>{position.title ?? ""}</TableCell>
+                    <TableCell>{position.name ?? ""}</TableCell>
                     <TableCell>
                       <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-blue-50 text-blue-700">
                         {position.isAcademic ? "Academic" : "Non-Academic"}
@@ -255,7 +255,7 @@ export default function PositionsPage() {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Delete position</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  This action will permanently remove <strong>{position.title}</strong>.
+                                  This action will permanently remove <strong>{position.name}</strong>.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
@@ -305,8 +305,8 @@ export default function PositionsPage() {
                 <Label htmlFor="pos-title">Title <span className="text-destructive">*</span></Label>
                 <Input
                   id="pos-title"
-                  value={formState.title}
-                  onChange={(e) => setFormState((s) => ({ ...s, title: e.target.value }))}
+                  value={formState.name}
+                  onChange={(e) => setFormState((s) => ({ ...s, name: e.target.value }))}
                   placeholder="e.g., Systems Administrator"
                   required
                   maxLength={200}

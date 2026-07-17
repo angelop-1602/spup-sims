@@ -12,9 +12,7 @@ import {
   type EmployeeResponse,
   type PagedResponseOfEmployeeResponse,
   type CreateEmployeeRequest,
-  type DepartmentResponse,
   type PagedResponseOfDepartmentResponse,
-  type PositionResponse,
   type PagedResponseOfPositionResponse,
 } from "@/lib/api"
 import {
@@ -195,8 +193,8 @@ export default function EmployeesPage() {
       lastName: employee.lastName ?? "",
       email: employee.email ?? "",
       employeeNumber: employee.employeeNumber ?? "",
-      departmentId: (employee as any).departmentId ?? null,
-      positionId: (employee as any).positionId ?? null,
+      departmentId: employee.departmentId ?? null,
+      positionId: employee.positionId ?? null,
     })
     setFormError(null)
     setIsDialogOpen(true)
@@ -315,7 +313,8 @@ export default function EmployeesPage() {
                 <thead>
                   <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-3 font-medium">Employee</th>
-                    <th className="px-4 py-3 font-medium">Employee ID</th>
+                    <th className="px-4 py-3 font-medium">ID</th>
+                    <th className="px-4 py-3 font-medium">Type</th>
                     <th className="px-4 py-3 font-medium">Department</th>
                     <th className="px-4 py-3 font-medium">Position</th>
                     <th className="px-4 py-3 font-medium">Status</th>
@@ -343,10 +342,13 @@ export default function EmployeesPage() {
                         </td>
                         <td className="px-4 py-3 text-muted-foreground">{employee.employeeNumber}</td>
                         <td className="px-4 py-3">
-                          {(employee as any).department ?? "-"}
+                          {employee.employeeType ?? "-"}
                         </td>
                         <td className="px-4 py-3">
-                          {(employee as any).position ?? "-"}
+                          {employee.department ?? "-"}
+                        </td>
+                        <td className="px-4 py-3">
+                          {employee.position ?? "-"}
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -545,7 +547,7 @@ export default function EmployeesPage() {
                     <SelectContent>
                       {positions.map((pos) => (
                         <SelectItem key={String(pos.id)} value={String(pos.id)}>
-                          {pos.title ?? ""} ({pos.code ?? ""})
+                          {pos.name ?? ""} ({pos.code ?? ""})
                         </SelectItem>
                       ))}
                     </SelectContent>

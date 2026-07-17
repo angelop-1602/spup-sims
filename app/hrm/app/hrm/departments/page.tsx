@@ -84,15 +84,6 @@ export default function DepartmentsPage() {
 
   const departments = data?.data ?? []
 
-  // Fetch all departments for parent selector (flat list)
-  const { data: allDepartmentsData } = useApiQuery<PagedResponseOfDepartmentResponse>(
-    "/api/v1/organization/departments",
-    { Page: 1, PageSize: 100, SortBy: "id" },
-    { onError: handleError },
-  )
-
-  const allDepartments = allDepartmentsData?.data ?? []
-
   const resetForm = React.useCallback(() => {
     setSelectedDepartment(null)
     setFormState({ name: "", code: "", isActive: true, parentDepartmentId: null })
@@ -109,7 +100,7 @@ export default function DepartmentsPage() {
       name: department.name ?? "",
       code: department.code ?? "",
       isActive: department.isActive ?? true,
-      parentDepartmentId: (department as any).parentDepartmentId ?? null,
+      parentDepartmentId: department.parentDepartmentId ?? null,
     })
     setIsDialogOpen(true)
   }
@@ -226,7 +217,7 @@ export default function DepartmentsPage() {
                     <TableCell>{department.code ?? "-"}</TableCell>
                     <TableCell>{department.name ?? ""}</TableCell>
                     <TableCell>
-                      {((department as any).parentDepartmentName ?? "-")}
+                      {department.parentDepartmentName ?? "-"}
                     </TableCell>
                     {(canUpdate || canDelete) && (
                       <TableCell className="space-x-2 text-right">
@@ -315,7 +306,7 @@ export default function DepartmentsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="">None (Top Level)</SelectItem>
-                    {allDepartments.map((dept) => (
+                    {departments.map((dept) => (
                       <SelectItem key={String(dept.id)} value={String(dept.id)}>
                         {dept.name ?? ""} ({dept.code ?? ""})
                       </SelectItem>
