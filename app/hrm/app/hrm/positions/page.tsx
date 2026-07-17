@@ -3,6 +3,7 @@
 import * as React from "react"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
+import { TableTemplate } from "@/components/custom/table-template"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +41,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit3, Loader2, Plus, Trash2 } from "lucide-react"
+import { Edit3, Plus, Trash2 } from "lucide-react"
 import {
   useApiQuery,
   useApiMutation,
@@ -50,6 +51,7 @@ import {
   type UpdatePositionRequest,
 } from "@/lib/api"
 import { ApiErrorView } from "@/components/ui/api-error-view"
+import { TableSkeletonRows } from "@/components/ui/table-skeleton-rows"
 
 export default function PositionsPage() {
   const { hasPermission } = useHrmAuth()
@@ -159,12 +161,6 @@ export default function PositionsPage() {
               Create, edit, and delete position records (replaces designations).
             </p>
           </div>
-          {canCreate && (
-            <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" />
-              New position
-            </Button>
-          )}
         </div>
 
         {error && (
@@ -173,7 +169,17 @@ export default function PositionsPage() {
           </div>
         )}
 
-        <div className="overflow-hidden rounded-lg border">
+        <TableTemplate
+          label="Positions table"
+          actions={
+            canCreate ? (
+              <Button onClick={openCreateDialog}>
+                <Plus className="mr-2 h-4 w-4" />
+                New position
+              </Button>
+            ) : undefined
+          }
+        >
           <Table>
             <TableHeader>
               <TableRow>
@@ -190,14 +196,7 @@ export default function PositionsPage() {
 
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="p-6 text-center">
-                    <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading positions...
-                    </span>
-                  </TableCell>
-                </TableRow>
+                <TableSkeletonRows columns={6} rows={8} />
               ) : queryError ? (
                 <TableRow>
                   <TableCell colSpan={6} className="p-0">
@@ -236,19 +235,22 @@ export default function PositionsPage() {
                         {canUpdate && (
                           <Button
                             variant="outline"
-                            size="sm"
+                            size="icon-sm"
                             onClick={() => openEditDialog(position)}
+                            aria-label={`Edit ${position.title}`}
                           >
-                            <Edit3 className="mr-2 h-4 w-4" />
-                            Edit
+                            <Edit3 aria-hidden="true" className="h-4 w-4" />
                           </Button>
                         )}
                         {canDelete && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
+                              <Button
+                                variant="destructive"
+                                size="icon-sm"
+                                aria-label={`Delete ${position.title}`}
+                              >
+                                <Trash2 aria-hidden="true" className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -277,7 +279,7 @@ export default function PositionsPage() {
               )}
             </TableBody>
           </Table>
-        </div>
+        </TableTemplate>
 
         {/* Create / Edit dialog */}
         <Dialog

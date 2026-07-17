@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 
 import { PermissionGuard } from "@/components/auth/permission-guard"
+import { TableTemplate } from "@/components/custom/table-template"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -221,7 +222,8 @@ export default function HrmDashboardPage() {
                     Loading applicant pipeline
                   </span>
                 ) : null}
-                <Table>
+                <TableTemplate label="Applicant pipeline table" variant="plain">
+                  <Table>
                   <TableHeader>
                     <TableRow>
                       <TableHead>Stage</TableHead>
@@ -269,7 +271,8 @@ export default function HrmDashboardPage() {
                       ))
                     )}
                   </TableBody>
-                </Table>
+                  </Table>
+                </TableTemplate>
               </CardContent>
               <CardFooter className="border-t">
                 <Button asChild variant="outline" size="sm">

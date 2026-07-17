@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Edit3, Eye, MoreHorizontal, Trash2 } from "lucide-react"
+import { Edit3, Eye, Trash2 } from "lucide-react"
+import { TableRowActions } from "@/components/custom/table-row-actions"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -21,13 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field"
 import {
   Select,
@@ -118,42 +112,35 @@ export function ApplicantRowActions({
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            type="button"
-            variant="outline"
-            size="icon-sm"
-            aria-label={`Actions for ${applicantLabel}`}
-          >
-            <MoreHorizontal aria-hidden="true" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-40">
-          <DropdownMenuItem onSelect={onView}>
-            <Eye aria-hidden="true" />
-            View profile
-          </DropdownMenuItem>
-          {canEdit ? (
-            <DropdownMenuItem onSelect={() => handleEditOpenChange(true)}>
-              <Edit3 aria-hidden="true" />
-              Edit status
-            </DropdownMenuItem>
-          ) : null}
-          {canDelete ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onSelect={() => setDeleteOpen(true)}
-              >
-                <Trash2 aria-hidden="true" />
-                Delete applicant
-              </DropdownMenuItem>
-            </>
-          ) : null}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <TableRowActions
+        label={`Actions for ${applicantLabel}`}
+        actions={[
+          {
+            label: "View profile",
+            icon: <Eye aria-hidden="true" />,
+            onSelect: onView,
+          },
+          ...(canEdit
+            ? [
+                {
+                  label: "Edit status",
+                  icon: <Edit3 aria-hidden="true" />,
+                  onSelect: () => handleEditOpenChange(true),
+                },
+              ]
+            : []),
+          ...(canDelete
+            ? [
+                {
+                  label: "Delete applicant",
+                  icon: <Trash2 aria-hidden="true" />,
+                  onSelect: () => setDeleteOpen(true),
+                  variant: "destructive" as const,
+                },
+              ]
+            : []),
+        ]}
+      />
 
       {canEdit ? (
         <Dialog open={editOpen} onOpenChange={handleEditOpenChange}>

@@ -3,6 +3,7 @@
 import * as React from "react"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
+import { TableTemplate } from "@/components/custom/table-template"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,7 +40,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit3, Loader2, Plus, Trash2 } from "lucide-react"
+import { Edit3, Plus, Trash2 } from "lucide-react"
 import {
   useApiQuery,
   useApiMutation,
@@ -50,6 +51,7 @@ import {
 } from "@/lib/api"
 import { Label } from "@/components/ui/label"
 import { ApiErrorView } from "@/components/ui/api-error-view"
+import { TableSkeletonRows } from "@/components/ui/table-skeleton-rows"
 
 type DepartmentFormState = CreateDepartmentRequest & {
   parentDepartmentId?: number | string | null
@@ -161,29 +163,17 @@ export default function DepartmentsPage() {
 
   return (
     <PermissionGuard requiredPermission="org.departments.view">
-      <div className="space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold">Departments</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Create, edit, and delete department records.
-            </p>
-          </div>
-          {canCreate && (
-            <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" />
-              New department
-            </Button>
-          )}
-        </div>
-
-        {error && (
-          <div className="rounded-md border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            {error}
-          </div>
-        )}
-
-        <div className="overflow-hidden rounded-lg border">
+        <TableTemplate
+          label="Departments table"
+          actions={
+            canCreate ? (
+              <Button onClick={openCreateDialog}>
+                <Plus className="mr-2 h-4 w-4" />
+                New department
+              </Button>
+            ) : undefined
+          }
+        >
           <Table>
             <TableHeader>
               <TableRow>
@@ -199,14 +189,7 @@ export default function DepartmentsPage() {
 
             <TableBody>
               {loading ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="p-6 text-center">
-                    <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      Loading departments...
-                    </span>
-                  </TableCell>
-                </TableRow>
+                <TableSkeletonRows columns={5} rows={8} />
               ) : queryError ? (
                 <TableRow>
                   <TableCell colSpan={5} className="p-0">
@@ -233,19 +216,22 @@ export default function DepartmentsPage() {
                         {canUpdate && (
                           <Button
                             variant="outline"
-                            size="sm"
+                            size="icon-sm"
                             onClick={() => openEditDialog(department)}
+                            aria-label={`Edit ${department.name}`}
                           >
-                            <Edit3 className="mr-2 h-4 w-4" />
-                            Edit
+                            <Edit3 aria-hidden="true" className="h-4 w-4" />
                           </Button>
                         )}
                         {canDelete && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
+                              <Button
+                                variant="destructive"
+                                size="icon-sm"
+                                aria-label={`Delete ${department.name}`}
+                              >
+                                <Trash2 aria-hidden="true" className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
@@ -274,7 +260,7 @@ export default function DepartmentsPage() {
               )}
             </TableBody>
           </Table>
-        </div>
+        </TableTemplate>
 
         {/* Create / Edit dialog */}
         <Dialog
@@ -349,7 +335,6 @@ export default function DepartmentsPage() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
     </PermissionGuard>
   )
 }

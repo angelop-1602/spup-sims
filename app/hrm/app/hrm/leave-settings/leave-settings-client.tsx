@@ -24,6 +24,8 @@ import { useApiQuery, useApiMutation, type components } from "@/lib/api"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { ApiErrorView } from "@/components/ui/api-error-view"
+import { TableTemplate } from "@/components/custom/table-template"
+import { TableSkeletonRows } from "@/components/ui/table-skeleton-rows"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -384,7 +386,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             </div>
           </form>
 
-          <div className="overflow-hidden rounded-lg border">
+          <TableTemplate label="Leave types table">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -395,14 +397,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
               </TableHeader>
               <TableBody>
                 {loadingLeaveTypes && (
-                  <TableRow>
-                    <TableCell colSpan={3} className="p-6 text-center">
-                      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Loading leave types...
-                      </span>
-                    </TableCell>
-                  </TableRow>
+                  <TableSkeletonRows columns={3} rows={6} />
                 )}
                 {!loadingLeaveTypes && leaveTypes.length === 0 && (
                   <TableRow>
@@ -437,11 +432,11 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                       {canUpdateType && (
                         <Button
                           variant="outline"
-                          size="sm"
+                          size="icon-sm"
                           onClick={() => handleTypeEdit(leaveType)}
+                          aria-label={`Edit ${leaveType.name}`}
                         >
-                          <Edit3 className="mr-2 h-4 w-4" />
-                          Edit
+                          <Edit3 aria-hidden="true" className="h-4 w-4" />
                         </Button>
                       )}
                       {canDeleteType && (
@@ -449,11 +444,11 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                         <AlertDialogTrigger asChild>
                           <Button
                             variant="destructive"
-                            size="sm"
+                            size="icon-sm"
                             disabled={deletingLeaveType}
+                            aria-label={`Delete ${leaveType.name}`}
                           >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
+                            <Trash2 aria-hidden="true" className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
@@ -477,7 +472,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </TableTemplate>
         </CardContent>
       </Card>
 
@@ -586,7 +581,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
             </div>
           </form>
 
-          <div className="overflow-hidden rounded-lg border">
+          <TableTemplate label="Employee leave balances table">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -598,14 +593,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
               </TableHeader>
               <TableBody>
                 {loadingBalances && (
-                  <TableRow>
-                    <TableCell colSpan={4} className="p-6 text-center">
-                      <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        Loading balances...
-                      </span>
-                    </TableCell>
-                  </TableRow>
+                  <TableSkeletonRows columns={4} rows={6} />
                 )}
                 {!loadingBalances && leaveBalances?.length === 0 && (
                   <TableRow>
@@ -643,7 +631,7 @@ export default function LeaveSettingsClient({ initialLeaveTypes }: LeaveSettings
                 ))}
               </TableBody>
             </Table>
-          </div>
+          </TableTemplate>
           {employeesError || leaveBalancesError ? (
             <ApiErrorView error={(employeesError ?? leaveBalancesError)!} fullScreen />
           ) : null}
