@@ -8,6 +8,7 @@ import type { DocumentType } from "./types"
 interface DocumentRowProps {
   doc: DocumentType
   isUploaded: boolean
+  fileName?: string | null
   isUploading: boolean
   isDeleting: boolean
   isViewing: boolean
@@ -20,6 +21,7 @@ interface DocumentRowProps {
 function DocumentRow({
   doc,
   isUploaded,
+  fileName,
   isUploading,
   isDeleting,
   isViewing,
@@ -34,14 +36,21 @@ function DocumentRow({
         {doc.label}
       </span>
 
-      <div className="flex items-center">
+      <div className="flex flex-col gap-1 min-w-0">
         {isUploaded ? (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-medium">
-            <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
-            Attached
-          </span>
+          <>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-green-200 bg-green-50 text-green-700 text-xs font-medium w-fit">
+              <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+              Attached
+            </span>
+            {fileName && (
+              <span className="text-xs text-muted-foreground truncate max-w-55" title={fileName}>
+                {fileName}
+              </span>
+            )}
+          </>
         ) : (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-muted text-muted-foreground text-xs font-medium">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-muted text-muted-foreground text-xs font-medium w-fit">
             <FileText className="h-3.5 w-3.5 text-muted-foreground" />
             Pending
           </span>
@@ -117,6 +126,7 @@ interface DocumentsChecklistProps {
   activeDeleteKey: string | null
   viewingDocKey: string | null
   getDocUrl: (key: string) => string | null | undefined
+  getDocFileName: (key: string) => string | null | undefined
   onUploadClick: (doc: DocumentType) => void
   onDelete: (doc: DocumentType) => void
   onView: (doc: DocumentType) => void
@@ -129,6 +139,7 @@ export function DocumentsChecklist({
   activeDeleteKey,
   viewingDocKey,
   getDocUrl,
+  getDocFileName,
   onUploadClick,
   onDelete,
   onView,
@@ -153,6 +164,7 @@ export function DocumentsChecklist({
             key={doc.key}
             doc={doc}
             isUploaded={!!getDocUrl(doc.apiName)}
+            fileName={getDocFileName(doc.apiName)}
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
             isViewing={viewingDocKey === doc.key}
@@ -182,6 +194,7 @@ export function DocumentsChecklist({
             key={doc.key}
             doc={doc}
             isUploaded={!!getDocUrl(doc.apiName)}
+            fileName={getDocFileName(doc.apiName)}
             isUploading={activeUploadKey === doc.key}
             isDeleting={activeDeleteKey === doc.key}
             isViewing={viewingDocKey === doc.key}

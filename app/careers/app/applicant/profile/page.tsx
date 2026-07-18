@@ -182,9 +182,18 @@ export default function ApplicantSelfProfilePage() {
     fileInputRef.current?.click()
   }
 
+  const MAX_FILE_SIZE = 10 * 1024 * 1024
+
   const handleDocumentUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file || !currentUploadingDoc) return
+
+    if (file.size > MAX_FILE_SIZE) {
+      setStatusModal({ open: true, type: "error", title: "Upload Failed", message: "This file is too large. Max file size is 10 MB." })
+      setCurrentUploadingDoc(null)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+      return
+    }
 
     setActiveUploadKey(currentUploadingDoc.key)
     try {
@@ -267,6 +276,10 @@ export default function ApplicantSelfProfilePage() {
   const getDocUrl = (apiName: string): string | null | undefined => {
     const doc = documents.find((d) => d.requirementName === apiName)
     return doc?.storagePath ? `/api/documents/${doc.storagePath}` : null
+  }
+
+  const getDocFileName = (apiName: string): string | null | undefined => {
+    return documents.find((d) => d.requirementName === apiName)?.fileName
   }
 
   const [viewingDocKey, setViewingDocKey] = React.useState<string | null>(null)
@@ -407,6 +420,7 @@ export default function ApplicantSelfProfilePage() {
         activeDeleteKey={activeDeleteKey}
         viewingDocKey={viewingDocKey}
         getDocUrl={getDocUrl}
+        getDocFileName={getDocFileName}
         onUploadClick={triggerFileSelection}
         onDelete={handleDocumentDelete}
         onView={handleViewDocument}
