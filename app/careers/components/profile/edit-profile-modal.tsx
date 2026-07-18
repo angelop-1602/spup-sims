@@ -110,7 +110,7 @@ export function EditProfileModal({
           <div className="col-span-2">
             <FormField
               label="Address"
-              placeholder="123 Main St, Baguio City, Benguet"
+              placeholder="e.g. Mabini Street, Ugac Norte, Tuguegarao City, Cagayan"
               value={editForm.address}
               onChange={(v) => setEditForm({ ...editForm, address: v })}
             />
