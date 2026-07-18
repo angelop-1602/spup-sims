@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, AlertCircle, ArrowLeft, CheckCircle2, Trash2, X } from "lucide-react"
+import { Loader2, AlertCircle, CheckCircle2, Trash2, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -193,29 +193,6 @@ export default function ApplicantSelfProfilePage() {
       if (!response.ok) {
         throw new Error(`Failed to update profile. Status code: ${response.status}`)
       }
-
-      setData((prev) => {
-        if (!prev?.profile) return prev
-        return {
-          ...prev,
-          profile: {
-            ...prev.profile,
-            firstName: editForm.firstName,
-            middleName: editForm.middleName,
-            lastName: editForm.lastName,
-            suffix: editForm.suffix,
-            gender: Number(editForm.gender),
-            birthDate: editForm.birthDate,
-            civilStatus: Number(editForm.civilStatus),
-            religion: editForm.religion,
-            qualifier: editForm.qualifier,
-            personalEmail: editForm.personalEmail,
-            phoneNumber: editForm.phoneNumber,
-            mobileNumber: editForm.mobileNumber,
-            address: editForm.address,
-          }
-        }
-      })
 
       await fetchMyProfile()
 
