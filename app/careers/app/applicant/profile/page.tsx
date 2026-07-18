@@ -233,6 +233,16 @@ export default function ApplicantSelfProfilePage() {
     const file = event.target.files?.[0]
     if (!file || !currentUploadingDoc) return
 
+    const allowedExts = currentUploadingDoc.accept.split(",").map((e) => e.trim().toLowerCase())
+    const fileExt = "." + file.name.split(".").pop()?.toLowerCase()
+    if (!allowedExts.includes(fileExt)) {
+      const allowedList = allowedExts.join(", ")
+      setStatusModal({ open: true, type: "error", title: "Invalid File Type", message: `"${file.name}" is not a supported file type for ${currentUploadingDoc.label}. Allowed: ${allowedList}` })
+      setCurrentUploadingDoc(null)
+      if (fileInputRef.current) fileInputRef.current.value = ""
+      return
+    }
+
     if (file.size > MAX_FILE_SIZE) {
       setStatusModal({ open: true, type: "error", title: "Upload Failed", message: "This file is too large. Max file size is 10 MB." })
       setCurrentUploadingDoc(null)
