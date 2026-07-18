@@ -55,7 +55,7 @@ export default function JobBoardCTA() {
             
             <div className="mt-8">
             <Link
-              href="#featured-jobs"
+              href="/job-openings"
               className={`${epilogue.className} group inline-flex items-center justify-center gap-2 border-2 border-emerald-950 bg-amber-400 hover:bg-amber-300 text-neutral-900 font-bold text-xs px-7 py-3 rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none active:translate-x-[4px] active:translate-y-[4px] active:shadow-none cursor-pointer`}
             >
               <span>Get Started</span>
