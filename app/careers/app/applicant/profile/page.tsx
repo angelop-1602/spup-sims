@@ -203,6 +203,9 @@ export default function ApplicantSelfProfilePage() {
       })
 
       if (!response.ok) {
+        if (response.status === 413) {
+          throw new Error("This file is too large. Max file size is 10 MB.")
+        }
         throw new Error(`Upload failed with status code: ${response.status}`)
       }
 
@@ -211,7 +214,13 @@ export default function ApplicantSelfProfilePage() {
       await saveFile(currentUploadingDoc.key, file)
       setStatusModal({ open: true, type: "success", title: "Upload Successful", message: `${currentUploadingDoc.label} has been uploaded successfully.` })
     } catch (err: any) {
-      setStatusModal({ open: true, type: "error", title: "Upload Failed", message: err.message || "Failed to upload document." })
+      const isTooLarge = err.message === "Failed to fetch" && file.size > 10 * 1024 * 1024
+      setStatusModal({
+        open: true,
+        type: "error",
+        title: "Upload Failed",
+        message: isTooLarge ? "This file is too large. Max file size is 10 MB." : (err.message || "Failed to upload document."),
+      })
     } finally {
       setActiveUploadKey(null)
       setCurrentUploadingDoc(null)
