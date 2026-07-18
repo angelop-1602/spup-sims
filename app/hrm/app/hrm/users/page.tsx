@@ -37,7 +37,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 
 type UserResponse = components["schemas"]["UserResponse"]
 type PagedUsers = components["schemas"]["PagedResponseOfUserResponse"]

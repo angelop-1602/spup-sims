@@ -40,7 +40,7 @@ import {
 } from "@/components/ui/table"
 import { Textarea } from "@/components/ui/textarea"
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 import { formatDays, formatStatus, statusVariant } from "./leave-status"
 
 type LeaveApplication = components["schemas"]["LeaveApplicationResponse"]

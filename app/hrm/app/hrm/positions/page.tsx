@@ -54,9 +54,9 @@ import { ApiErrorView } from "@/components/ui/api-error-view"
 export default function PositionsPage() {
   const { hasPermission } = useHrmAuth()
 
-  const canCreate = hasPermission("org.positions.create")
-  const canUpdate = hasPermission("org.positions.update")
-  const canDelete = hasPermission("org.positions.delete")
+  const canCreate = hasPermission("org.designations.create")
+  const canUpdate = hasPermission("org.designations.update")
+  const canDelete = hasPermission("org.designations.delete")
 
   const [formState, setFormState] = React.useState<CreatePositionRequest>({
     code: "",
@@ -150,7 +150,7 @@ export default function PositionsPage() {
   }
 
   return (
-    <PermissionGuard requiredPermission="org.positions.view">
+    <PermissionGuard requiredPermission="org.designations.view">
       <div className="space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>

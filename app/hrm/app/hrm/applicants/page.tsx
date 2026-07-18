@@ -80,8 +80,10 @@ export default function ApplicantsPage() {
   const { hasPermission } = useHrmAuth()
 
   const canCreate = hasPermission("hrms.recruitment.applicants.create")
-  const canUpdateApplicant = hasPermission("hrms.recruitment.applicants.update")
-  const canDeleteApplicant = hasPermission("hrms.recruitment.applicants.delete")
+  const canProcess = hasPermission("hrms.recruitment.applicants.process")
+  const canUpdate =
+    canProcess || hasPermission("hrms.recruitment.applicants.update")
+  const canDelete = hasPermission("hrms.recruitment.applicants.delete")
 
   const [search, setSearch] = React.useState("")
   const [debouncedSearch, setDebouncedSearch] = React.useState("")
@@ -305,39 +307,34 @@ export default function ApplicantsPage() {
                       profileNames.get(String(applicant.profileId)) ?? "No linked profile"
 
                     return (
-                      <tr key={applicant.id} className="border-b last:border-0 hover:bg-muted/30">
-                        <td className="px-4 py-3 font-medium">{applicant.applicationNumber}</td>
-                        <td className="px-4 py-3">{fullName}</td>
-                        <td className="px-4 py-3">
-                          <span className={"inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " + getStatusStyle(applicant.status)}>
-                            {applicant.status}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatDate(applicant.createdAt)}</td>
-                        <td className="px-4 py-3 text-muted-foreground">{formatDate(applicant.updatedAt)}</td>
-                        <td className="px-4 py-3 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="outline"
-                              size="icon-sm"
-                              className="active:translate-y-0!"
-                              onClick={() => router.push(`/hrm/profiles/${applicant.profileId}?status=${encodeURIComponent(applicant.status)}&applicantId=${applicant.id}`)}
-                              aria-label="View applicant"
-                            >
-                              <Eye className="h-3.5 w-3.5" />
-                            </Button>
-                            {/* Edit/Delete each require their own permission */}
-                            {(canUpdateApplicant || canDeleteApplicant) && (
-                              <ApplicantRowActions
-                                applicant={applicant}
-                                onChanged={refreshApplicants}
-                                canUpdate={canUpdateApplicant}
-                                canDelete={canDeleteApplicant}
-                              />
-                            )}
-                          </div>
-                        </td>
-                      </tr>
+                      <TableRow key={applicant.id}>
+                        <TableCell className="h-11 px-4 font-medium">
+                          {applicant.applicationNumber}
+                        </TableCell>
+                        <TableCell className="max-w-64 truncate px-4">
+                          {fullName}
+                        </TableCell>
+                        <TableCell className="px-4">
+                          <ApplicantStatusBadge status={applicant.status} />
+                        </TableCell>
+                        <TableCell className="px-4 text-muted-foreground">
+                          {formatDate(applicant.createdAt)}
+                        </TableCell>
+                        <TableCell className="px-4 text-muted-foreground">
+                          {formatDate(applicant.updatedAt)}
+                        </TableCell>
+                        <TableCell className="px-4 text-right">
+                          <ApplicantRowActions
+                            applicant={applicant}
+                            applicantLabel={applicant.applicationNumber}
+                            canEdit={canUpdate}
+                            canDelete={canDelete}
+                            idPrefix="desktop"
+                            onView={() => viewApplicant(applicant)}
+                            onChanged={refreshApplicants}
+                          />
+                        </TableCell>
+                      </TableRow>
                     )
                   })
                 )}

@@ -4556,6 +4556,8 @@ export interface paths {
                     PageSize?: number | string;
                     EmployeeId?: number | string;
                     SchoolYearId?: number | string;
+                    DepartmentId?: number | string;
+                    IsDepartmentHead?: boolean;
                     Status?: components["schemas"]["EmploymentStatus"];
                 };
                 header?: never;
@@ -16299,6 +16301,8 @@ export interface components {
             positionId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
+            /** @default false */
+            isDepartmentHead?: boolean;
             /** Format: date */
             startDate: string;
             /** Format: date */
@@ -16655,6 +16659,8 @@ export interface components {
             phoneNumber: null | string;
             gender: components["schemas"]["Gender"];
             civilStatus: components["schemas"]["CivilStatus"];
+            /** Format: date */
+            birthDate: null | string;
             /** Format: int32 */
             age: null | number | string;
             religion: null | string;
@@ -16728,6 +16734,7 @@ export interface components {
             position: string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
+            isDepartmentHead: boolean;
             isActive: boolean;
             /** Format: date */
             startDate: string;
@@ -17864,6 +17871,8 @@ export interface components {
             positionId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
+            /** @default false */
+            isDepartmentHead?: boolean;
             isActive: boolean;
             /** Format: date */
             startDate: string;

@@ -63,6 +63,30 @@ function formatCivilStatus(value: number | string | null | undefined) {
   return CIVIL_STATUS_LABELS[Number(value)] ?? String(value)
 }
 
+function formatBirthDate(value: string | null | undefined) {
+  if (!value) return "—"
+  return new Date(value).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  })
+}
+
+function calculateAge(birthDate: string): number | null {
+  if (!birthDate) return null
+  const birth = new Date(birthDate)
+  if (Number.isNaN(birth.getTime())) return null
+
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const hasHadBirthdayThisYear =
+    today.getMonth() > birth.getMonth() ||
+    (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate())
+  if (!hasHadBirthdayThisYear) age -= 1
+
+  return age >= 0 ? age : null
+}
+
 type ProfileFields = {
   label: string
   value: string | number | null | undefined
@@ -85,7 +109,7 @@ type EditProfileForm = {
   mobileNumber: string
   phoneNumber: string
   religion: string
-  age: string
+  birthDate: string
 }
 
 function toEditForm(profile: components["schemas"]["EmployeeResponse"]): EditProfileForm {
@@ -99,7 +123,7 @@ function toEditForm(profile: components["schemas"]["EmployeeResponse"]): EditPro
     mobileNumber: profile.mobileNumber ?? "",
     phoneNumber: profile.phoneNumber ?? "",
     religion: profile.religion ?? "",
-    age: profile.age != null ? String(profile.age) : "",
+    birthDate: profile.birthDate ?? "",
   }
 }
 
@@ -139,7 +163,18 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
       path: `/api/v1/hrms/employees/${profile.id}`,
       method: "PUT",
       body: {
+        isActive: profile.isActive,
         employeeNumber: profile.employeeNumber ?? "",
+        employeeTypeId: profile.employeeTypeId,
+        departmentId: profile.departmentId,
+        positionId: profile.positionId,
+        supervisorId: profile.supervisorId ?? null,
+        employmentStatus: profile.employmentStatus,
+        employmentCategory: profile.employmentCategory,
+        shared: profile.shared,
+        dateHired: profile.dateHired,
+        dateRegularized: profile.dateRegularized ?? null,
+        dateSeparated: profile.dateSeparated ?? null,
         profile: {
           firstName: editForm.firstName,
           middleName: editForm.middleName || null,
@@ -150,7 +185,8 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
           mobileNumber: editForm.mobileNumber || null,
           phoneNumber: editForm.phoneNumber || null,
           religion: editForm.religion || null,
-          age: editForm.age ? Number(editForm.age) : null,
+          birthDate: editForm.birthDate || null,
+          age: editForm.birthDate ? calculateAge(editForm.birthDate) : null,
         },
       },
     })
@@ -198,6 +234,7 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
     window.history.replaceState(null, "", url)
   }
   const personalFields: ProfileFields[] = [
+    { label: "Birthdate", value: formatBirthDate(profile.birthDate) },
     { label: "Age", value: profile.age ?? "—" },
     { label: "Gender", value: formatGender(profile.gender) },
     { label: "Civil status", value: formatCivilStatus(profile.civilStatus) },
@@ -419,13 +456,22 @@ export function EmployeePortfolioDetails({ profile, onProfileUpdated, readOnly =
                   />
                 </div>
                 <div>
+                  <label className="mb-2 block text-sm font-medium">Birthdate</label>
+                  <Input
+                    type="date"
+                    value={editForm.birthDate}
+                    onChange={(e) => setEditForm((f) => ({ ...f, birthDate: e.target.value }))}
+                  />
+                </div>
+                <div>
                   <label className="mb-2 block text-sm font-medium">Age</label>
                   <Input
-                    type="number"
-                    min={0}
-                    value={editForm.age}
-                    onChange={(e) => setEditForm((f) => ({ ...f, age: e.target.value }))}
-                    placeholder="e.g. 30"
+                    value={
+                      editForm.birthDate ? (calculateAge(editForm.birthDate) ?? "—") : "—"
+                    }
+                    disabled
+                    readOnly
+                    placeholder="Calculated from birthdate"
                   />
                 </div>
               </div>

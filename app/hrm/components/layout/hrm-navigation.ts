@@ -1,10 +1,12 @@
 import type { LucideIcon } from "lucide-react"
 import {
+  Briefcase,
   Building,
   CloudDownload,
   FileSliders,
   IdCard,
   LayoutDashboard,
+  Layers,
   UserLock,
   UserRoundPlus,
   Users,
@@ -39,6 +41,12 @@ export const HRM_NAV_GROUPS: HrmNavGroup[] = [
     label: "Human Resources",
     items: [
       {
+        title: "Job Postings",
+        icon: Briefcase,
+        url: "/hrm/job-postings",
+        requiredPermission: "hrms.recruitment.job-postings.view",
+      },
+      {
         title: "Applicants",
         icon: UserRoundPlus,
         url: "/hrm/applicants",
@@ -55,6 +63,12 @@ export const HRM_NAV_GROUPS: HrmNavGroup[] = [
         icon: Building,
         url: "/hrm/departments",
         requiredPermission: "org.departments.view",
+      },
+      {
+        title: "Positions",
+        icon: Layers,
+        url: "/hrm/positions",
+        requiredPermission: "org.designations.view",
       },
     ],
   },
@@ -93,6 +107,9 @@ export function getHrmBreadcrumbs(pathname: string): HrmBreadcrumbItem[] {
   if (pathname === "/hrm" || pathname === "/hrm/dashboard") {
     return [root, { label: "Dashboard" }]
   }
+  if (pathname.startsWith("/hrm/job-postings")) {
+    return [root, { label: "Recruitment" }, { label: "Job Postings" }]
+  }
   if (pathname.startsWith("/hrm/applicants")) {
     return [root, { label: "Recruitment" }, { label: "Applicants" }]
   }
@@ -107,6 +124,14 @@ export function getHrmBreadcrumbs(pathname: string): HrmBreadcrumbItem[] {
   }
   if (pathname === "/hrm/portfolio") {
     return [root, { label: "My Portfolio" }]
+  }
+  if (pathname.startsWith("/hrm/departments/")) {
+    return [
+      root,
+      { label: "Organization" },
+      { label: "Departments", href: "/hrm/departments" },
+      { label: "Department" },
+    ]
   }
   if (pathname.startsWith("/hrm/departments")) {
     return [root, { label: "Organization" }, { label: "Departments" }]

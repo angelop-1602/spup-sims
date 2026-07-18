@@ -12,8 +12,10 @@ import {
   type EmployeeResponse,
   type PagedResponseOfEmployeeResponse,
   type CreateEmployeeRequest,
+  type UpdateEmployeeRequest,
   type PagedResponseOfDepartmentResponse,
   type PagedResponseOfPositionResponse,
+  type PagedResponseOfEmployeeTypeResponse,
 } from "@/lib/api"
 import {
   Dialog,
@@ -85,6 +87,8 @@ type EmployeeForm = {
   employeeNumber: string
   departmentId: number | string | null
   positionId: number | string | null
+  employeeTypeId: number | string | null
+  dateHired: string
 }
 
 const EMPTY_FORM: EmployeeForm = {
@@ -94,9 +98,19 @@ const EMPTY_FORM: EmployeeForm = {
   employeeNumber: "",
   departmentId: null,
   positionId: null,
+  employeeTypeId: null,
+  dateHired: "",
 }
 
-function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
+/**
+ * The backend validates EmployeeTypeId/DepartmentId/PositionId/DateHired as
+ * required on both create and update even though the OpenAPI schema marks
+ * them optional, so both paths must always send them.
+ */
+function toEmployeeRequestBody(
+  form: EmployeeForm,
+  existing?: Employee | null,
+): CreateEmployeeRequestWithDeps & UpdateEmployeeRequest {
   return {
     employeeNumber: form.employeeNumber,
     profile: {
@@ -106,6 +120,17 @@ function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
     },
     departmentId: Number(form.departmentId),
     positionId: Number(form.positionId),
+    employeeTypeId: Number(form.employeeTypeId),
+    dateHired: form.dateHired,
+    // Preserve employment fields the edit form doesn't expose so saving
+    // personal/assignment details doesn't wipe them out.
+    isActive: existing?.isActive ?? true,
+    supervisorId: existing?.supervisorId ?? null,
+    employmentStatus: existing?.employmentStatus,
+    employmentCategory: existing?.employmentCategory,
+    shared: existing?.shared ?? false,
+    dateRegularized: existing?.dateRegularized ?? null,
+    dateSeparated: existing?.dateSeparated ?? null,
   }
 }
 
@@ -120,6 +145,9 @@ export default function EmployeesPage() {
   // for their own profile via the portfolio page, not for the employee list.
   const canManageOthers = hasPermission("hrms.employees.create")
   const canDelete = hasPermission("hrms.employees.delete")
+  // Department Head has hrms.employees.view but not hrms.employees.create — the
+  // only role in that shape today. Scope their roster to their own department.
+  const isDepartmentScoped = !canManageOthers
 
   // Search and filters
   const [search, setSearch] = useState("")
@@ -145,16 +173,27 @@ export default function EmployeesPage() {
     return () => clearTimeout(timeout)
   }, [search])
 
+  // Department Head's own department, used to scope the roster below.
+  const { data: ownProfile } = useApiQuery<Employee>(
+    isDepartmentScoped ? "/api/v1/hrms/me/profile" : null,
+  )
+  const ownDepartmentId = ownProfile?.departmentId ?? null
+
   const {
     data: employeesPaged,
     loading,
     error,
     refresh,
-  } = useApiQuery<PagedEmployees>("/api/v1/hrms/employees", {
-    Page: page,
-    PageSize: PAGE_SIZE,
-    Search: debouncedSearch || undefined,
-  })
+  } = useApiQuery<PagedEmployees>(
+    "/api/v1/hrms/employees",
+    {
+      Page: page,
+      PageSize: PAGE_SIZE,
+      Search: debouncedSearch || undefined,
+      DepartmentId: isDepartmentScoped ? ownDepartmentId ?? undefined : undefined,
+    },
+    { enabled: !isDepartmentScoped || Boolean(ownDepartmentId) },
+  )
 
   const { mutate: saveEmployee, loading: saving } = useApiMutation()
   const { mutate: deleteEmployee, loading: deleting } = useApiMutation()
@@ -173,6 +212,13 @@ export default function EmployeesPage() {
     { Page: 1, PageSize: 500, SortBy: "id" },
   )
   const positions = positionsData?.data ?? []
+
+  // Fetch employee types for dropdown
+  const { data: employeeTypesData } = useApiQuery<PagedResponseOfEmployeeTypeResponse>(
+    "/api/v1/hrms/employee-types",
+    { Page: 1, PageSize: 500, SortBy: "id" },
+  )
+  const employeeTypes = employeeTypesData?.data ?? []
 
   const employees = employeesPaged?.data ?? []
   const totalPages = Number(employeesPaged?.totalPages ?? 1)
@@ -195,6 +241,8 @@ export default function EmployeesPage() {
       employeeNumber: employee.employeeNumber ?? "",
       departmentId: employee.departmentId ?? null,
       positionId: employee.positionId ?? null,
+      employeeTypeId: employee.employeeTypeId ?? null,
+      dateHired: employee.dateHired ?? "",
     })
     setFormError(null)
     setIsDialogOpen(true)
@@ -209,7 +257,11 @@ export default function EmployeesPage() {
       : "/api/v1/hrms/employees"
     const method = selectedEmployee ? "PUT" : "POST"
 
-    const ok = await saveEmployee({ path, method, body: toCreateRequest(formState) })
+    const ok = await saveEmployee({
+      path,
+      method,
+      body: toEmployeeRequestBody(formState, selectedEmployee),
+    })
     if (!ok) {
       setFormError("Unable to save employee.")
       return
@@ -250,7 +302,9 @@ export default function EmployeesPage() {
           <div>
             <h1 className="text-2xl font-semibold tracking-normal">Employees</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              Employee details will appear below.
+              {isDepartmentScoped
+                ? "Employees in your department. View only — contact HR for edits."
+                : "Employee details will appear below."}
             </p>
           </div>
           {canCreate && (
@@ -552,6 +606,36 @@ export default function EmployeesPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="emp-type">Employee Type <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={String(formState.employeeTypeId ?? "")}
+                    onValueChange={(value) => setFormState((s) => ({ ...s, employeeTypeId: value || null }))}
+                  >
+                    <SelectTrigger id="emp-type">
+                      <SelectValue placeholder="Select employee type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employeeTypes.map((type) => (
+                        <SelectItem key={String(type.id)} value={String(type.id)}>
+                          {type.name ?? ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="emp-date-hired">Date Hired <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="emp-date-hired"
+                    type="date"
+                    value={formState.dateHired}
+                    onChange={(e) => setFormState((s) => ({ ...s, dateHired: e.target.value }))}
+                    required
+                  />
                 </div>
               </div>
               {formError && (

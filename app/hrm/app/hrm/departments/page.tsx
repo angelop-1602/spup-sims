@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import {
@@ -39,11 +40,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit3, Loader2, Plus, Trash2 } from "lucide-react"
+import { Edit3, Eye, Loader2, Plus, Trash2 } from "lucide-react"
 import {
   useApiQuery,
   useApiMutation,
   type DepartmentResponse,
+  type EmployeeResponse,
   type PagedResponseOfDepartmentResponse,
   type CreateDepartmentRequest,
   type UpdateDepartmentRequest,
@@ -56,11 +58,20 @@ type DepartmentFormState = CreateDepartmentRequest & {
 }
 
 export default function DepartmentsPage() {
+  const router = useRouter()
   const { hasPermission } = useHrmAuth()
 
   const canCreate = hasPermission("org.departments.create")
   const canUpdate = hasPermission("org.departments.update")
   const canDelete = hasPermission("org.departments.delete")
+  // Department Head has hrms.employees.view but not hrms.employees.create — the
+  // only role in that shape today. Scope their view to their own department.
+  const isDepartmentScoped = !hasPermission("hrms.employees.create")
+
+  const { data: ownProfile } = useApiQuery<EmployeeResponse>(
+    isDepartmentScoped ? "/api/v1/hrms/me/profile" : null,
+  )
+  const ownDepartmentId = ownProfile?.departmentId ?? null
 
   const [formState, setFormState] = React.useState<DepartmentFormState>({
     name: "",
@@ -82,7 +93,10 @@ export default function DepartmentsPage() {
     { onError: handleError },
   )
 
-  const departments = data?.data ?? []
+  const allDepartments = data?.data ?? []
+  const departments = isDepartmentScoped
+    ? allDepartments.filter((dept) => String(dept.id) === String(ownDepartmentId))
+    : allDepartments
 
   const resetForm = React.useCallback(() => {
     setSelectedDepartment(null)
@@ -182,9 +196,7 @@ export default function DepartmentsPage() {
                 <TableHead>Code</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Parent Department</TableHead>
-                {(canUpdate || canDelete) && (
-                  <TableHead className="text-right">Actions</TableHead>
-                )}
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -219,47 +231,53 @@ export default function DepartmentsPage() {
                     <TableCell>
                       {department.parentDepartmentName ?? "-"}
                     </TableCell>
-                    {(canUpdate || canDelete) && (
-                      <TableCell className="space-x-2 text-right">
-                        {canUpdate && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openEditDialog(department)}
-                          >
-                            <Edit3 className="mr-2 h-4 w-4" />
-                            Edit
-                          </Button>
-                        )}
-                        {canDelete && (
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button variant="destructive" size="sm">
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                Delete
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Delete department</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action will permanently remove <strong>{department.name}</strong>.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => handleDelete(department)}
-                                  disabled={deletingId === department.id || deletingMutation}
-                                >
-                                  {deletingId === department.id ? "Deleting..." : "Delete"}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        )}
+                    <TableCell className="space-x-2 text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => router.push(`/hrm/departments/${department.id}`)}
+                      >
+                        <Eye className="mr-2 h-4 w-4" />
+                        View
+                      </Button>
+                      {canUpdate && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => openEditDialog(department)}
+                        >
+                          <Edit3 className="mr-2 h-4 w-4" />
+                          Edit
+                        </Button>
+                      )}
+                      {canDelete && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete department</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action will permanently remove <strong>{department.name}</strong>.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => handleDelete(department)}
+                                disabled={deletingId === department.id || deletingMutation}
+                              >
+                                {deletingId === department.id ? "Deleting..." : "Delete"}
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
                       </TableCell>
-                    )}
                   </TableRow>
                 ))
               )}

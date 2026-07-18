@@ -54,7 +54,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useApiQuery, useApiMutation, type components } from "@/lib/api"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 import { cn } from "@/lib/utils"
 import { formatDays, formatStatus, statusVariant } from "./leave-status"
 

@@ -3,6 +3,10 @@ const API_BASE_URL =
   process.env.API_BASE_URL ?? "https://sims.spup.space"
 
 const nextConfig = {
+  output: "standalone",
+  // Pin the tracing root to this app; the host machine has an ancestor
+  // lockfile that would otherwise make Next guess the monorepo root.
+  outputFileTracingRoot: process.cwd(),
   async rewrites() {
     const base = API_BASE_URL.replace(/\/+$/, "")
 
