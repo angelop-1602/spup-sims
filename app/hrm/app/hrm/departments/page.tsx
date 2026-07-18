@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useRouter } from "next/navigation"
 import { PermissionGuard } from "@/components/auth/permission-guard"
 import { useHrmAuth } from "@/components/auth/hrm-auth-guard"
 import { TableTemplate } from "@/components/custom/table-template"
@@ -40,7 +41,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Edit3, Plus, Trash2 } from "lucide-react"
+import { Edit3, Eye, Plus, Trash2 } from "lucide-react"
 import {
   useApiQuery,
   useApiMutation,
@@ -59,6 +60,7 @@ type DepartmentFormState = CreateDepartmentRequest & {
 
 export default function DepartmentsPage() {
   const { hasPermission } = useHrmAuth()
+  const router = useRouter()
 
   const canCreate = hasPermission("org.departments.create")
   const canUpdate = hasPermission("org.departments.update")
@@ -172,9 +174,7 @@ export default function DepartmentsPage() {
                 <TableHead>Code</TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Parent Department</TableHead>
-                {(canUpdate || canDelete) && (
-                  <TableHead className="text-right">Actions</TableHead>
-                )}
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
 
@@ -202,8 +202,15 @@ export default function DepartmentsPage() {
                     <TableCell>
                       {department.parentDepartmentName ?? "-"}
                     </TableCell>
-                    {(canUpdate || canDelete) && (
-                      <TableCell className="space-x-2 text-right">
+                    <TableCell className="space-x-2 text-right">
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          onClick={() => router.push(`/hrm/departments/${department.id}`)}
+                          aria-label={`View ${department.name}`}
+                        >
+                          <Eye aria-hidden="true" className="h-4 w-4" />
+                        </Button>
                         {canUpdate && (
                           <Button
                             variant="outline"
@@ -245,7 +252,6 @@ export default function DepartmentsPage() {
                           </AlertDialog>
                         )}
                       </TableCell>
-                    )}
                   </TableRow>
                 ))
               )}
