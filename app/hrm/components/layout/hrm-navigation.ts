@@ -6,6 +6,7 @@ import {
   FilePen,
   FileSliders,
   IdCard,
+  Layers,
   LayoutDashboard,
   UserLock,
   UserRoundCog,
@@ -71,6 +72,12 @@ export const HRM_NAV_GROUPS: HrmNavGroup[] = [
         url: "/hrm/departments",
         requiredPermission: "org.departments.view",
       },
+      {
+        title: "Positions",
+        icon: Layers,
+        url: "/hrm/positions",
+        requiredPermission: "org.designations.view",
+      },
     ],
   },
   {
@@ -131,6 +138,14 @@ export function getHrmBreadcrumbs(pathname: string): HrmBreadcrumbItem[] {
   }
   if (pathname === "/hrm/portfolio") {
     return [root, { label: "My Portfolio" }]
+  }
+  if (pathname.startsWith("/hrm/departments/")) {
+    return [
+      root,
+      { label: "Organization" },
+      { label: "Departments", href: "/hrm/departments" },
+      { label: "Department" },
+    ]
   }
   if (pathname.startsWith("/hrm/departments")) {
     return [root, { label: "Organization" }, { label: "Departments" }]
