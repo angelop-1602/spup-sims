@@ -9,7 +9,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 import type { ApplicantMePayload, ProfileUpdateForm, DocumentType, DocumentEntry, DocKind } from "@/components/profile/types"
-import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS, getDocKind } from "@/components/profile/types"
+import { REQUIRED_DOCUMENTS, IF_APPLICABLE_DOCUMENTS, getDocKind, normalizeGender, normalizeCivilStatus } from "@/components/profile/types"
 import { ProfileBanner } from "@/components/profile/profile-banner"
 import { PersonalInfoSection } from "@/components/profile/personal-info-section"
 import { EditProfileModal } from "@/components/profile/edit-profile-modal"
@@ -47,8 +47,12 @@ export default function ApplicantSelfProfilePage() {
     firstName: "",
     middleName: "",
     lastName: "",
+    suffix: "",
+    gender: "0",
     birthDate: "",
+    civilStatus: "0",
     religion: "",
+    qualifier: "",
     personalEmail: "",
     phoneNumber: "",
     mobileNumber: "",
@@ -90,6 +94,13 @@ export default function ApplicantSelfProfilePage() {
 
       const payload = await response.json()
       const profileData = payload?.data || payload
+      if (profileData?.profile) {
+        profileData.profile = {
+          ...profileData.profile,
+          gender: normalizeGender(profileData.profile.gender),
+          civilStatus: normalizeCivilStatus(profileData.profile.civilStatus),
+        }
+      }
       setData(profileData)
 
       if (profileData && profileData.profile) {
@@ -97,8 +108,12 @@ export default function ApplicantSelfProfilePage() {
           firstName: profileData.profile.firstName || "",
           middleName: profileData.profile.middleName || "",
           lastName: profileData.profile.lastName || "",
+          suffix: profileData.profile.suffix || "",
+          gender: String(profileData.profile.gender),
           birthDate: profileData.profile.birthDate || "",
+          civilStatus: String(profileData.profile.civilStatus),
           religion: profileData.profile.religion || "",
+          qualifier: profileData.profile.qualifier || "",
           personalEmail: profileData.profile.personalEmail || "",
           phoneNumber: profileData.profile.phoneNumber || "",
           mobileNumber: profileData.profile.mobileNumber || "",
@@ -151,20 +166,73 @@ export default function ApplicantSelfProfilePage() {
       const token = localStorage.getItem("access_token")
       if (!token) throw new Error("No active session found.")
 
+      const body = {
+        firstName: editForm.firstName,
+        middleName: editForm.middleName || null,
+        lastName: editForm.lastName,
+        suffix: editForm.suffix || null,
+        gender: Number(editForm.gender),
+        birthDate: editForm.birthDate,
+        civilStatus: Number(editForm.civilStatus),
+        religion: editForm.religion || null,
+        qualifier: editForm.qualifier || null,
+        phoneNumber: editForm.phoneNumber || null,
+        mobileNumber: editForm.mobileNumber || null,
+        address: editForm.address || null,
+      }
+
       const response = await fetch("/api/v1/applicant/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(editForm)
+        body: JSON.stringify(body)
       })
 
       if (!response.ok) {
         throw new Error(`Failed to update profile. Status code: ${response.status}`)
       }
 
+      setData((prev) => {
+        if (!prev?.profile) return prev
+        return {
+          ...prev,
+          profile: {
+            ...prev.profile,
+            firstName: editForm.firstName,
+            middleName: editForm.middleName,
+            lastName: editForm.lastName,
+            suffix: editForm.suffix,
+            gender: Number(editForm.gender),
+            birthDate: editForm.birthDate,
+            civilStatus: Number(editForm.civilStatus),
+            religion: editForm.religion,
+            qualifier: editForm.qualifier,
+            personalEmail: editForm.personalEmail,
+            phoneNumber: editForm.phoneNumber,
+            mobileNumber: editForm.mobileNumber,
+            address: editForm.address,
+          }
+        }
+      })
+
       await fetchMyProfile()
+
+      setData((prev) => {
+        if (!prev?.profile) return prev
+        return {
+          ...prev,
+          profile: {
+            ...prev.profile,
+            suffix: editForm.suffix || null,
+            gender: Number(editForm.gender),
+            civilStatus: Number(editForm.civilStatus),
+            qualifier: editForm.qualifier || null,
+          }
+        }
+      })
+
       setIsEditModalOpen(false)
       setStatusModal({ open: true, type: "success", title: "Profile Updated", message: "Your personal information has been updated successfully." })
     } catch (err: any) {

@@ -29,12 +29,16 @@ const profileSchema = z.object({
   firstName: z.string().trim().min(1, "First Name is required.").regex(NAME_PATTERN, "Enter a valid name."),
   middleName: z.string().refine((v) => !v.trim() || NAME_PATTERN.test(v), "Enter a valid name."),
   lastName: z.string().trim().min(1, "Last Name is required.").regex(NAME_PATTERN, "Enter a valid name."),
+  suffix: z.string().refine((v) => !v.trim() || NAME_PATTERN.test(v), "Enter a valid suffix."),
+  gender: z.string().refine((v) => ["0", "1", "2", "3"].includes(v), "Select a valid gender."),
   birthDate: z
     .string()
     .trim()
     .min(1, "Date of Birth is required.")
     .refine((v) => new Date(v) <= new Date(), "Enter a valid date of birth."),
+  civilStatus: z.string().refine((v) => ["0", "1", "2", "3", "4"].includes(v), "Select a valid civil status."),
   religion: z.string().refine((v) => !v.trim() || NAME_PATTERN.test(v), "Enter a valid religion."),
+  qualifier: z.string().refine((v) => !v.trim() || /^[A-Za-z0-9\s.'-]+$/.test(v), "Enter a valid qualifier."),
   personalEmail: z.email("Enter a valid email address."),
   phoneNumber: z
     .string()
@@ -78,8 +82,12 @@ export function EditProfileModal({
         firstName: flat.firstName?.[0],
         middleName: flat.middleName?.[0],
         lastName: flat.lastName?.[0],
+        suffix: flat.suffix?.[0],
+        gender: flat.gender?.[0],
         birthDate: flat.birthDate?.[0],
+        civilStatus: flat.civilStatus?.[0],
         religion: flat.religion?.[0],
+        qualifier: flat.qualifier?.[0],
         personalEmail: flat.personalEmail?.[0],
         phoneNumber: flat.phoneNumber?.[0],
         mobileNumber: flat.mobileNumber?.[0],
@@ -123,12 +131,60 @@ export function EditProfileModal({
             onChange={(v) => setEditForm({ ...editForm, lastName: v })}
             error={fieldErrors.lastName}
           />
+          <FormField
+            label="Suffix"
+            placeholder="Jr, III, etc."
+            value={editForm.suffix}
+            onChange={(v) => setEditForm({ ...editForm, suffix: v })}
+            error={fieldErrors.suffix}
+          />
           <DateField
             label="Date of Birth"
             required
             value={editForm.birthDate}
             onChange={(v) => setEditForm({ ...editForm, birthDate: v })}
             error={fieldErrors.birthDate}
+          />
+          <SelectField
+            label="Gender"
+            value={editForm.gender}
+            onValueChange={(v) => setEditForm({ ...editForm, gender: v })}
+            placeholder="Select gender"
+            options={[
+              { value: "0", label: "Unspecified" },
+              { value: "1", label: "Female" },
+              { value: "2", label: "Male" },
+              { value: "3", label: "Other" },
+            ]}
+            error={fieldErrors.gender}
+          />
+          <SelectField
+            label="Civil Status"
+            value={editForm.civilStatus}
+            onValueChange={(v) => setEditForm({ ...editForm, civilStatus: v })}
+            placeholder="Select civil status"
+            options={[
+              { value: "0", label: "Unspecified" },
+              { value: "1", label: "Single" },
+              { value: "2", label: "Married" },
+              { value: "3", label: "Widowed" },
+              { value: "4", label: "Separated" }
+            ]}
+            error={fieldErrors.civilStatus}
+          />
+          <FormField
+            label="Religion"
+            placeholder="e.g. Roman Catholic"
+            value={editForm.religion}
+            onChange={(v) => setEditForm({ ...editForm, religion: v })}
+            error={fieldErrors.religion}
+          />
+          <FormField
+            label="Qualifier"
+            placeholder="e.g. DIT, MIT"
+            value={editForm.qualifier}
+            onChange={(v) => setEditForm({ ...editForm, qualifier: v })}
+            error={fieldErrors.qualifier}
           />
           <FormField
             label="Email"
@@ -138,13 +194,6 @@ export function EditProfileModal({
             value={editForm.personalEmail}
             onChange={(v) => setEditForm({ ...editForm, personalEmail: v })}
             error={fieldErrors.personalEmail}
-          />
-          <FormField
-            label="Religion"
-            placeholder="e.g. Roman Catholic"
-            value={editForm.religion}
-            onChange={(v) => setEditForm({ ...editForm, religion: v })}
-            error={fieldErrors.religion}
           />
           <PhoneField
             label="Phone"
@@ -363,6 +412,46 @@ function PhoneField({
           aria-invalid={!!error}
         />
       </div>
+      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
+    </div>
+  )
+}
+
+function SelectField({
+  label,
+  value,
+  onValueChange,
+  placeholder,
+  options,
+  error,
+}: {
+  label: string
+  value: string
+  onValueChange: (value: string) => void
+  placeholder: string
+  options: { value: string; label: string }[]
+  error?: string
+}) {
+  return (
+    <div>
+      <label className="mb-2 block text-sm font-medium">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onValueChange(e.target.value)}
+        className="flex h-9 w-full items-center rounded-md border border-input bg-transparent px-2.5 text-sm shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20"
+        aria-invalid={!!error}
+      >
+        {placeholder && (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        )}
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value}>
+            {opt.label}
+          </option>
+        ))}
+      </select>
       {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
     </div>
   )

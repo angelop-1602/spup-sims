@@ -23,7 +23,7 @@ export function ProfileBanner({ profile, status, createdAt }: ProfileBannerProps
         </div>
         <div className="space-y-1">
           <h1 className="text-xl font-semibold text-foreground">
-            {profile.firstName} {profile.lastName}
+            {profile.firstName} {profile.lastName}{profile.suffix ? `, ${profile.suffix}` : ""}
           </h1>
           <p className="text-sm text-muted-foreground">{profile.personalEmail || "—"}</p>
           <div className="flex flex-wrap items-center gap-2 pt-0.5">

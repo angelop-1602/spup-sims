@@ -3,7 +3,7 @@
 import { PenLine } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { calculateAge, type ApplicantMePayload } from "./types"
+import { calculateAge, GENDER_LABELS, CIVIL_STATUS_LABELS, type ApplicantMePayload } from "./types"
 
 interface PersonalInfoSectionProps {
   profile: ApplicantMePayload["profile"]
@@ -44,6 +44,16 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
         </div>
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">
+          <span className="text-muted-foreground">Suffix</span>
+          <span className="col-span-2 text-foreground">{profile.suffix || "—"}</span>
+        </div>
+
+        <div className="grid grid-cols-3 px-4 py-3 items-center">
+          <span className="text-muted-foreground">Gender</span>
+          <span className="col-span-2 text-foreground">{GENDER_LABELS[profile.gender ?? 0]}</span>
+        </div>
+
+        <div className="grid grid-cols-3 px-4 py-3 items-center">
           <span className="text-muted-foreground">Date of Birth</span>
           <span className="col-span-2 text-foreground">{profile.birthDate || "—"}</span>
         </div>
@@ -54,8 +64,18 @@ export function PersonalInfoSection({ profile, onEdit }: PersonalInfoSectionProp
         </div>
 
         <div className="grid grid-cols-3 px-4 py-3 items-center">
+          <span className="text-muted-foreground">Civil Status</span>
+          <span className="col-span-2 text-foreground">{CIVIL_STATUS_LABELS[profile.civilStatus ?? 0]}</span>
+        </div>
+
+        <div className="grid grid-cols-3 px-4 py-3 items-center">
           <span className="text-muted-foreground">Religion</span>
           <span className="col-span-2 text-foreground">{profile.religion || "—"}</span>
+        </div>
+
+        <div className="grid grid-cols-3 px-4 py-3 items-center">
+          <span className="text-muted-foreground">Qualifier</span>
+          <span className="col-span-2 text-foreground">{profile.qualifier || "—"}</span>
         </div>
       </div>
 

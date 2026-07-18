@@ -8,9 +8,13 @@ export interface ApplicantMePayload {
     firstName: string
     middleName?: string | null
     lastName: string
+    suffix?: string | null
+    gender?: number | null
     birthDate?: string | null
+    civilStatus?: number | null
     age?: number | string | null
     religion?: string | null
+    qualifier?: string | null
     personalEmail?: string | null
     phoneNumber?: string | null
     mobileNumber?: string | null
@@ -29,8 +33,12 @@ export interface ProfileUpdateForm {
   firstName: string
   middleName: string
   lastName: string
+  suffix: string
+  gender: string
   birthDate: string
+  civilStatus: string
   religion: string
+  qualifier: string
   personalEmail: string
   phoneNumber: string
   mobileNumber: string
@@ -66,6 +74,48 @@ export const STATUS_STYLES: Record<string, string> = {
   Rejected:  "bg-red-500/10 text-red-600 border border-red-500/20",
   Pending:   "bg-yellow-500/10 text-yellow-600 border border-yellow-500/20",
   Submitted: "bg-purple-500/10 text-purple-600 border border-purple-500/20",
+}
+
+export const GENDER_LABELS: Record<number, string> = {
+  0: "Unspecified",
+  1: "Female",
+  2: "Male",
+  3: "Other"
+}
+
+export const CIVIL_STATUS_LABELS: Record<number, string> = {
+  0: "Unspecified",
+  1: "Single",
+  2: "Married",
+  3: "Widowed",
+  4: "Separated"
+}
+
+export const GENDER_BY_LABEL: Record<string, number> = {
+  Female: 1,
+  Male: 2,
+  Other: 3,
+  Unspecified: 0,
+}
+
+export const CIVIL_STATUS_BY_LABEL: Record<string, number> = {
+  Single: 1,
+  Married: 2,
+  Widowed: 3,
+  Separated: 4,
+  Unspecified: 0,
+}
+
+export function normalizeGender(value: unknown): number {
+  if (typeof value === "number") return value
+  if (typeof value === "string") return GENDER_BY_LABEL[value] ?? 0
+  return 0
+}
+
+export function normalizeCivilStatus(value: unknown): number {
+  if (typeof value === "number") return value
+  if (typeof value === "string") return CIVIL_STATUS_BY_LABEL[value] ?? 0
+  return 0
 }
 
 export type DocKind = "pdf" | "image" | "word" | "other"
