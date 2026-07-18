@@ -124,8 +124,15 @@ export async function request<T>(
   }
 
   if (!response.ok) {
+    // Business-rule errors (PlatformException) come back as an ASP.NET
+    // ProblemDetails body ({ title, detail }), not the { success, message }
+    // envelope other endpoints use — fall back to `detail`/`title` so those
+    // messages aren't swallowed as a generic "Request failed (400)".
+    const problemDetails = payload as unknown as { title?: string; detail?: string } | null;
     const message =
       (payload && typeof payload.message === "string" && payload.message) ||
+      (problemDetails && typeof problemDetails.detail === "string" && problemDetails.detail) ||
+      (problemDetails && typeof problemDetails.title === "string" && problemDetails.title) ||
       `Request failed (${response.status})`;
     throw new ApiError(message, response.status, payload);
   }
