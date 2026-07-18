@@ -146,32 +146,6 @@ export default function ApplicantSelfProfilePage() {
   const handleSaveProfile = async () => {
     setSaveStatus(null)
 
-    const requiredFields: { key: keyof ProfileUpdateForm; label: string }[] = [
-      { key: "firstName", label: "First Name" },
-      { key: "lastName", label: "Last Name" },
-      { key: "birthDate", label: "Date of Birth" },
-      { key: "personalEmail", label: "Email" },
-    ]
-
-    const missing = requiredFields.filter((f) => !editForm[f.key].trim())
-    if (missing.length > 0) {
-      const names = missing.map((f) => f.label).join(", ")
-      setSaveStatus({ type: "error", message: `${names} ${missing.length > 1 ? "are" : "is"} required.` })
-      return
-    }
-
-    const phoneDigits = editForm.phoneNumber.replace(/\D/g, "").replace(/^63/, "")
-    if (editForm.phoneNumber && phoneDigits.length !== 9) {
-      setSaveStatus({ type: "error", message: "Phone number is incomplete." })
-      return
-    }
-
-    const mobileDigits = editForm.mobileNumber.replace(/\D/g, "").replace(/^63/, "")
-    if (editForm.mobileNumber && mobileDigits.length !== 10) {
-      setSaveStatus({ type: "error", message: "Mobile number is incomplete." })
-      return
-    }
-
     setIsSaving(true)
     try {
       const token = localStorage.getItem("access_token")

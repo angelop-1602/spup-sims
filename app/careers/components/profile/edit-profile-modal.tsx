@@ -3,6 +3,7 @@
 import * as React from "react"
 import { CalendarIcon, AlertCircle, Loader2 } from "lucide-react"
 import { format } from "date-fns"
+import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,6 +18,36 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Calendar } from "@/components/ui/calendar"
 import { calculateAge, type ProfileUpdateForm } from "./types"
+
+function digitsOnly(value: string): string {
+  return value.replace(/\D/g, "").replace(/^63/, "")
+}
+
+const NAME_PATTERN = /^[A-Za-z\s'-]+$/
+
+const profileSchema = z.object({
+  firstName: z.string().trim().min(1, "First Name is required.").regex(NAME_PATTERN, "Enter a valid name."),
+  middleName: z.string().refine((v) => !v.trim() || NAME_PATTERN.test(v), "Enter a valid name."),
+  lastName: z.string().trim().min(1, "Last Name is required.").regex(NAME_PATTERN, "Enter a valid name."),
+  birthDate: z
+    .string()
+    .trim()
+    .min(1, "Date of Birth is required.")
+    .refine((v) => new Date(v) <= new Date(), "Enter a valid date of birth."),
+  religion: z.string().refine((v) => !v.trim() || NAME_PATTERN.test(v), "Enter a valid religion."),
+  personalEmail: z.email("Enter a valid email address."),
+  phoneNumber: z
+    .string()
+    .refine((v) => !v || digitsOnly(v).length === 9, "Enter a valid phone number."),
+  mobileNumber: z
+    .string()
+    .refine((v) => !v || digitsOnly(v).length === 10, "Enter a valid mobile number."),
+  address: z
+    .string()
+    .refine((v) => !v.trim() || /[A-Za-z0-9]/.test(v), "Enter a valid address."),
+})
+
+type FieldErrors = Partial<Record<keyof ProfileUpdateForm, string>>
 
 interface EditProfileModalProps {
   open: boolean
@@ -37,6 +68,29 @@ export function EditProfileModal({
   onCancel,
   onSave,
 }: EditProfileModalProps) {
+  const [fieldErrors, setFieldErrors] = React.useState<FieldErrors>({})
+
+  const handleSave = () => {
+    const result = profileSchema.safeParse(editForm)
+    if (!result.success) {
+      const flat = z.flattenError(result.error).fieldErrors
+      setFieldErrors({
+        firstName: flat.firstName?.[0],
+        middleName: flat.middleName?.[0],
+        lastName: flat.lastName?.[0],
+        birthDate: flat.birthDate?.[0],
+        religion: flat.religion?.[0],
+        personalEmail: flat.personalEmail?.[0],
+        phoneNumber: flat.phoneNumber?.[0],
+        mobileNumber: flat.mobileNumber?.[0],
+        address: flat.address?.[0],
+      })
+      return
+    }
+    setFieldErrors({})
+    onSave()
+  }
+
   return (
     <Dialog open={open} onOpenChange={(next) => !next && !isSaving && onCancel()}>
       <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
@@ -52,13 +106,14 @@ export function EditProfileModal({
             placeholder="Juan"
             value={editForm.firstName}
             onChange={(v) => setEditForm({ ...editForm, firstName: v })}
-            hasError={saveStatus?.type === "error" && saveStatus.message.includes("First Name")}
+            error={fieldErrors.firstName}
           />
           <FormField
             label="Middle Name"
             placeholder="Santos"
             value={editForm.middleName}
             onChange={(v) => setEditForm({ ...editForm, middleName: v })}
+            error={fieldErrors.middleName}
           />
           <FormField
             label="Last Name"
@@ -66,13 +121,14 @@ export function EditProfileModal({
             placeholder="Dela Cruz"
             value={editForm.lastName}
             onChange={(v) => setEditForm({ ...editForm, lastName: v })}
-            hasError={saveStatus?.type === "error" && saveStatus.message.includes("Last Name")}
+            error={fieldErrors.lastName}
           />
           <DateField
             label="Date of Birth"
             required
             value={editForm.birthDate}
             onChange={(v) => setEditForm({ ...editForm, birthDate: v })}
+            error={fieldErrors.birthDate}
           />
           <FormField
             label="Email"
@@ -81,13 +137,14 @@ export function EditProfileModal({
             placeholder="juan.delacruz@email.com"
             value={editForm.personalEmail}
             onChange={(v) => setEditForm({ ...editForm, personalEmail: v })}
-            hasError={saveStatus?.type === "error" && saveStatus.message.includes("Email")}
+            error={fieldErrors.personalEmail}
           />
           <FormField
             label="Religion"
             placeholder="e.g. Roman Catholic"
             value={editForm.religion}
             onChange={(v) => setEditForm({ ...editForm, religion: v })}
+            error={fieldErrors.religion}
           />
           <PhoneField
             label="Phone"
@@ -97,6 +154,7 @@ export function EditProfileModal({
             grouping={[2, 3, 4]}
             value={editForm.phoneNumber}
             onChange={(v) => setEditForm({ ...editForm, phoneNumber: v })}
+            error={fieldErrors.phoneNumber}
           />
           <PhoneField
             label="Mobile"
@@ -106,6 +164,7 @@ export function EditProfileModal({
             grouping={[3, 3, 4]}
             value={editForm.mobileNumber}
             onChange={(v) => setEditForm({ ...editForm, mobileNumber: v })}
+            error={fieldErrors.mobileNumber}
           />
           <div className="col-span-2">
             <FormField
@@ -113,6 +172,7 @@ export function EditProfileModal({
               placeholder="e.g. Mabini Street, Ugac Norte, Tuguegarao City, Cagayan"
               value={editForm.address}
               onChange={(v) => setEditForm({ ...editForm, address: v })}
+              error={fieldErrors.address}
             />
           </div>
         </div>
@@ -128,7 +188,7 @@ export function EditProfileModal({
           <Button variant="outline" onClick={onCancel} disabled={isSaving}>
             Cancel
           </Button>
-          <Button onClick={onSave} disabled={isSaving}>
+          <Button onClick={handleSave} disabled={isSaving}>
             {isSaving && <Loader2 className="h-4 w-4 animate-spin" />}
             Save Changes
           </Button>
@@ -145,7 +205,7 @@ function FormField({
   placeholder,
   value,
   onChange,
-  hasError = false,
+  error,
 }: {
   label: string
   type?: string
@@ -153,7 +213,7 @@ function FormField({
   placeholder?: string
   value: string
   onChange: (value: string) => void
-  hasError?: boolean
+  error?: string
 }) {
   return (
     <div>
@@ -166,8 +226,9 @@ function FormField({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        aria-invalid={hasError}
+        aria-invalid={!!error}
       />
+      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
     </div>
   )
 }
@@ -177,55 +238,61 @@ function DateField({
   required = false,
   value,
   onChange,
+  error,
 }: {
   label: string
   required?: boolean
   value: string
   onChange: (value: string) => void
+  error?: string
 }) {
   const [open, setOpen] = React.useState(false)
   const selected = value ? new Date(value) : undefined
 
   return (
-    <div className="flex">
-      <div className="flex-1">
-        <label className="mb-2 block text-sm font-medium">
-          {label}
-          {required && <span className="ml-0.5 text-destructive">*</span>}
-        </label>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-full justify-start rounded-r-none font-normal"
-            >
-              <CalendarIcon className="h-4 w-4" />
-              {selected ? (
-                format(selected, "MMMM d, yyyy")
-              ) : (
-                <span className="text-muted-foreground">Pick a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={selected}
-              captionLayout="dropdown"
-              onSelect={(date) => {
-                onChange(date ? format(date, "yyyy-MM-dd") : "")
-                setOpen(false)
-              }}
-            />
-          </PopoverContent>
-        </Popover>
+    <div>
+      <div className="flex">
+        <div className="flex-1">
+          <label className="mb-2 block text-sm font-medium">
+            {label}
+            {required && <span className="ml-0.5 text-destructive">*</span>}
+          </label>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full justify-start rounded-r-none font-normal"
+              >
+                <CalendarIcon className="h-4 w-4" />
+                {selected ? (
+                  format(selected, "MMMM d, yyyy")
+                ) : (
+                  <span className="text-muted-foreground">Pick a date</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={selected}
+                captionLayout="dropdown"
+                disabled={{ after: new Date() }}
+                onSelect={(date) => {
+                  onChange(date ? format(date, "yyyy-MM-dd") : "")
+                  setOpen(false)
+                }}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        <div>
+          <label className="mb-2 block text-sm font-medium">Age</label>
+          <span className="flex h-9 w-14 items-center justify-center rounded-r-md border border-l-0 border-input bg-muted px-2.5 text-sm text-foreground select-none">
+            {calculateAge(value)}
+          </span>
+        </div>
       </div>
-      <div>
-        <label className="mb-2 block text-sm font-medium">Age</label>
-        <span className="flex h-9 w-14 items-center justify-center rounded-r-md border border-l-0 border-input bg-muted px-2.5 text-sm text-foreground select-none">
-          {calculateAge(value)}
-        </span>
-      </div>
+      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
     </div>
   )
 }
@@ -261,6 +328,7 @@ function PhoneField({
   grouping,
   value,
   onChange,
+  error,
 }: {
   label: string
   prefix: string
@@ -269,6 +337,7 @@ function PhoneField({
   grouping: number[]
   value: string
   onChange: (value: string) => void
+  error?: string
 }) {
   const rawDigits = React.useMemo(() => extractDigits(value), [value])
   const formatted = React.useMemo(() => formatDigits(rawDigits, grouping), [rawDigits, grouping])
@@ -291,8 +360,10 @@ function PhoneField({
             onChange(raw ? `${prefix}${formatDigits(raw, grouping)}` : "")
           }}
           className="rounded-l-none"
+          aria-invalid={!!error}
         />
       </div>
+      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
     </div>
   )
 }
