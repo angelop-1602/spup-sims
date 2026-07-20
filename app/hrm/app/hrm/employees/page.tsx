@@ -14,8 +14,12 @@ import {
   type EmployeeResponse,
   type PagedResponseOfEmployeeResponse,
   type CreateEmployeeRequest,
+  type UpdateEmployeeRequest,
   type PagedResponseOfDepartmentResponse,
   type PagedResponseOfPositionResponse,
+  type PagedResponseOfEmployeeTypeResponse,
+  type SchoolYearResponse,
+  type PagedResponseOfEmployeeSchoolYearAssignmentResponse,
 } from "@/lib/api"
 import {
   Dialog,
@@ -51,6 +55,10 @@ type CreateEmployeeRequestWithDeps = CreateEmployeeRequest & {
   departmentId: number | string
   positionId: number | string
 }
+type UpdateEmployeeRequestWithDeps = UpdateEmployeeRequest & {
+  departmentId: number | string
+  positionId: number | string
+}
 
 const PAGE_SIZE = 10
 
@@ -80,6 +88,8 @@ type EmployeeForm = {
   employeeNumber: string
   departmentId: number | string | null
   positionId: number | string | null
+  employeeTypeId: number | string | null
+  dateHired: string
 }
 
 const EMPTY_FORM: EmployeeForm = {
@@ -89,6 +99,8 @@ const EMPTY_FORM: EmployeeForm = {
   employeeNumber: "",
   departmentId: null,
   positionId: null,
+  employeeTypeId: null,
+  dateHired: "",
 }
 
 function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
@@ -101,6 +113,25 @@ function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
     },
     departmentId: Number(form.departmentId),
     positionId: Number(form.positionId),
+    employeeTypeId: Number(form.employeeTypeId),
+    dateHired: form.dateHired,
+  }
+}
+
+/** PUT carries the same required fields as create, plus whatever the existing
+ * record already has for fields the form doesn't expose — otherwise saving
+ * would silently reset them to their schema defaults (e.g. employment status
+ * back to Active, isActive back to true). */
+function toUpdateRequest(form: EmployeeForm, existing: Employee): UpdateEmployeeRequestWithDeps {
+  return {
+    ...toCreateRequest(form),
+    supervisorId: existing.supervisorId ?? null,
+    employmentStatus: existing.employmentStatus,
+    employmentCategory: existing.employmentCategory,
+    shared: existing.shared ?? false,
+    dateRegularized: existing.dateRegularized ?? null,
+    dateSeparated: existing.dateSeparated ?? null,
+    isActive: existing.isActive ?? true,
   }
 }
 
@@ -115,6 +146,31 @@ export default function EmployeesPage() {
   // for their own profile via the portfolio page, not for the employee list.
   const canManageOthers = hasPermission("hrms.employees.create")
   const canDelete = hasPermission("hrms.employees.delete")
+  // Department Head is the only role with hrms.employees.view but not .create —
+  // restrict them to the roster of the department they currently head. Headship
+  // is scoped per school year (EmployeeSchoolYearAssignmentResponse.isDepartmentHead),
+  // not a static field on the employee record, so it's resolved via that assignment
+  // rather than assumed to be the viewer's own home department.
+  const isDepartmentScoped = !canManageOthers
+
+  const { data: ownProfile } = useApiQuery<EmployeeResponse>(
+    isDepartmentScoped ? "/api/v1/hrms/me/profile" : null,
+  )
+  const { data: currentSchoolYear } = useApiQuery<SchoolYearResponse>(
+    isDepartmentScoped ? "/api/v1/academic/school-years/current" : null,
+  )
+  const { data: ownHeadAssignmentData } = useApiQuery<PagedResponseOfEmployeeSchoolYearAssignmentResponse>(
+    "/api/v1/hrms/employee-school-years",
+    {
+      EmployeeId: ownProfile?.id,
+      SchoolYearId: currentSchoolYear?.id,
+      IsDepartmentHead: true,
+      Page: 1,
+      PageSize: 1,
+    },
+    { enabled: isDepartmentScoped && Boolean(ownProfile?.id) && Boolean(currentSchoolYear?.id) },
+  )
+  const headedDepartmentId = ownHeadAssignmentData?.data?.[0]?.departmentId ?? null
 
   // Search and filters
   const [search, setSearch] = useState("")
@@ -146,11 +202,16 @@ export default function EmployeesPage() {
     loading,
     error,
     refresh,
-  } = useApiQuery<PagedEmployees>("/api/v1/hrms/employees", {
-    Page: page,
-    PageSize: PAGE_SIZE,
-    Search: debouncedSearch || undefined,
-  })
+  } = useApiQuery<PagedEmployees>(
+    "/api/v1/hrms/employees",
+    {
+      Page: page,
+      PageSize: PAGE_SIZE,
+      Search: debouncedSearch || undefined,
+      DepartmentId: isDepartmentScoped ? headedDepartmentId ?? undefined : undefined,
+    },
+    { enabled: !isDepartmentScoped || Boolean(headedDepartmentId) },
+  )
 
   const { mutate: saveEmployee, loading: saving } = useApiMutation()
   const { mutate: deleteEmployee, loading: deleting } = useApiMutation()
@@ -169,6 +230,13 @@ export default function EmployeesPage() {
     { Page: 1, PageSize: 500, SortBy: "id" },
   )
   const positions = positionsData?.data ?? []
+
+  // Fetch employee types for dropdown
+  const { data: employeeTypesData } = useApiQuery<PagedResponseOfEmployeeTypeResponse>(
+    "/api/v1/hrms/employee-types",
+    { Page: 1, PageSize: 500, SortBy: "id" },
+  )
+  const employeeTypes = employeeTypesData?.data ?? []
 
   const employees = employeesPaged?.data ?? []
   const totalPages = Number(employeesPaged?.totalPages ?? 1)
@@ -191,6 +259,8 @@ export default function EmployeesPage() {
       employeeNumber: employee.employeeNumber ?? "",
       departmentId: employee.departmentId ?? null,
       positionId: employee.positionId ?? null,
+      employeeTypeId: employee.employeeTypeId ?? null,
+      dateHired: employee.dateHired ?? "",
     })
     setFormError(null)
     setIsDialogOpen(true)
@@ -205,7 +275,8 @@ export default function EmployeesPage() {
       : "/api/v1/hrms/employees"
     const method = selectedEmployee ? "PUT" : "POST"
 
-    const ok = await saveEmployee({ path, method, body: toCreateRequest(formState) })
+    const body = selectedEmployee ? toUpdateRequest(formState, selectedEmployee) : toCreateRequest(formState)
+    const ok = await saveEmployee({ path, method, body })
     if (!ok) {
       setFormError("Unable to save employee.")
       return
@@ -281,14 +352,18 @@ export default function EmployeesPage() {
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
               <Users className="h-8 w-8 text-muted-foreground" />
               <p className="text-sm font-medium">
-                {hasActiveFilters
-                  ? "No employees match your filters"
-                  : "No employees yet"}
+                {isDepartmentScoped && !headedDepartmentId
+                  ? "You're not currently assigned as head of a department"
+                  : hasActiveFilters
+                    ? "No employees match your filters"
+                    : "No employees yet"}
               </p>
               <p className="text-sm text-muted-foreground">
-                {hasActiveFilters
-                  ? "Try a different name."
-                  : "Employees you add will show up here."}
+                {isDepartmentScoped && !headedDepartmentId
+                  ? "Once you're assigned as a department head for the current school year, its employees will show up here."
+                  : hasActiveFilters
+                    ? "Try a different name."
+                    : "Employees you add will show up here."}
               </p>
             </div>
           }
@@ -529,6 +604,36 @@ export default function EmployeesPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="emp-type">Employee type <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={String(formState.employeeTypeId ?? "")}
+                    onValueChange={(value) => setFormState((s) => ({ ...s, employeeTypeId: value || null }))}
+                  >
+                    <SelectTrigger id="emp-type">
+                      <SelectValue placeholder="Select employee type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {employeeTypes.map((type) => (
+                        <SelectItem key={String(type.id)} value={String(type.id)}>
+                          {type.name ?? ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="emp-date-hired">Date hired <span className="text-destructive">*</span></Label>
+                  <Input
+                    id="emp-date-hired"
+                    type="date"
+                    value={formState.dateHired}
+                    onChange={(e) => setFormState((s) => ({ ...s, dateHired: e.target.value }))}
+                    required
+                  />
                 </div>
               </div>
               {formError && (

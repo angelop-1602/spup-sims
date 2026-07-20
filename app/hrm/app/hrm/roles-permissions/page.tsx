@@ -55,6 +55,7 @@ type User = components["schemas"]["UserResponse"]
 type PagedUsers = components["schemas"]["PagedResponseOfUserResponse"]
 type Role = components["schemas"]["RoleResponse"]
 type PagedRoles = components["schemas"]["PagedResponseOfRoleResponse"]
+type RolePermissions = components["schemas"]["RolePermissionsResponse"]
 type Permission = components["schemas"]["PermissionResponse"]
 type PagedPermissions = components["schemas"]["PagedResponseOfPermissionResponse"]
 type UserRoles = components["schemas"]["UserRolesResponse"]
@@ -142,14 +143,22 @@ export default function RolesPage() {
     if (!selectedUserId) setAssignedRoles([])
   }, [selectedUserId])
 
+  const {
+    data: rolePermissionsData,
+    loading: loadingRolePermissions,
+    refresh: refreshRolePermissions,
+  } = useApiQuery<RolePermissions>(
+    selectedRoleId ? `/api/v1/identity/roles/${selectedRoleId}/permissions` : undefined,
+    undefined,
+    { enabled: Boolean(selectedRoleId), onError: handleError },
+  )
+
   React.useEffect(() => {
-    if (!selectedRoleId) {
-      setAssignedPermissions([])
-      return
-    }
-    // No standalone GET endpoint exists for role permissions in the API schema.
-    // Permissions are seeded from the response of POST/DELETE operations below.
-    setAssignedPermissions([])
+    setAssignedPermissions(rolePermissionsData?.permissions ?? [])
+  }, [rolePermissionsData])
+
+  React.useEffect(() => {
+    if (!selectedRoleId) setAssignedPermissions([])
   }, [selectedRoleId])
 
   const { mutate: command, loading: saving } = useApiMutation()
@@ -200,12 +209,7 @@ export default function RolesPage() {
         method: "POST",
       })
       if (ok) {
-        // POST returns RolePermissionsResponse but useApiMutation discards the
-        // body. Update optimistically from the local permissions list.
-        const perm = permissions.find(
-          (p) => String(p.id) === String(selectedAssignPermissionId),
-        )
-        if (perm) setAssignedPermissions((prev) => [...prev, perm])
+        await refreshRolePermissions()
         setSelectedAssignPermissionId("")
       }
       return ok
@@ -218,12 +222,7 @@ export default function RolesPage() {
         path: `/api/v1/identity/roles/${selectedRoleId}/permissions/${permissionId}`,
         method: "DELETE",
       })
-      if (ok) {
-        // DELETE returns 204 — remove optimistically from local state
-        setAssignedPermissions((prev) =>
-          prev.filter((p) => String(p.id) !== String(permissionId)),
-        )
-      }
+      if (ok) await refreshRolePermissions()
       return ok
     }, "Unable to remove permission from role")
 
@@ -571,6 +570,15 @@ export default function RolesPage() {
                             <div className="flex flex-col items-center gap-2 text-muted-foreground">
                               <Shield className="h-8 w-8 opacity-50" />
                               <p className="text-sm">Select a role above to view its permissions</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) : loadingRolePermissions ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="h-32 text-center">
+                            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                              <Loader2 className="h-8 w-8 animate-spin opacity-50" />
+                              <p className="text-sm">Loading permissions…</p>
                             </div>
                           </TableCell>
                         </TableRow>

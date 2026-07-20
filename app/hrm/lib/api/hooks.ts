@@ -91,11 +91,16 @@ export function useApiMutation() {
   const { headers } = useAuthorizedHeaders()
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<Error | null>(null)
+  // `error` state only reflects the *next* render, so a caller that awaits
+  // `mutate(...)` and immediately wants the failure reason (to show a
+  // specific message instead of a generic one) should read this ref instead.
+  const lastErrorRef = React.useRef<Error | null>(null)
 
   const mutate = React.useCallback(
     async (params: MutateParams): Promise<boolean> => {
       setLoading(true)
       setError(null)
+      lastErrorRef.current = null
 
       try {
         await request(params.path, headers, {
@@ -106,6 +111,7 @@ export function useApiMutation() {
         return true
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err))
+        lastErrorRef.current = error
         setError(error)
         return false
       } finally {
@@ -117,7 +123,7 @@ export function useApiMutation() {
 
   const reset = React.useCallback(() => setError(null), [])
 
-  return { mutate, loading, error, reset }
+  return { mutate, loading, error, reset, lastErrorRef }
 }
 
 /**

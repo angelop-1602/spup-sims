@@ -47,7 +47,6 @@ import {
   type UpdateEmployeeSchoolYearAssignmentRequest,
 } from "@/lib/api"
 import { ApiErrorView } from "@/components/ui/api-error-view"
-import { ErrorPage } from "@/components/ui/error-page"
 
 // Mirrors SIS.Domain.Platform.EmploymentStatus
 const EMPLOYMENT_STATUS_LABEL: Record<number, string> = {
@@ -91,53 +90,37 @@ export default function DepartmentDetailPage({ params }: PageProps) {
   const router = useRouter()
   const { hasPermission } = useHrmAuth()
 
-  // Department Head has hrms.employees.view but not hrms.employees.create — the
-  // only role in that shape today. Restrict them to their own department.
-  const isDepartmentScoped = !hasPermission("hrms.employees.create")
+  // Browsing any department's page (info, roster, current head) only requires
+  // org.departments.view — it's not scoped to the viewer's own department.
+  // Managing headship is a separate, more privileged action gated below.
   // Reassigning a department head requires updating (and possibly creating) a
   // school-year assignment row.
   const canManageHead = hasPermission("hrms.schoolYears.update")
   const canCreateAssignment = hasPermission("hrms.schoolYears.create")
-
-  const { data: ownProfile } = useApiQuery<EmployeeResponse>(
-    isDepartmentScoped ? "/api/v1/hrms/me/profile" : null,
-  )
-  const ownDepartmentId = ownProfile?.departmentId ?? null
-  const isForbidden = isDepartmentScoped && ownDepartmentId != null && String(ownDepartmentId) !== String(id)
 
   const {
     data: department,
     loading: loadingDepartment,
     error: departmentError,
     refresh: refreshDepartment,
-  } = useApiQuery<DepartmentResponse>(
-    `/api/v1/organization/departments/${id}`,
-    undefined,
-    { enabled: !isForbidden },
-  )
+  } = useApiQuery<DepartmentResponse>(`/api/v1/organization/departments/${id}`)
 
   const {
     data: employeesData,
     loading: loadingEmployees,
     error: employeesError,
     refresh: refreshEmployees,
-  } = useApiQuery<PagedResponseOfEmployeeResponse>(
-    "/api/v1/hrms/employees",
-    {
-      DepartmentId: id,
-      Page: 1,
-      PageSize: 200,
-      SortBy: "lastName",
-    },
-    { enabled: !isForbidden },
-  )
+  } = useApiQuery<PagedResponseOfEmployeeResponse>("/api/v1/hrms/employees", {
+    DepartmentId: id,
+    Page: 1,
+    PageSize: 200,
+    SortBy: "lastName",
+  })
 
   const {
     data: currentSchoolYear,
     error: schoolYearError,
-  } = useApiQuery<SchoolYearResponse>(
-    !isForbidden ? "/api/v1/academic/school-years/current" : null,
-  )
+  } = useApiQuery<SchoolYearResponse>("/api/v1/academic/school-years/current")
   const currentSchoolYearId = currentSchoolYear?.id ?? null
   const noCurrentSchoolYear = isNotFound(schoolYearError)
 
@@ -155,7 +138,7 @@ export default function DepartmentDetailPage({ params }: PageProps) {
       Page: 1,
       PageSize: 1,
     },
-    { enabled: !isForbidden && Boolean(currentSchoolYearId) },
+    { enabled: Boolean(currentSchoolYearId) },
   )
 
   // Only fetched when the "Change head" flow is actually usable, to avoid an
@@ -171,7 +154,7 @@ export default function DepartmentDetailPage({ params }: PageProps) {
       Page: 1,
       PageSize: 200,
     },
-    { enabled: !isForbidden && canManageHead && Boolean(currentSchoolYearId) },
+    { enabled: canManageHead && Boolean(currentSchoolYearId) },
   )
 
   const employees = employeesData?.data ?? EMPTY_EMPLOYEES
@@ -180,14 +163,6 @@ export default function DepartmentDetailPage({ params }: PageProps) {
   const assignments = assignmentsData?.data ?? EMPTY_ASSIGNMENTS
 
   const [manageOpen, setManageOpen] = React.useState(false)
-
-  if (isForbidden) {
-    return (
-      <PermissionGuard requiredPermission="org.departments.view">
-        <ErrorPage status={403} fullScreen />
-      </PermissionGuard>
-    )
-  }
 
   return (
     <PermissionGuard requiredPermission="org.departments.view">
@@ -450,7 +425,7 @@ function ChangeDepartmentHeadDialog({
   const [newIsFaculty, setNewIsFaculty] = React.useState(false)
   const [newStartDate, setNewStartDate] = React.useState(() => new Date().toISOString().slice(0, 10))
   const [error, setError] = React.useState<string | null>(null)
-  const { mutate, loading: saving } = useApiMutation()
+  const { mutate, loading: saving, lastErrorRef } = useApiMutation()
 
   const reset = React.useCallback(() => {
     setStep("select")
@@ -518,7 +493,10 @@ function ChangeDepartmentHeadDialog({
         body: removeBody,
       })
       if (!removed) {
-        setError(`Unable to remove ${currentHead.employeeName} as head. No changes were made.`)
+        setError(
+          lastErrorRef.current?.message ??
+            `Unable to remove ${currentHead.employeeName} as head. No changes were made.`,
+        )
         return
       }
     }
@@ -561,10 +539,12 @@ function ChangeDepartmentHeadDialog({
     }
 
     if (!assigned) {
+      const reason = lastErrorRef.current?.message
       setError(
-        currentHead
-          ? `${currentHead.employeeName} was removed as head, but assigning the new head failed. Please try again.`
-          : "Unable to assign the new department head.",
+        reason ??
+          (currentHead
+            ? `${currentHead.employeeName} was removed as head, but assigning the new head failed. Please try again.`
+            : "Unable to assign the new department head."),
       )
       return
     }
