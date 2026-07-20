@@ -57,7 +57,7 @@ export function EmployeeProfileHeader({
             <div className="relative shrink-0">
               <Avatar className="size-20 sm:size-24">
                 <AvatarImage
-                  src={`/api/v1/public/avatars/${profile.id}?v=${encodeURIComponent(profile.profilePicture ?? "")}`}
+                  src={`/api/v1/public/avatars/${profile.profileId}?v=${encodeURIComponent(profile.profilePicture ?? "")}`}
                   alt={`${profile.fullName} profile photo`}
                 />
                 <AvatarFallback className="text-xl font-semibold sm:text-2xl">

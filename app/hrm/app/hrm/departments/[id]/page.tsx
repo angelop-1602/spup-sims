@@ -48,27 +48,24 @@ import {
 } from "@/lib/api"
 import { ApiErrorView } from "@/components/ui/api-error-view"
 
-// Mirrors SIS.Domain.Platform.EmploymentStatus
-const EMPLOYMENT_STATUS_LABEL: Record<number, string> = {
-  0: "Applicant",
-  1: "Active",
-  2: "Probationary",
-  3: "Contractual",
-  4: "Resigned",
-  5: "Retired",
-  6: "Terminated",
-  7: "Inactive",
-}
+// Mirrors SIS.Domain.Platform.EmploymentStatus — the API serializes this enum as
+// its member name (e.g. "Active"), so it's keyed/compared by name throughout.
+const EMPLOYMENT_STATUSES = [
+  { name: "Applicant", style: "bg-zinc-100 text-zinc-600" },
+  { name: "Active", style: "bg-green-50 text-green-700" },
+  { name: "Probationary", style: "bg-blue-50 text-blue-700" },
+  { name: "Contractual", style: "bg-blue-50 text-blue-700" },
+  { name: "Resigned", style: "bg-zinc-100 text-zinc-600" },
+  { name: "Retired", style: "bg-zinc-100 text-zinc-600" },
+  { name: "Terminated", style: "bg-red-50 text-red-700" },
+  { name: "Inactive", style: "bg-zinc-100 text-zinc-600" },
+] as const
 
-const EMPLOYMENT_STATUS_STYLE: Record<number, string> = {
-  1: "bg-green-50 text-green-700",
-  2: "bg-blue-50 text-blue-700",
-  3: "bg-blue-50 text-blue-700",
-  4: "bg-zinc-100 text-zinc-600",
-  5: "bg-zinc-100 text-zinc-600",
-  6: "bg-red-50 text-red-700",
-  7: "bg-zinc-100 text-zinc-600",
-}
+const EMPLOYMENT_STATUS_BY_NAME = Object.fromEntries(
+  EMPLOYMENT_STATUSES.map((status) => [status.name, status]),
+) as Record<string, (typeof EMPLOYMENT_STATUSES)[number]>
+
+type EmploymentStatusName = (typeof EMPLOYMENT_STATUSES)[number]["name"]
 
 const EMPTY_EMPLOYEES: EmployeeResponse[] = []
 const EMPTY_ASSIGNMENTS: EmployeeSchoolYearAssignmentResponse[] = []
@@ -321,7 +318,8 @@ export default function DepartmentDetailPage({ params }: PageProps) {
                   </TableRow>
                 ) : (
                   employees.map((employee) => {
-                    const status = Number(employee.employmentStatus ?? 0)
+                    const statusName = String(employee.employmentStatus ?? "Applicant")
+                    const status = EMPLOYMENT_STATUS_BY_NAME[statusName]
                     const isHead = headAssignment && String(headAssignment.employeeId) === String(employee.id)
                     return (
                       <TableRow key={String(employee.id)}>
@@ -339,10 +337,10 @@ export default function DepartmentDetailPage({ params }: PageProps) {
                           <span
                             className={
                               "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " +
-                              (EMPLOYMENT_STATUS_STYLE[status] ?? "bg-zinc-100 text-zinc-600")
+                              (status?.style ?? "bg-zinc-100 text-zinc-600")
                             }
                           >
-                            {EMPLOYMENT_STATUS_LABEL[status] ?? "Unknown"}
+                            {status?.name ?? "Unknown"}
                           </span>
                         </TableCell>
                         <TableCell className="text-muted-foreground">
@@ -421,7 +419,7 @@ function ChangeDepartmentHeadDialog({
   const [step, setStep] = React.useState<"select" | "confirm">("select")
   const [selectedEmployeeId, setSelectedEmployeeId] = React.useState("")
   const [newPositionId, setNewPositionId] = React.useState<number | string | null>(null)
-  const [newStatus, setNewStatus] = React.useState("1")
+  const [newStatus, setNewStatus] = React.useState("Active")
   const [newIsFaculty, setNewIsFaculty] = React.useState(false)
   const [newStartDate, setNewStartDate] = React.useState(() => new Date().toISOString().slice(0, 10))
   const [error, setError] = React.useState<string | null>(null)
@@ -431,7 +429,7 @@ function ChangeDepartmentHeadDialog({
     setStep("select")
     setSelectedEmployeeId("")
     setNewPositionId(null)
-    setNewStatus("1")
+    setNewStatus("Active")
     setNewIsFaculty(false)
     setNewStartDate(new Date().toISOString().slice(0, 10))
     setError(null)
@@ -453,7 +451,7 @@ function ChangeDepartmentHeadDialog({
     const hasAssignment = assignments.some((a) => String(a.employeeId) === employeeId)
     if (employee && !hasAssignment) {
       setNewPositionId(employee.positionId ?? null)
-      setNewStatus(String(employee.employmentStatus ?? 1))
+      setNewStatus(String(employee.employmentStatus ?? "Active"))
     }
   }
 
@@ -525,7 +523,7 @@ function ChangeDepartmentHeadDialog({
         schoolYearId: Number(schoolYear.id),
         departmentId: Number(departmentId),
         positionId: Number(newPositionId),
-        status: Number(newStatus),
+        status: newStatus as EmploymentStatusName,
         isFaculty: newIsFaculty,
         startDate: newStartDate,
         endDate: null,
@@ -594,8 +592,10 @@ function ChangeDepartmentHeadDialog({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(EMPLOYMENT_STATUS_LABEL).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                      {EMPLOYMENT_STATUSES.map((status) => (
+                        <SelectItem key={status.name} value={status.name}>
+                          {status.name}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

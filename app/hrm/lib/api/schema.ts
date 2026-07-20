@@ -1159,7 +1159,67 @@ export interface paths {
                 };
             };
         };
-        put?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProfileRequest"];
+                    "text/json": components["schemas"]["ProfileRequest"];
+                    "application/*+json": components["schemas"]["ProfileRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -12579,6 +12639,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/identity/roles/{roleId}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/identity/roles/{roleId}/permissions/{permissionId}": {
         parameters: {
             query?: never;
@@ -16032,7 +16164,8 @@ export interface components {
             confirmPassword: string;
             profile: components["schemas"]["ProfileRequest"];
         };
-        ApplicantStatus: number;
+        /** @enum {string} */
+        ApplicantStatus: "Submitted" | "Screening" | "Evaluation" | "Interview" | "Approved" | "Hired" | "Enrolled" | "Rejected" | "Withdrawn";
         /** @description Applicant-facing request to apply for a job posting. */
         ApplyToJobRequest: {
             /** Format: int64 */
@@ -16135,6 +16268,9 @@ export interface components {
             departmentId?: null | number | string;
             /** Format: int64 */
             positionId?: null | number | string;
+            /** Format: date */
+            dateHired?: null | string;
+            employmentCategory?: null | components["schemas"]["EmploymentCategory"];
         };
         /** @description Summary of an import operation. */
         AzureImportResult: {
@@ -16188,7 +16324,8 @@ export interface components {
             /** Format: time */
             checkOut: string;
         };
-        CivilStatus: number;
+        /** @enum {string} */
+        CivilStatus: "Unspecified" | "Single" | "Married" | "Widowed" | "Separated";
         CommunityInvolvementRequest: {
             involvement: string;
             natureInvolvement: string;
@@ -16256,8 +16393,6 @@ export interface components {
             departmentId?: number | string;
             /** Format: int64 */
             positionId?: number | string;
-            /** Format: int64 */
-            supervisorId?: null | number | string;
             employmentStatus?: components["schemas"]["EmploymentStatus"];
             employmentCategory?: components["schemas"]["EmploymentCategory"];
             shared?: boolean;
@@ -16267,6 +16402,12 @@ export interface components {
             dateRegularized?: null | string;
             /** Format: date */
             dateSeparated?: null | string;
+            /**
+             * Format: int64
+             * @description Role to assign if this employee's institutional email causes a login User
+             *                 to be auto-created. Ignored otherwise (and ignored entirely on update).
+             */
+            roleId?: null | number | string;
         };
         CreateEmployeeScheduleRequest: {
             /** Format: int64 */
@@ -16301,12 +16442,12 @@ export interface components {
             positionId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
-            /** @default false */
-            isDepartmentHead?: boolean;
             /** Format: date */
             startDate: string;
             /** Format: date */
             endDate: null | string;
+            /** @default false */
+            isDepartmentHead: boolean;
         };
         CreateEmployeeTypeRequest: {
             name: string;
@@ -16506,7 +16647,8 @@ export interface components {
             /** Format: int32 */
             expiringSoon: number | string;
         };
-        EducationalAttainment: number;
+        /** @enum {string} */
+        EducationalAttainment: "Elementary" | "Secondary" | "Tertiary" | "Vocational" | "Graduate" | "Postgraduate" | "Other";
         EducationalBackgroundRequest: {
             /** Format: int64 */
             educationId: null | number | string;
@@ -16548,7 +16690,8 @@ export interface components {
             diploma: null | string;
             transcriptOfRecords: null | string;
         };
-        EducationLevel: number;
+        /** @enum {string} */
+        EducationLevel: "BasicEducation" | "SeniorHighSchool" | "College" | "GraduateSchool";
         EmployeeApplicantDocumentResponse: {
             /** Format: int64 */
             id?: number | string;
@@ -16613,7 +16756,8 @@ export interface components {
             /** Format: date-time */
             verifiedAt: null | string;
         };
-        EmployeeDocumentStatus: number;
+        /** @enum {string} */
+        EmployeeDocumentStatus: "Pending" | "Verified" | "Rejected" | "Expired";
         EmployeeLeaveBalanceSummaryResponse: {
             /** Format: int64 */
             employeeId: number | string;
@@ -16648,6 +16792,8 @@ export interface components {
         EmployeeResponse: {
             /** Format: int64 */
             id: number | string;
+            /** Format: int64 */
+            profileId: number | string;
             employeeNumber: string;
             firstName: string;
             middleName: null | string;
@@ -16659,6 +16805,8 @@ export interface components {
             phoneNumber: null | string;
             gender: components["schemas"]["Gender"];
             civilStatus: components["schemas"]["CivilStatus"];
+            /** Format: date */
+            birthDate: null | string;
             /** Format: int32 */
             age: null | number | string;
             religion: null | string;
@@ -16673,8 +16821,6 @@ export interface components {
             /** Format: int64 */
             positionId: number | string;
             position: null | string;
-            /** Format: int64 */
-            supervisorId: null | number | string;
             supervisor: null | string;
             employmentStatus: components["schemas"]["EmploymentStatus"];
             employmentCategory: components["schemas"]["EmploymentCategory"];
@@ -16713,7 +16859,8 @@ export interface components {
             /** Format: date */
             endDate: null | string;
         };
-        EmployeeScheduleType: number;
+        /** @enum {string} */
+        EmployeeScheduleType: "Fixed" | "Flexible" | "Shift";
         EmployeeSchoolYearAssignmentResponse: {
             /** Format: int64 */
             id: number | string;
@@ -16749,8 +16896,10 @@ export interface components {
             name: string;
             description: null | string;
         };
-        EmploymentCategory: number;
-        EmploymentStatus: number;
+        /** @enum {string} */
+        EmploymentCategory: "Regular" | "Probationary" | "Contractual" | "PartTime" | "JobOrder" | "Consultant";
+        /** @enum {string} */
+        EmploymentStatus: "Applicant" | "Active" | "Probationary" | "Contractual" | "Resigned" | "Retired" | "Terminated" | "Inactive";
         EntityDefinition: {
             key: string;
             route: string;
@@ -16774,7 +16923,8 @@ export interface components {
         ForgotPasswordRequest: {
             email: string;
         };
-        Gender: number;
+        /** @enum {string} */
+        Gender: "Unspecified" | "Female" | "Male" | "Other";
         /**
          * @description Payload for the hire action. Creates an Employee record from the applicant's existing Profile.
          *     Runs in a transaction. Requires `hrms.recruitment.applications.hire`.
@@ -16788,8 +16938,6 @@ export interface components {
              * @description Optional position for the new employee; can also be assigned later via a school-year assignment.
              */
             positionId?: null | number | string;
-            /** Format: int64 */
-            supervisorId?: null | number | string;
             employmentCategory?: components["schemas"]["EmploymentCategory"];
             shared?: boolean;
             /** Format: date */
@@ -16902,7 +17050,8 @@ export interface components {
             /** Format: date-time */
             updatedAt?: null | string;
         };
-        JobApplicationStatus: number;
+        /** @enum {string} */
+        JobApplicationStatus: "Pending" | "Reviewing" | "Shortlisted" | "Rejected" | "Hired" | "Withdrawn";
         JobPostingResponse: {
             /** Format: int64 */
             id?: number | string;
@@ -16928,7 +17077,8 @@ export interface components {
             /** Format: date-time */
             closedAt?: null | string;
         };
-        JobPostingStatus: number;
+        /** @enum {string} */
+        JobPostingStatus: "Draft" | "Published" | "Closed" | "Cancelled";
         LeaveApplicationDetailResponse: {
             /** Format: int64 */
             id: number | string;
@@ -16977,7 +17127,8 @@ export interface components {
             submittedAtUtc: string;
             attachmentUrl: null | string;
         };
-        LeaveApplicationStatus: number;
+        /** @enum {string} */
+        LeaveApplicationStatus: "Pending" | "DeptHeadApproved" | "DeptHeadRejected" | "HrApproved" | "HrRejected" | "Cancelled";
         LeaveApprovalResponse: {
             approverLevel: string;
             /** Format: int64 */
@@ -17850,8 +18001,6 @@ export interface components {
             departmentId?: number | string;
             /** Format: int64 */
             positionId?: number | string;
-            /** Format: int64 */
-            supervisorId?: null | number | string;
             employmentStatus?: components["schemas"]["EmploymentStatus"];
             employmentCategory?: components["schemas"]["EmploymentCategory"];
             shared?: boolean;
@@ -17861,6 +18010,12 @@ export interface components {
             dateRegularized?: null | string;
             /** Format: date */
             dateSeparated?: null | string;
+            /**
+             * Format: int64
+             * @description Role to assign if this employee's institutional email causes a login User
+             *                 to be auto-created. Ignored otherwise (and ignored entirely on update).
+             */
+            roleId?: null | number | string;
         };
         UpdateEmployeeSchoolYearAssignmentRequest: {
             /** Format: int64 */
@@ -17869,13 +18024,13 @@ export interface components {
             positionId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
-            /** @default false */
-            isDepartmentHead?: boolean;
             isActive: boolean;
             /** Format: date */
             startDate: string;
             /** Format: date */
             endDate: null | string;
+            /** @default false */
+            isDepartmentHead: boolean;
         };
         UpdateEmployeeTypeRequest: {
             name: string;
