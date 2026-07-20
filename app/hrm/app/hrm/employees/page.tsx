@@ -20,6 +20,7 @@ import {
   type PagedResponseOfEmployeeTypeResponse,
   type SchoolYearResponse,
   type PagedResponseOfEmployeeSchoolYearAssignmentResponse,
+  type PagedResponseOfRoleResponse,
 } from "@/lib/api"
 import {
   Dialog,
@@ -90,6 +91,10 @@ type EmployeeForm = {
   positionId: number | string | null
   employeeTypeId: number | string | null
   dateHired: string
+  // Only applied on create: the backend auto-creates a login User for @spup.edu.ph
+  // emails and assigns this role to it. Ignored on update, and ignored entirely if
+  // the email isn't institutional (no User gets created in that case).
+  roleId: number | string | null
 }
 
 const EMPTY_FORM: EmployeeForm = {
@@ -101,6 +106,7 @@ const EMPTY_FORM: EmployeeForm = {
   positionId: null,
   employeeTypeId: null,
   dateHired: "",
+  roleId: null,
 }
 
 function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
@@ -115,17 +121,40 @@ function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
     positionId: Number(form.positionId),
     employeeTypeId: Number(form.employeeTypeId),
     dateHired: form.dateHired,
+    roleId: form.roleId ? Number(form.roleId) : null,
   }
 }
 
 /** PUT carries the same required fields as create, plus whatever the existing
  * record already has for fields the form doesn't expose — otherwise saving
  * would silently reset them to their schema defaults (e.g. employment status
- * back to Active, isActive back to true). */
+ * back to Active, isActive back to true). This also applies to `profile`: if the
+ * caller holds core.profiles.update, the backend writes every field in that object
+ * unconditionally, so fields this form never shows (middleName, gender, birthDate,
+ * etc.) must be carried through from `existing` or they'd get wiped on save. */
 function toUpdateRequest(form: EmployeeForm, existing: Employee): UpdateEmployeeRequestWithDeps {
   return {
-    ...toCreateRequest(form),
-    supervisorId: existing.supervisorId ?? null,
+    employeeNumber: form.employeeNumber,
+    profile: {
+      firstName: form.firstName,
+      middleName: existing.middleName ?? null,
+      lastName: form.lastName,
+      suffix: existing.suffix ?? null,
+      gender: existing.gender ?? null,
+      civilStatus: existing.civilStatus ?? null,
+      personalEmail: form.email,
+      mobileNumber: existing.mobileNumber ?? null,
+      phoneNumber: existing.phoneNumber ?? null,
+      birthDate: existing.birthDate ?? null,
+      age: existing.age ?? null,
+      religion: existing.religion ?? null,
+      qualifier: existing.qualifier ?? null,
+      profilePicture: existing.profilePicture ?? null,
+    },
+    departmentId: Number(form.departmentId),
+    positionId: Number(form.positionId),
+    employeeTypeId: Number(form.employeeTypeId),
+    dateHired: form.dateHired,
     employmentStatus: existing.employmentStatus,
     employmentCategory: existing.employmentCategory,
     shared: existing.shared ?? false,
@@ -146,6 +175,15 @@ export default function EmployeesPage() {
   // for their own profile via the portfolio page, not for the employee list.
   const canManageOthers = hasPermission("hrms.employees.create")
   const canDelete = hasPermission("hrms.employees.delete")
+  // Editing an existing employee's personal/profile fields (name, email, etc.) requires
+  // core.profiles.update — HR roles without it can only edit employment details (department,
+  // position, type, dates, status). The backend silently ignores profile field changes from
+  // callers lacking this permission, so the form must not present them as editable either.
+  const canEditProfile = hasPermission("core.profiles.update")
+  // Shown only on the create form — lets HR pick a role for the login User the
+  // backend auto-creates when the new employee's email is institutional. Gated by
+  // the same permission that lets the identity/roles list endpoint be called.
+  const canAssignRole = hasPermission("identity.roles.view")
   // Department Head is the only role with hrms.employees.view but not .create —
   // restrict them to the roster of the department they currently head. Headship
   // is scoped per school year (EmployeeSchoolYearAssignmentResponse.isDepartmentHead),
@@ -238,6 +276,13 @@ export default function EmployeesPage() {
   )
   const employeeTypes = employeeTypesData?.data ?? []
 
+  // Fetch roles for the create form's role picker
+  const { data: rolesData } = useApiQuery<PagedResponseOfRoleResponse>(
+    canAssignRole ? "/api/v1/identity/roles" : null,
+    { Page: 1, PageSize: 100, SortBy: "id" },
+  )
+  const roles = (rolesData?.data ?? []).filter((role) => role.isActive !== false)
+
   const employees = employeesPaged?.data ?? []
   const totalPages = Number(employeesPaged?.totalPages ?? 1)
   const totalRecords = employeesPaged?.totalRecords ?? 0
@@ -261,6 +306,7 @@ export default function EmployeesPage() {
       positionId: employee.positionId ?? null,
       employeeTypeId: employee.employeeTypeId ?? null,
       dateHired: employee.dateHired ?? "",
+      roleId: null,
     })
     setFormError(null)
     setIsDialogOpen(true)
@@ -523,42 +569,56 @@ export default function EmployeesPage() {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>{selectedEmployee ? "Edit employee" : "New employee"}</DialogTitle>
-              <DialogDescription>Fill in the employee details below. Department and Position are required.</DialogDescription>
+              <DialogDescription>
+                {selectedEmployee && !canEditProfile
+                  ? "You can update this employee's department, position, type, and dates. Personal details are managed by the employee or an administrator."
+                  : "Fill in the employee details below. Department and Position are required."}
+              </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSave} className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="emp-first-name">First name</Label>
-                  <Input
-                    id="emp-first-name"
-                    value={formState.firstName}
-                    onChange={(e) => setFormState((s) => ({ ...s, firstName: e.target.value }))}
-                    placeholder="Juan"
-                    required
-                  />
+              {(!selectedEmployee || canEditProfile) && (
+                <>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="emp-first-name">First name</Label>
+                      <Input
+                        id="emp-first-name"
+                        value={formState.firstName}
+                        onChange={(e) => setFormState((s) => ({ ...s, firstName: e.target.value }))}
+                        placeholder="Juan"
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="emp-last-name">Last name</Label>
+                      <Input
+                        id="emp-last-name"
+                        value={formState.lastName}
+                        onChange={(e) => setFormState((s) => ({ ...s, lastName: e.target.value }))}
+                        placeholder="Dela Cruz"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="emp-email">Personal email</Label>
+                    <Input
+                      id="emp-email"
+                      type="email"
+                      value={formState.email}
+                      onChange={(e) => setFormState((s) => ({ ...s, email: e.target.value }))}
+                      placeholder="juan@spup.edu.ph"
+                      required
+                    />
+                  </div>
+                </>
+              )}
+              {selectedEmployee && !canEditProfile && (
+                <div className="rounded-md border bg-muted/30 px-3 py-2 text-sm">
+                  <p className="font-medium">{selectedEmployee.fullName}</p>
+                  <p className="text-muted-foreground">{selectedEmployee.email}</p>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="emp-last-name">Last name</Label>
-                  <Input
-                    id="emp-last-name"
-                    value={formState.lastName}
-                    onChange={(e) => setFormState((s) => ({ ...s, lastName: e.target.value }))}
-                    placeholder="Dela Cruz"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="emp-email">Email</Label>
-                <Input
-                  id="emp-email"
-                  type="email"
-                  value={formState.email}
-                  onChange={(e) => setFormState((s) => ({ ...s, email: e.target.value }))}
-                  placeholder="juan@spup.edu.ph"
-                  required
-                />
-              </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="emp-number">Employee number</Label>
                 <Input
@@ -636,6 +696,30 @@ export default function EmployeesPage() {
                   />
                 </div>
               </div>
+              {!selectedEmployee && canAssignRole && (
+                <div className="space-y-2">
+                  <Label htmlFor="emp-role">Role</Label>
+                  <Select
+                    value={formState.roleId != null ? String(formState.roleId) : ""}
+                    onValueChange={(value) => setFormState((s) => ({ ...s, roleId: value || null }))}
+                  >
+                    <SelectTrigger id="emp-role">
+                      <SelectValue placeholder="No role (assign later)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={String(role.id)} value={String(role.id)}>
+                          {role.name ?? ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Only applies if the email above is an @spup.edu.ph address — that&apos;s
+                    the only case a login account gets created automatically.
+                  </p>
+                </div>
+              )}
               {formError && (
                 <p className="text-sm text-destructive">{formError}</p>
               )}

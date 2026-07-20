@@ -53,27 +53,21 @@ import {
 } from "@/lib/api"
 import { ApiErrorView } from "@/components/ui/api-error-view"
 
-// Mirrors SIS.Domain.Platform.JobPostingStatus
-const STATUS_LABEL: Record<number, string> = {
-  0: "Draft",
-  1: "Published",
-  2: "Closed",
-  3: "Cancelled",
-}
-
-const STATUS_STYLE: Record<number, string> = {
-  0: "bg-zinc-100 text-zinc-700",
-  1: "bg-green-50 text-green-700",
-  2: "bg-blue-50 text-blue-700",
-  3: "bg-red-50 text-red-700",
+// Mirrors SIS.Domain.Platform.JobPostingStatus. The API serializes this enum as its
+// member name (e.g. "Draft"), so status is compared/keyed by name, not ordinal.
+const STATUS_STYLE: Record<string, string> = {
+  Draft: "bg-zinc-100 text-zinc-700",
+  Published: "bg-green-50 text-green-700",
+  Closed: "bg-blue-50 text-blue-700",
+  Cancelled: "bg-red-50 text-red-700",
 }
 
 const STATUS_FILTERS: { label: string; value: string }[] = [
   { label: "All", value: "" },
-  { label: "Draft", value: "0" },
-  { label: "Published", value: "1" },
-  { label: "Closed", value: "2" },
-  { label: "Cancelled", value: "3" },
+  { label: "Draft", value: "Draft" },
+  { label: "Published", value: "Published" },
+  { label: "Closed", value: "Closed" },
+  { label: "Cancelled", value: "Cancelled" },
 ]
 
 const EMPLOYMENT_TYPES = ["Full-time", "Part-time", "Contract", "Temporary"]
@@ -128,7 +122,7 @@ export default function JobPostingsPage() {
       Search: debouncedSearch || undefined,
       SortBy: "id",
       Descending: true,
-      Status: statusFilter === "" ? undefined : Number(statusFilter),
+      Status: statusFilter === "" ? undefined : statusFilter,
     },
     { onError: handleError },
   )
@@ -338,7 +332,7 @@ export default function JobPostingsPage() {
                 </TableRow>
               ) : (
                 postings.map((posting) => {
-                  const status = Number(posting.status ?? 0)
+                  const status = String(posting.status ?? "Draft")
                   const isBusy = busyId === posting.id
 
                   return (
@@ -356,11 +350,11 @@ export default function JobPostingsPage() {
                       </TableCell>
                       <TableCell>
                         <span className={"inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium " + (STATUS_STYLE[status] ?? "bg-zinc-100 text-zinc-700")}>
-                          {STATUS_LABEL[status] ?? "Unknown"}
+                          {status}
                         </span>
                       </TableCell>
                       <TableCell className="space-x-2 text-right whitespace-nowrap">
-                        {canUpdate && status === 0 && (
+                        {canUpdate && status === "Draft" && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -371,7 +365,7 @@ export default function JobPostingsPage() {
                             Publish
                           </Button>
                         )}
-                        {canUpdate && status === 1 && (
+                        {canUpdate && status === "Published" && (
                           <Button
                             variant="outline"
                             size="sm"
@@ -382,7 +376,7 @@ export default function JobPostingsPage() {
                             Close
                           </Button>
                         )}
-                        {canUpdate && status !== 2 && (
+                        {canUpdate && status !== "Closed" && (
                           <Button
                             variant="outline"
                             size="sm"

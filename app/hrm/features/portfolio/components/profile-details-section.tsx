@@ -1,28 +1,18 @@
+import type { ReactNode } from "react"
+import { Edit3 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import type { components } from "@/lib/api"
 import { formatPortfolioDate } from "../utils/format-portfolio-date"
 
 type Employee = components["schemas"]["EmployeeResponse"]
 
-const GENDER_LABELS: Record<number, string> = {
-  0: "Male",
-  1: "Female",
-}
-
-const CIVIL_STATUS_LABELS: Record<number, string> = {
-  0: "Single",
-  1: "Married",
-  2: "Separated",
-  3: "Widowed",
-  4: "Divorced",
-}
-
-function formatEnumLabel(
-  value: number | string | null | undefined,
-  labels: Record<number, string>,
-) {
-  if (value == null) return undefined
-  return labels[Number(value)] ?? String(value)
+/** The API serializes Gender/CivilStatus as their backend enum member name
+ * already (e.g. "Female", "Married"), so no numeric lookup is needed — just
+ * hide the "Unspecified" default rather than showing it as a real value. */
+function formatEnumLabel(value: string | null | undefined) {
+  if (value == null || value === "Unspecified") return undefined
+  return value
 }
 
 type DetailField = {
@@ -30,10 +20,21 @@ type DetailField = {
   value: string | number | null | undefined
 }
 
-function DetailGroup({ title, fields }: { title: string; fields: DetailField[] }) {
+function DetailGroup({
+  title,
+  fields,
+  action,
+}: {
+  title: string
+  fields: DetailField[]
+  action?: ReactNode
+}) {
   return (
     <div>
-      <h3 className="text-sm font-semibold">{title}</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold">{title}</h3>
+        {action}
+      </div>
       <dl className="mt-3 grid gap-x-6 gap-y-4 sm:grid-cols-2 xl:grid-cols-3">
         {fields.map((field) => (
           <div key={field.label} className="min-w-0">
@@ -50,15 +51,23 @@ function DetailGroup({ title, fields }: { title: string; fields: DetailField[] }
   )
 }
 
-export function ProfileDetailsSection({ profile }: { profile: Employee }) {
+export function ProfileDetailsSection({
+  profile,
+  canEditEmployment,
+  onEditEmployment,
+}: {
+  profile: Employee
+  canEditEmployment?: boolean
+  onEditEmployment?: () => void
+}) {
   const personalFields: DetailField[] = [
     { label: "Full name", value: profile.fullName },
     { label: "Email", value: profile.email },
     { label: "Age", value: profile.age },
-    { label: "Gender", value: formatEnumLabel(profile.gender, GENDER_LABELS) },
+    { label: "Gender", value: formatEnumLabel(profile.gender != null ? String(profile.gender) : null) },
     {
       label: "Civil status",
-      value: formatEnumLabel(profile.civilStatus, CIVIL_STATUS_LABELS),
+      value: formatEnumLabel(profile.civilStatus != null ? String(profile.civilStatus) : null),
     },
     { label: "Mobile number", value: profile.mobileNumber },
     { label: "Phone number", value: profile.phoneNumber },
@@ -70,12 +79,14 @@ export function ProfileDetailsSection({ profile }: { profile: Employee }) {
     { label: "Employee type", value: profile.employeeType },
     { label: "Position / designation", value: profile.position },
     { label: "Department / office", value: profile.department },
-    { label: "Supervisor", value: profile.supervisor },
+    ...(profile.supervisor ? [{ label: "Department head", value: profile.supervisor }] : []),
     { label: "Employment status", value: String(profile.employmentStatus) },
     { label: "Employment category", value: String(profile.employmentCategory) },
     { label: "Date hired", value: formatPortfolioDate(profile.dateHired) },
     { label: "Regularization date", value: formatPortfolioDate(profile.dateRegularized) },
-    { label: "Separation date", value: formatPortfolioDate(profile.dateSeparated) },
+    ...(profile.dateSeparated
+      ? [{ label: "Separation date", value: formatPortfolioDate(profile.dateSeparated) }]
+      : []),
     { label: "Active status", value: profile.isActive ? "Active" : "Inactive" },
     { label: "Shared profile", value: profile.shared ? "Yes" : "No" },
   ]
@@ -97,7 +108,24 @@ export function ProfileDetailsSection({ profile }: { profile: Employee }) {
         </CardHeader>
         <CardContent className="grid gap-6 p-4 sm:p-5 lg:grid-cols-2">
           <DetailGroup title="Personal information" fields={personalFields} />
-          <DetailGroup title="Employment information" fields={employmentFields} />
+          <DetailGroup
+            title="Employment information"
+            fields={employmentFields}
+            action={
+              canEditEmployment ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="print:hidden"
+                  onClick={onEditEmployment}
+                >
+                  <Edit3 aria-hidden="true" className="h-4 w-4" />
+                  Edit
+                </Button>
+              ) : undefined
+            }
+          />
         </CardContent>
       </Card>
     </section>

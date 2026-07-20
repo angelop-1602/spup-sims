@@ -20,7 +20,14 @@ export default function ViewEmployeePortfolioPage({ params }: PageProps) {
   const unwrappedParams = React.use(params)
   const employeeId = unwrappedParams.id
   const { hasPermission } = useHrmAuth()
-  const canEditProfile = hasPermission("hrms.employees.create")
+  // Editing another employee's personal/profile details (name, gender, contact info, etc.)
+  // requires core.profiles.update — HR roles without it can view but not edit this section;
+  // employment details are managed from the employees list instead.
+  const canEditProfile = hasPermission("core.profiles.update")
+  // Employment details (department, position, employee type, date hired) are editable
+  // by any HR role that can edit employees at all — from this profile view, not just
+  // the employees list table.
+  const canEditEmployment = hasPermission("hrms.employees.update")
 
   const { data: profile, loading, error, refresh } = useApiQuery<EmployeeResponse>(
     `/api/v1/hrms/employees/${employeeId}`,
@@ -40,6 +47,8 @@ export default function ViewEmployeePortfolioPage({ params }: PageProps) {
             readOnly
             canEditProfile={canEditProfile}
             canUploadPicture={false}
+            selfService={false}
+            canEditEmployment={canEditEmployment}
           />
         ) : (
           <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
