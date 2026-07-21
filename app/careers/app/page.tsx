@@ -8,9 +8,8 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Job, UserProfile, Application, JobPostingsApiResponse, mapApiJobToJob } from '@/components/landing/types';
+import { Job, JobPostingsApiResponse, mapApiJobToJob } from '@/components/landing/types';
 import FeaturedJobs from '@/components/landing/FeaturedJobs';
-import JobDetailsModal from '@/components/landing/JobDetailsModal';
 import ProcessTimeline from '@/components/landing/ApplicationProcess';
 import FaqSection from '@/components/landing/Faq';
 import JobBoardCTA from '@/components/landing/Cta';
@@ -25,26 +24,17 @@ export default function LandingPage() {
     ? `${authProfile.profile.firstName} ${authProfile.profile.lastName}`.trim()
     : "Applicant User";
   const emailLabel = authProfile?.profile.personalEmail || "";
-  const [activeTab, setActiveTab] = useState<'explore' | 'applications' | 'profile' | 'faqs' >('explore');
+  const [activeTab, setActiveTab] = useState<'explore'>('explore');
   const [jobs, setJobs] = useState<Job[]>([]);
   const [jobsLoading, setJobsLoading] = useState<boolean>(true);
 
   const [savedJobIds, setSavedJobIds] = useState<string[]>([]);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
-  const [applications, setApplications] = useState<Application[]>([]);
-
-  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<'home' | 'process' | 'faqs'>('home');
 
   useEffect(() => {
     const cachedIds = localStorage.getItem('edu_careers_saved_ids');
-    const cachedProfile = localStorage.getItem('edu_careers_profile');
-    const cachedApps = localStorage.getItem('edu_careers_applications');
-
     if (cachedIds) setSavedJobIds(JSON.parse(cachedIds));
-    if (cachedProfile) setUserProfile(JSON.parse(cachedProfile));
-    if (cachedApps) setApplications(JSON.parse(cachedApps));
   }, []);
 
   useEffect(() => {
@@ -52,20 +42,6 @@ export default function LandingPage() {
       localStorage.setItem('edu_careers_saved_ids', JSON.stringify(savedJobIds));
     }
   }, [savedJobIds]);
-
-  useEffect(() => {
-    if (userProfile) {
-      localStorage.setItem('edu_careers_profile', JSON.stringify(userProfile));
-    } else {
-      localStorage.removeItem('edu_careers_profile');
-    }
-  }, [userProfile]);
-
-  useEffect(() => {
-    if (applications.length > 0) {
-      localStorage.setItem('edu_careers_applications', JSON.stringify(applications));
-    }
-  }, [applications]);
 
   useEffect(() => {
     let cancelled = false;
@@ -136,32 +112,6 @@ export default function LandingPage() {
       setSavedJobIds([...savedJobIds, jobId]);
       triggerToast('Opportunity successfully saved to your collection.');
     }
-  };
-
-  const handleApplySuccess = (job: Job, submittedProfile: UserProfile) => {
-    const newApplication: Application = {
-      id: `app-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      jobId: job.id,
-      jobTitle: job.title,
-      department: job.department,
-      appliedDate: new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      }),
-      status: 'Submitted',
-      timeline: [
-        {
-          status: 'Submitted',
-          date: new Date().toLocaleDateString('en-US'),
-          description: 'Dossier successfully registered in the HR database.'
-        }
-      ],
-      profileSnapshot: submittedProfile
-    };
-
-    setApplications([newApplication, ...applications]);
-    triggerToast(`Successfully applied to ${job.title}! Track status under 'My Applications'`);
   };
 
   return (
@@ -241,11 +191,6 @@ export default function LandingPage() {
                 className={`text-[11px] font-semibold transition-colors flex items-center gap-1 cursor-pointer ${activeSection === 'process' ? 'text-neutral-900' : 'text-neutral-500 hover:text-neutral-900'}`}
               >
                 Application Process
-                {applications.length > 0 && (
-                  <span className="inline-flex items-center justify-center px-1.5 py-0.5 text-[9px] font-bold leading-none text-neutral-50 bg-neutral-900 rounded-full">
-                    {applications.length}
-                  </span>
-                )}
               </button>
 
               <button 
@@ -296,28 +241,28 @@ export default function LandingPage() {
               <div className="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:60px_60px] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_80%)]" />
 
               {/* Blobs */}
-              <div className="absolute -top-24 -left-24 w-80 h-80 bg-emerald-200/40 rounded-full blur-3xl pointer-events-none" /> {/* Top left green blob */}
-              <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Top left green circle outline */}
+              <div className="absolute -top-24 -left-24 w-80 h-80 bg-emerald-200/40 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -top-24 -left-24 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" />
 
-              <div className="absolute -bottom-28 -right-16 w-80 h-80 bg-emerald-200/35 rounded-full blur-3xl pointer-events-none" /> {/* Bottom right green blob */}
-              <div className="absolute -bottom-28 -right-16 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Bottom right green circle outline*/}
+              <div className="absolute -bottom-28 -right-16 w-80 h-80 bg-emerald-200/35 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-28 -right-16 w-80 h-80 rounded-full border-2 border-emerald-900/30 pointer-events-none" />
               
-              <div className="absolute top-2 right-2 sm:top-6 sm:right-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-200/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Top right yellow blob */}
-              <div className="absolute bottom-2 left-2 sm:bottom-6 sm:left-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Bottom left yellow blob */}
+              <div className="absolute top-2 right-2 sm:top-6 sm:right-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-200/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" />
+              <div className="absolute bottom-2 left-2 sm:bottom-6 sm:left-6 w-28 h-28 sm:w-40 sm:h-40 md:w-52 md:h-52 bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" />
 
-              <div className="absolute top-1 left-1/3 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-56 sm:h-56 md:w-[300px] md:h-[300px] bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Top left yellow blob */}
-              <div className="absolute bottom-1 right-1/3 w-36 h-36 sm:w-52 sm:h-52 md:w-72 md:h-72 bg-emerald-200/30 rounded-full blur-2xl sm:blur-3xl pointer-events-none" /> {/* Bottom right green blob */}
+              <div className="absolute top-1 left-1/3 -translate-x-1/2 -translate-y-1/2 w-40 h-40 sm:w-56 sm:h-56 md:w-[300px] md:h-[300px] bg-amber-100/40 rounded-full blur-2xl sm:blur-3xl pointer-events-none" />
+              <div className="absolute bottom-1 right-1/3 w-36 h-36 sm:w-52 sm:h-52 md:w-72 md:h-72 bg-emerald-200/30 rounded-full blur-2xl sm:blur-3xl pointer-events-none" />
 
-              <div className="hidden sm:block absolute top-32 sm:top-50 left-1/4 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-[100px] sm:h-[100px] rounded-full border-2 border-emerald-900/30 pointer-events-none" /> {/* Left green circle outline */}
-              <div className="hidden sm:block absolute top-40 sm:top-60 left-1/5 -translate-x-1/10 -translate-y-1/2 w-12 h-12 sm:w-[80px] sm:h-[80px] rounded-full bg-amber-400/30 pointer-events-none" /> {/* Left yellow circle */}
+              <div className="hidden sm:block absolute top-32 sm:top-50 left-1/4 -translate-x-1/2 -translate-y-1/2 w-16 h-16 sm:w-[100px] sm:h-[100px] rounded-full border-2 border-emerald-900/30 pointer-events-none" />
+              <div className="hidden sm:block absolute top-40 sm:top-60 left-1/5 -translate-x-1/10 -translate-y-1/2 w-12 h-12 sm:w-[80px] sm:h-[80px] rounded-full bg-amber-400/30 pointer-events-none" />
 
-              <div className="hidden md:block absolute -top-1 right-[22%] -translate-x-1/20 -translate-y-1/5 w-[40px] h-[40px] rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Top right green circle */}
-              <div className="absolute top-0 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[60px] h-[60px] rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Top right bigger yellow circle outline */}
-              <div className="absolute top-12 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[24px] h-[24px] rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Top right smaller yellow circle outline */}
+              <div className="hidden md:block absolute -top-1 right-[22%] -translate-x-1/20 -translate-y-1/5 w-[40px] h-[40px] rounded-full bg-emerald-900/30 pointer-events-none" />
+              <div className="absolute top-0 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[60px] h-[60px] rounded-full border-2 border-amber-400/30 pointer-events-none" />
+              <div className="absolute top-12 right-[18%] -translate-x-1/2 -translate-y-1/5 w-[24px] h-[24px] rounded-full border-2 border-amber-400/30 pointer-events-none" />
 
-              <div className="hidden sm:block absolute bottom-14 sm:bottom-20 right-[30%] w-24 h-24 sm:w-40 sm:h-40 rounded-full border-2 border-amber-400/30 pointer-events-none" /> {/* Bottom right yellow circle outline */}
-              <div className="hidden sm:block absolute bottom-32 sm:bottom-50 right-[29%] w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Bottom right green circle */}
-              <div className="hidden md:block absolute bottom-22 right-[65%] w-20 h-20 rounded-full bg-emerald-900/30 pointer-events-none" /> {/* Bottom left green bar */}
+              <div className="hidden sm:block absolute bottom-14 sm:bottom-20 right-[30%] w-24 h-24 sm:w-40 sm:h-40 rounded-full border-2 border-amber-400/30 pointer-events-none" />
+              <div className="hidden sm:block absolute bottom-32 sm:bottom-50 right-[29%] w-14 h-14 sm:w-20 sm:h-20 rounded-full bg-emerald-900/30 pointer-events-none" />
+              <div className="hidden md:block absolute bottom-22 right-[65%] w-20 h-20 rounded-full bg-emerald-900/30 pointer-events-none" />
 
               <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div className="relative w-full max-w-2xl mx-auto text-center bg-white border-2 border-emerald-950 rounded-2xl p-8 md:p-10 shadow-[6px_6px_0px_0px_#022c22]">
@@ -361,7 +306,6 @@ export default function LandingPage() {
           loading={jobsLoading}
           savedJobIds={savedJobIds}
           onToggleSave={handleToggleSave}
-          onSelectJob={setSelectedJob}
         />
         <ProcessTimeline />
         <FaqSection />
@@ -379,19 +323,6 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
-
-      {/* Job Details Modal */}
-      {selectedJob && (
-        <JobDetailsModal
-          job={selectedJob}
-          isOpen={!!selectedJob}
-          onClose={() => setSelectedJob(null)}
-          userProfile={userProfile}
-          hasApplied={applications.some(app => app.jobId === selectedJob.id)}
-          onApplySuccess={handleApplySuccess}
-          onSaveProfile={(prof) => setUserProfile(prof)}
-        />
-      )}
     </div>
   );
 }

@@ -23,14 +23,34 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ApiError, request } from "@/lib/api/client"
+import { STATUS_STYLES } from "@/components/profile/types"
+import Link from "next/link"
 
 const PAGE_SIZE = 10
+
+const STATUS_LABELS: Record<number, string> = {
+  0: "Draft",
+  1: "Pending",
+  2: "Submitted",
+  3: "Interview",
+  4: "Hired",
+  5: "Rejected",
+}
+
+function resolveStatusLabel(status: number | string): string {
+  if (typeof status === "string") return status
+  return STATUS_LABELS[status] ?? `Status ${status}`
+}
+
+function resolveStatusStyle(label: string): string {
+  return STATUS_STYLES[label] ?? "bg-muted text-muted-foreground border border-border"
+}
 
 interface JobApplicationListItem {
   id: number
   jobPostingId: number
   jobPostingTitle: string
-  status: number
+  status: number | string
   coverLetter: string | null
   createdAt: string
   updatedAt: string | null
@@ -126,18 +146,30 @@ export default function ApplicantJobApplications() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="pl-6 font-medium">{item.jobPostingTitle}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Status {item.status}</Badge>
-                      </TableCell>
-                      <TableCell>{formatDate(item.createdAt)}</TableCell>
-                      <TableCell className="pr-6 text-muted-foreground">
-                        {item.coverLetter ? item.coverLetter : "—"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {items.map((item) => {
+                    const label = resolveStatusLabel(item.status)
+                    return (
+                      <TableRow key={item.id}>
+                        <TableCell className="pl-6 font-medium">
+                          <Link
+                            href={`/job-openings/${item.jobPostingId}`}
+                            className="hover:underline"
+                          >
+                            {item.jobPostingTitle}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={resolveStatusStyle(label)}>
+                            {label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{formatDate(item.createdAt)}</TableCell>
+                        <TableCell className="pr-6 text-muted-foreground">
+                          {item.coverLetter ? item.coverLetter : "—"}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
             )}

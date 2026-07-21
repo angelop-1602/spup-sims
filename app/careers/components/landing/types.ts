@@ -135,25 +135,5 @@ export function mapApiJobToJob(apiJob: ApiJobPosting): Job {
   };
 }
 
-export interface UserProfile {
-  fullName: string;
-  email: string;
-  phone: string;
-  resumeName: string;
-  resumeContent: string; 
-  portfolioUrl?: string;
-  coverLetterText?: string;
-  education: string;
-}
 
-export interface Application {
-  id: string;
-  jobId: string;
-  jobTitle: string;
-  department: string;
-  appliedDate: string;
-  status: 'Submitted' | 'Under Review' | 'Interviewing' | 'Decision Pending' | 'Offer';
-  timeline: { status: string; date: string; description: string }[];
-  profileSnapshot: UserProfile;
-}
 

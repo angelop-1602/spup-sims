@@ -360,7 +360,7 @@ export default function JobDetailPage() {
                     Back
                   </Link>
                   <Link
-                    href="/register"
+                    href={`/job-openings/${id}/apply`}
                     className={`${epilogue.className} inline-flex items-center justify-center gap-2 px-6 py-2.5 border-2 border-emerald-950 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold rounded-xl shadow-[4px_4px_0px_0px_#022c22] transition-all duration-150 hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none`}
                   >
                     Apply Now

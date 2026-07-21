@@ -36,7 +36,6 @@ interface FeaturedJobsProps {
   loading?: boolean;
   savedJobIds: string[];
   onToggleSave: (jobId: string, e: React.MouseEvent) => void;
-  onSelectJob: (job: Job) => void;
 }
 
 function SkeletonCard() {
@@ -73,7 +72,6 @@ export default function FeaturedJobs({
   loading = false,
   savedJobIds,
   onToggleSave,
-  onSelectJob,
 }: FeaturedJobsProps) {
   const gridRef = useRef<HTMLDivElement>(null);
   const [extraPadding, setExtraPadding] = useState(0);
@@ -187,14 +185,13 @@ export default function FeaturedJobs({
                               Posted {job.postedDate || "Recently"}
                             </span>
 
-                            <button
-                              type="button"
-                              onClick={() => onSelectJob(job)}
+                            <Link
+                              href={`/job-openings/${job.id}`}
                               className="inline-flex items-center gap-1 text-xs font-bold text-emerald-900 hover:text-emerald-950 uppercase tracking-wider group/btn"
                             >
                               View Details
                               <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-1" />
-                            </button>
+                            </Link>
                           </div>
                         </div>
                       </div>
