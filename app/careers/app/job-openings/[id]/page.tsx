@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -13,15 +13,15 @@ import {
   Building2,
   Clock,
   SearchX,
-  Loader2,
 } from "lucide-react";
 import { Instrument_Serif, Poppins, Epilogue } from "next/font/google";
 import {
   Job,
   SingleJobPostingApiResponse,
-  JobPostingsApiResponse,
   mapApiJobToJob,
 } from "@/components/landing/types";
+import { AccountMenu } from "@/components/auth/account-menu";
+import { logout, useAuthStatus } from "@/hooks/use-auth-status";
 
 const instrumentSerif = Instrument_Serif({
   subsets: ["latin"],
@@ -66,7 +66,13 @@ function DetailSkeleton() {
 
 export default function JobDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = params?.id as string;
+  const { status, profile: authProfile } = useAuthStatus();
+  const displayName = authProfile
+    ? `${authProfile.profile.firstName} ${authProfile.profile.lastName}`.trim()
+    : "Applicant User";
+  const emailLabel = authProfile?.profile.personalEmail || "";
 
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
@@ -149,12 +155,21 @@ export default function JobDetailPage() {
               >
                 Job Openings
               </Link>
-              <a
-                href="/register"
-                className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-neutral-800 rounded-md transition-colors cursor-pointer shadow-sm"
-              >
-                Login / Register
-              </a>
+
+              {status === "authenticated" ? (
+                <AccountMenu
+                  displayName={displayName}
+                  email={emailLabel}
+                  onLogout={() => logout(router)}
+                />
+              ) : (
+                <a
+                  href="/register"
+                  className="inline-flex items-center justify-center px-3.5 py-1.5 text-xs font-semibold text-white bg-neutral-900 hover:bg-neutral-800 rounded-md transition-colors cursor-pointer shadow-sm"
+                >
+                  Login / Register
+                </a>
+              )}
             </nav>
           </div>
         </div>
