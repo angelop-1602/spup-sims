@@ -7,7 +7,7 @@ import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
   return (
     <nav
-      aria-label="breadcrumb"
+      aria-label="Breadcrumb"
       data-slot="breadcrumb"
       className={cn(className)}
       {...props}
@@ -20,7 +20,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground sm:gap-2.5",
+        "flex flex-wrap items-center gap-1.5 text-xs/relaxed wrap-break-word text-muted-foreground",
         className
       )}
       {...props}
@@ -32,7 +32,7 @@ function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
   return (
     <li
       data-slot="breadcrumb-item"
-      className={cn("inline-flex items-center gap-1.5", className)}
+      className={cn("inline-flex items-center gap-1", className)}
       {...props}
     />
   )
@@ -50,7 +50,10 @@ function BreadcrumbLink({
   return (
     <Comp
       data-slot="breadcrumb-link"
-      className={cn("transition-colors hover:text-foreground", className)}
+      className={cn(
+        "rounded-sm transition-colors hover:text-foreground hover:underline hover:underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+        className
+      )}
       {...props}
     />
   )
@@ -60,10 +63,8 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="breadcrumb-page"
-      role="link"
-      aria-disabled="true"
       aria-current="page"
-      className={cn("font-normal text-foreground", className)}
+      className={cn("block max-w-56 truncate font-medium text-foreground", className)}
       {...props}
     />
   )
@@ -99,7 +100,7 @@ function BreadcrumbEllipsis({
       role="presentation"
       aria-hidden="true"
       className={cn(
-        "flex size-5 items-center justify-center [&>svg]:size-4",
+        "flex size-4 items-center justify-center [&>svg]:size-3.5",
         className
       )}
       {...props}

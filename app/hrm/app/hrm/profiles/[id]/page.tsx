@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { PermissionGuard } from "@/components/auth/permission-guard"
-import { ApiErrorView } from "@/components/ui/error-page"
+import { ApiErrorView } from "@/components/ui/api-error-view"
 
 // ─── Interfaces ────────────────────────────────────────────────
 
@@ -53,11 +53,14 @@ interface InterviewSchedule {
   createdAt: string
 }
 
-type PagedRecords<TRecord> = Omit<
-  components["schemas"]["PagedResponseOfAcademicTermResponse"],
-  "data"
-> & {
+type PagedRecords<TRecord> = {
   data: TRecord[]
+  page: number | string
+  pageSize: number | string
+  totalRecords: number | string
+  totalPages: number | string
+  success?: boolean
+  message?: string
 }
 
 type ProfileRecord = ProfileValues

@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useMsal } from "@azure/msal-react"
-import type { components } from "./schema"
+import * as React from "react";
+import { useMsal } from "@azure/msal-react";
+import type { components } from "./schema";
 
 /**
  * Error thrown by {@link request} when the response is not OK or the API
@@ -10,14 +10,14 @@ import type { components } from "./schema"
  * callers can branch on the failure reason.
  */
 export class ApiError extends Error {
-  status: number
-  detail?: unknown
+  status: number;
+  detail?: unknown;
 
   constructor(message: string, status: number, detail?: unknown) {
-    super(message)
-    this.name = "ApiError"
-    this.status = status
-    this.detail = detail
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.detail = detail;
   }
 }
 
@@ -26,11 +26,11 @@ export class ApiError extends Error {
  * used across the HRM pages: a comma/space-separated env var with a
  * `User.Read` fallback.
  */
-const API_SCOPES =
-  process.env.NEXT_PUBLIC_API_SCOPES?.split(/[\s,]+/).filter(Boolean) ??
-  ["User.Read"]
+const API_SCOPES = process.env.NEXT_PUBLIC_API_SCOPES?.split(/[\s,]+/).filter(
+  Boolean,
+) ?? ["User.Read"];
 
-type ApiEnvelope = components["schemas"]["ApiResponseOfAttendanceResponse"]
+type ApiEnvelope = components["schemas"]["ApiResponseOfAttendanceResponse"];
 
 /**
  * Returns a memoized callback that acquires a bearer token for the current
@@ -39,35 +39,35 @@ type ApiEnvelope = components["schemas"]["ApiResponseOfAttendanceResponse"]
  * request.
  */
 export function useAuthorizedHeaders() {
-  const { accounts, instance } = useMsal()
-  const account = accounts[0]
+  const { accounts, instance } = useMsal();
+  const account = accounts[0];
 
   const headers = React.useCallback(async () => {
     if (!account) {
-      throw new Error("No authenticated account available")
+      throw new Error("No authenticated account available");
     }
 
     const result = await instance.acquireTokenSilent({
       scopes: API_SCOPES,
       account,
-    })
+    });
 
     return {
       Authorization: `Bearer ${result.accessToken}`,
       "Content-Type": "application/json",
       Accept: "application/json",
-    }
-  }, [account, instance])
+    };
+  }, [account, instance]);
 
-  return { headers, account }
+  return { headers, account };
 }
 
 type RequestOptions = {
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
-  params?: Record<string, string | number | boolean | undefined | null>
-  body?: unknown
-  signal?: AbortSignal
-}
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  params?: Record<string, string | number | boolean | undefined | null>;
+  body?: unknown;
+  signal?: AbortSignal;
+};
 
 /**
  * Thin, typed wrapper around `fetch` for the SIMS API.
@@ -87,23 +87,23 @@ export async function request<T>(
   authorize: () => Promise<Record<string, string>>,
   { method = "GET", params, body, signal }: RequestOptions = {},
 ): Promise<T> {
-  const url = new URL(path, window.location.origin)
+  const url = new URL(path, window.location.origin);
 
   if (params) {
-    const search = new URLSearchParams()
+    const search = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
-      if (value === undefined || value === null) continue
-      search.set(key, String(value))
+      if (value === undefined || value === null) continue;
+      search.set(key, String(value));
     }
-    url.search = search.toString()
+    url.search = search.toString();
   }
 
-  const headers = await authorize()
-  const isFormData = body instanceof FormData
+  const headers = await authorize();
+  const isFormData = body instanceof FormData;
 
   if (isFormData) {
     // Let fetch set its own Content-Type with the multipart boundary.
-    delete headers["Content-Type"]
+    delete headers["Content-Type"];
   }
 
   const response = await fetch(url.toString(), {
@@ -111,22 +111,43 @@ export async function request<T>(
     headers,
     cache: "no-store",
     signal,
-    body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
-  })
+    body:
+      body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
+  });
 
-  let payload: ApiEnvelope | null = null
+  let payload: ApiEnvelope | null = null;
   try {
-    payload = (await response.json()) as ApiEnvelope
+    payload = (await response.json()) as ApiEnvelope;
   } catch {
     // Non-JSON response (e.g. an empty body on 240/304). Fall through to the
     // status-based error below.
   }
 
   if (!response.ok) {
+    // Business-rule errors (PlatformException) come back as an ASP.NET
+    // ProblemDetails body ({ title, detail }), not the { success, message }
+    // envelope other endpoints use — fall back to `detail`/`title` so those
+    // messages aren't swallowed as a generic "Request failed (400)".
+    //
+    // Model-binding validation failures ([Required] etc., caught before FluentValidation
+    // ever runs) come back as ValidationProblemDetails instead: detail is just "One or more
+    // validation errors occurred." with the real reason in `errors: { FieldName: [messages] }`
+    // — fold those in so the actual field/reason isn't hidden behind a generic sentence.
+    const problemDetails = payload as unknown as {
+      title?: string;
+      detail?: string;
+      errors?: Record<string, string[]>;
+    } | null;
+    const fieldErrors = problemDetails?.errors
+      ? Object.values(problemDetails.errors).flat().join(" ")
+      : "";
     const message =
       (payload && typeof payload.message === "string" && payload.message) ||
-      `Request failed (${response.status})`
-    throw new ApiError(message, response.status, payload)
+      fieldErrors ||
+      (problemDetails && typeof problemDetails.detail === "string" && problemDetails.detail) ||
+      (problemDetails && typeof problemDetails.title === "string" && problemDetails.title) ||
+      `Request failed (${response.status})`;
+    throw new ApiError(message, response.status, payload);
   }
 
   if (payload && payload.success === false) {
@@ -134,8 +155,9 @@ export async function request<T>(
       payload.message || "Request failed",
       response.status,
       payload,
-    )
+    );
   }
 
-  return (payload?.data ?? null) as T
+  return (payload?.data ?? null) as T;
 }
+

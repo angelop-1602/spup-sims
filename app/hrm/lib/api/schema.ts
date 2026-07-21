@@ -248,6 +248,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/applicant/resend-verification": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Resend email verification link. Safe to call when the original link has expired.
+         *     Always returns 200 so as not to reveal whether the address has an account.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ResendVerificationRequest"];
+                    "text/json": components["schemas"]["ResendVerificationRequest"];
+                    "application/*+json": components["schemas"]["ResendVerificationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/applicant/reset-password": {
         parameters: {
             query?: never;
@@ -457,9 +500,57 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Returns all uploaded documents for the authenticated applicant,
+         *     including a checklist of which requirements have been submitted.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
         get?: never;
         put?: never;
-        /** Upload applicant document */
+        /** Upload or replace your Resume. PDF, DOC, DOCX, JPG, PNG — max 10 MB. REQUIRED. */
         post: {
             parameters: {
                 query?: never;
@@ -476,8 +567,8 @@ export interface paths {
                 };
             };
             responses: {
-                /** @description Created */
-                201: {
+                /** @description OK */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -505,8 +596,60 @@ export interface paths {
                         "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
-                /** @description Unprocessable Entity */
-                422: {
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/application-letter": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload or replace your Application Letter. PDF, DOC, DOCX — max 10 MB. REQUIRED. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -519,6 +662,447 @@ export interface paths {
             };
         };
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/transcript-of-records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload or replace your Transcript of Records. PDF, JPG, PNG — max 10 MB. REQUIRED. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/diploma": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload or replace your Diploma. PDF, JPG, PNG — max 10 MB. REQUIRED. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/prc-id": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload or replace your PRC ID. PDF, JPG, PNG — max 10 MB. If applicable. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/certificate-of-employment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload or replace your Certificate of Employment. PDF, JPG, PNG — max 10 MB. If applicable. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/latest-performance-rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload or replace your Latest Performance Rating. PDF, JPG, PNG — max 10 MB. If applicable. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/certificates-of-training": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload or replace your Certificates of Training. PDF, JPG, PNG — max 10 MB. If applicable. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/documents/{requirementName}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete one of your uploaded documents by requirement name
+         *     (e.g. "Resume", "Diploma", "PRC ID").
+         *     Only optional / conditional documents can be deleted; required documents must be replaced
+         *     via the upload endpoints rather than deleted outright.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    requirementName: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -575,7 +1159,67 @@ export interface paths {
                 };
             };
         };
-        put?: never;
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ProfileRequest"];
+                    "text/json": components["schemas"]["ProfileRequest"];
+                    "application/*+json": components["schemas"]["ProfileRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         post?: never;
         delete?: never;
         options?: never;
@@ -616,9 +1260,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -657,9 +1301,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -1777,11 +2421,14 @@ export interface paths {
                     Search?: string;
                     SortBy?: string;
                     Descending?: boolean;
+                    DepartmentId?: number | string;
+                    PositionId?: number | string;
                     EmployeeTypeId?: number | string;
                     EmploymentStatus?: components["schemas"]["EmploymentStatus"];
                     IsActive?: boolean;
                     DateHiredFrom?: string;
                     DateHiredTo?: string;
+                    SchoolYearId?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -2144,7 +2791,13 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody?: {
+                content: {
+                    "application/json": null | components["schemas"]["EmployeeStatusChangeRequest"];
+                    "text/json": null | components["schemas"]["EmployeeStatusChangeRequest"];
+                    "application/*+json": null | components["schemas"]["EmployeeStatusChangeRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -2227,7 +2880,13 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody?: {
+                content: {
+                    "application/json": null | components["schemas"]["EmployeeStatusChangeRequest"];
+                    "text/json": null | components["schemas"]["EmployeeStatusChangeRequest"];
+                    "application/*+json": null | components["schemas"]["EmployeeStatusChangeRequest"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -2667,9 +3326,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -2711,9 +3370,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -3488,7 +4147,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Uploads/registers an employee document; stored in EmployeeDocuments. */
+        /** Uploads an employee document as a multipart file. The server generates the storage path. */
         post: {
             parameters: {
                 query?: never;
@@ -3498,14 +4157,15 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CreateEmployeeDocumentRequest"];
-                    "text/json": components["schemas"]["CreateEmployeeDocumentRequest"];
-                    "application/*+json": components["schemas"]["CreateEmployeeDocumentRequest"];
+                    "multipart/form-data": {
+                        /** Format: binary */
+                        file: string;
+                    };
                 };
             };
             responses: {
-                /** @description OK */
-                200: {
+                /** @description Created */
+                201: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -3513,6 +4173,39 @@ export interface paths {
                         "text/plain": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
                         "application/json": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
                         "text/json": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -3559,6 +4252,50 @@ export interface paths {
                         "text/json": components["schemas"]["ApiResponseOfEmployeeDocumentResponse"];
                     };
                 };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
             };
         };
         post?: never;
@@ -3573,12 +4310,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -3716,141 +4486,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/hrms/schedules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    EmployeeId?: number | string;
-                    SchoolYearId?: number | string;
-                    DayOfWeek?: string;
-                    ScheduleType?: components["schemas"]["EmployeeScheduleType"];
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeScheduleResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeScheduleResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeScheduleResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateEmployeeScheduleRequest"];
-                    "text/json": components["schemas"]["CreateEmployeeScheduleRequest"];
-                    "application/*+json": components["schemas"]["CreateEmployeeScheduleRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEmployeeScheduleResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfEmployeeScheduleResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfEmployeeScheduleResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/hrms/schedules/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateEmployeeScheduleRequest"];
-                    "text/json": components["schemas"]["UpdateEmployeeScheduleRequest"];
-                    "application/*+json": components["schemas"]["UpdateEmployeeScheduleRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfEmployeeScheduleResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfEmployeeScheduleResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfEmployeeScheduleResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/hrms/employee-types": {
         parameters: {
             query?: never;
@@ -3982,6 +4617,8 @@ export interface paths {
                     PageSize?: number | string;
                     EmployeeId?: number | string;
                     SchoolYearId?: number | string;
+                    DepartmentId?: number | string;
+                    IsDepartmentHead?: boolean;
                     Status?: components["schemas"]["EmploymentStatus"];
                 };
                 header?: never;
@@ -4206,12 +4843,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -4256,9 +4926,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -4300,9 +4970,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -4360,9 +5030,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -4404,9 +5074,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -4568,12 +5238,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -4618,9 +5321,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -4662,9 +5365,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -4722,9 +5425,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -4766,9 +5469,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -4915,12 +5618,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -4965,9 +5701,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -5009,9 +5745,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -5156,12 +5892,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -5206,9 +5975,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -5250,9 +6019,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -5397,12 +6166,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -5447,9 +6249,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -5491,9 +6293,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -5638,12 +6440,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -5688,9 +6523,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -5732,9 +6567,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -5879,12 +6714,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -5929,9 +6797,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -5973,9 +6841,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -6120,12 +6988,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -6170,9 +7071,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -6214,9 +7115,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -6361,12 +7262,45 @@ export interface paths {
             };
             requestBody?: never;
             responses: {
-                /** @description OK */
-                200: {
+                /** @description No Content */
+                204: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -6411,9 +7345,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -6455,9 +7389,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Not Found */
@@ -6494,11 +7428,14 @@ export interface paths {
                     Search?: string;
                     SortBy?: string;
                     Descending?: boolean;
+                    DepartmentId?: number | string;
+                    PositionId?: number | string;
                     EmployeeTypeId?: number | string;
                     EmploymentStatus?: components["schemas"]["EmploymentStatus"];
                     IsActive?: boolean;
                     DateHiredFrom?: string;
                     DateHiredTo?: string;
+                    SchoolYearId?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -6662,10 +7599,8 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Returns Microsoft Entra ID users eligible for HRMS faculty onboarding.
-         *     Eligible users must be account-enabled, hold a M365EDU_A3_FACULTY or
-         *     STANDARDWOFFPACK_FACULTY license, and must not already have an HRMS
-         *     account or a pending invitation.
+         * Returns Microsoft Entra ID users eligible for HRMS faculty onboarding,
+         *     served from the local cache table. Call /sync first to refresh from Graph.
          */
         get: {
             parameters: {
@@ -6713,6 +7648,72 @@ export interface paths {
                         "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/azure/eligible-users/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refreshes the local eligible-users cache by pulling the latest data from
+         *     Microsoft Graph. Run this before browsing or importing to ensure the list
+         *     is up to date. Returns the count of users upserted.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfAzureSyncResult"];
+                        "application/json": components["schemas"]["ApiResponseOfAzureSyncResult"];
+                        "text/json": components["schemas"]["ApiResponseOfAzureSyncResult"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
                 /** @description Bad Gateway */
                 502: {
                     headers: {
@@ -6726,8 +7727,6 @@ export interface paths {
                 };
             };
         };
-        put?: never;
-        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -6942,6 +7941,1857 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/hrms/job-postings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List job postings. HR can see all statuses; filter by status and/or search term. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Search?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                    Status?: components["schemas"]["JobPostingStatus"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /** Create a job posting. Defaults to Draft status. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateJobPostingRequest"];
+                    "text/json": components["schemas"]["CreateJobPostingRequest"];
+                    "application/*+json": components["schemas"]["CreateJobPostingRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-postings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single job posting by id. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        /** Update a job posting. Cannot update a Closed posting. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateJobPostingRequest"];
+                    "text/json": components["schemas"]["UpdateJobPostingRequest"];
+                    "application/*+json": components["schemas"]["UpdateJobPostingRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** Soft-delete a job posting. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-postings/{id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish a Draft job posting so applicants can see and apply to it. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-postings/{id}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Close a Published job posting, stopping new applications. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List all job applications. Filterable by jobPostingId, status, and search.
+         *     Returns internal remarks.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Search?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                    JobPostingId?: number | string;
+                    Status?: components["schemas"]["JobApplicationStatus"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single job application including internal HR remarks. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        /** Update the status and/or internal remarks of a job application. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateJobApplicationRequest"];
+                    "text/json": components["schemas"]["UpdateJobApplicationRequest"];
+                    "application/*+json": components["schemas"]["UpdateJobApplicationRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications/{id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark application as Reviewing (from Pending). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications/{id}/shortlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark application as Shortlisted (from Reviewing). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject an application (from Pending, Reviewing, or Shortlisted). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications/{id}/hire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Hire the applicant: creates an Employee record from the applicant's existing Profile
+         *     (no profile duplication), writes the new EmployeeId back onto the application,
+         *     and transitions status to Hired. Runs in a transaction.
+         *     Requires `hrms.recruitment.applications.hire`.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["HireApplicantRequest"];
+                    "text/json": components["schemas"]["HireApplicantRequest"];
+                    "application/*+json": components["schemas"]["HireApplicantRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfHireApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfHireApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfHireApplicantResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications/{id}/interviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List interview schedules for a specific job application. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Search?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                    SchoolYearId?: number | string;
+                    Status?: string;
+                };
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfInterviewScheduleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfInterviewScheduleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfInterviewScheduleResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Schedule an interview for this application.
+         *     The `employeeApplicantId` is derived server-side from the application — do not pass it in the body.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateNestedInterviewScheduleRequest"];
+                    "text/json": components["schemas"]["CreateNestedInterviewScheduleRequest"];
+                    "application/*+json": components["schemas"]["CreateNestedInterviewScheduleRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hrms/job-applications/{id}/interviews/{scheduleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update an interview tied to this application. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    scheduleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["UpdateNestedInterviewScheduleRequest"];
+                    "text/json": components["schemas"]["UpdateNestedInterviewScheduleRequest"];
+                    "application/*+json": components["schemas"]["UpdateNestedInterviewScheduleRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        /** Soft-delete an interview tied to this application. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                    scheduleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/job-applications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the authenticated applicant's own job applications. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Search?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                    SchoolYearId?: number | string;
+                    Status?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Apply to a published job posting. Returns 409 if the applicant has already applied
+         *     to the same posting. Returns 400 if the posting is not Published or the deadline has passed.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ApplyToJobRequest"];
+                    "text/json": components["schemas"]["ApplyToJobRequest"];
+                    "application/*+json": components["schemas"]["ApplyToJobRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/job-applications/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated applicant's own job application by id. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/job-applications/{id}/withdraw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Withdraw own job application. Only allowed while status is Pending or Reviewing. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/job-postings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List published job postings. Publicly accessible — no authentication required.
+         *     Supports search and pagination.
+         */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Search?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                    Status?: components["schemas"]["JobPostingStatus"];
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Unprocessable Entity */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/applicant/job-postings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a single published job posting. Returns 404 if the posting is not Published. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfJobPostingResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/hrms/leave-applications": {
         parameters: {
             query?: never;
@@ -7040,9 +9890,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7273,9 +10123,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -7332,9 +10182,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7365,9 +10215,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -7492,9 +10342,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7525,9 +10375,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -7582,9 +10432,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7615,9 +10465,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -7743,9 +10593,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7776,9 +10626,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -7833,9 +10683,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -7866,9 +10716,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -7921,9 +10771,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -8020,9 +10870,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -8312,9 +11162,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -8427,9 +11277,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -8469,9 +11319,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -8502,9 +11352,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unprocessable Entity */
@@ -8546,9 +11396,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -8579,9 +11429,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiErrorResponse"];
-                        "application/json": components["schemas"]["ApiErrorResponse"];
-                        "text/json": components["schemas"]["ApiErrorResponse"];
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
             };
@@ -8739,31 +11589,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfProfileResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfProfileResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfProfileResponse"];
                     };
                 };
             };
@@ -8778,76 +11606,21 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateProfileRequest"];
+                    "text/json": components["schemas"]["CreateProfileRequest"];
+                    "application/*+json": components["schemas"]["CreateProfileRequest"];
                 };
             };
             responses: {
-                /** @description Created */
-                201: {
+                /** @description OK */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfProfileResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProfileResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProfileResponse"];
                     };
                 };
             };
@@ -8882,42 +11655,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfProfileResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProfileResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProfileResponse"];
                     };
                 };
             };
@@ -8933,9 +11673,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateProfileRequest"];
+                    "text/json": components["schemas"]["UpdateProfileRequest"];
+                    "application/*+json": components["schemas"]["UpdateProfileRequest"];
                 };
             };
             responses: {
@@ -8945,64 +11685,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfProfileResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProfileResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProfileResponse"];
                     };
                 };
             };
@@ -9025,39 +11710,6 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
                 };
             };
         };
@@ -9989,30 +12641,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/identity/roles/{id}/departments": {
+    "/api/v1/identity/roles/{roleId}/permissions": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put: {
+        get: {
             parameters: {
                 query?: never;
                 header?: never;
                 path: {
-                    id: number;
+                    roleId: number;
                 };
                 cookie?: never;
             };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["SetRoleDepartmentsRequest"];
-                    "text/json": components["schemas"]["SetRoleDepartmentsRequest"];
-                    "application/*+json": components["schemas"]["SetRoleDepartmentsRequest"];
-                };
-            };
+            requestBody?: never;
             responses: {
                 /** @description OK */
                 200: {
@@ -10020,20 +12665,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfRoleResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfRoleResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfRoleResponse"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfRolePermissionsResponse"];
                     };
                 };
                 /** @description Unauthorized */
@@ -10071,6 +12705,7 @@ export interface paths {
                 };
             };
         };
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -10374,165 +13009,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/organization/colleges": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCollegeResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCollegeResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCollegeResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateCollegeRequest"];
-                    "text/json": components["schemas"]["CreateCollegeRequest"];
-                    "application/*+json": components["schemas"]["CreateCollegeRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCollegeResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCollegeResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCollegeResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/organization/colleges/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCollegeResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCollegeResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCollegeResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateCollegeRequest"];
-                    "text/json": components["schemas"]["UpdateCollegeRequest"];
-                    "application/*+json": components["schemas"]["UpdateCollegeRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCollegeResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCollegeResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCollegeResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/organization/departments": {
         parameters: {
             query?: never;
@@ -10692,7 +13168,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/organization/designations": {
+    "/api/v1/organization/positions": {
         parameters: {
             query?: never;
             header?: never;
@@ -10722,9 +13198,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDesignationResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDesignationResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDesignationResponse"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfPositionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfPositionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfPositionResponse"];
                     };
                 };
             };
@@ -10739,9 +13215,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["CreateDesignationRequest"];
-                    "text/json": components["schemas"]["CreateDesignationRequest"];
-                    "application/*+json": components["schemas"]["CreateDesignationRequest"];
+                    "application/json": components["schemas"]["CreatePositionRequest"];
+                    "text/json": components["schemas"]["CreatePositionRequest"];
+                    "application/*+json": components["schemas"]["CreatePositionRequest"];
                 };
             };
             responses: {
@@ -10751,9 +13227,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDesignationResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfDesignationResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "text/plain": components["schemas"]["ApiResponseOfPositionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPositionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPositionResponse"];
                     };
                 };
             };
@@ -10764,7 +13240,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/organization/designations/{id}": {
+    "/api/v1/organization/positions/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -10788,9 +13264,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDesignationResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfDesignationResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "text/plain": components["schemas"]["ApiResponseOfPositionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPositionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPositionResponse"];
                     };
                 };
             };
@@ -10806,9 +13282,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": components["schemas"]["UpdateDesignationRequest"];
-                    "text/json": components["schemas"]["UpdateDesignationRequest"];
-                    "application/*+json": components["schemas"]["UpdateDesignationRequest"];
+                    "application/json": components["schemas"]["UpdatePositionRequest"];
+                    "text/json": components["schemas"]["UpdatePositionRequest"];
+                    "application/*+json": components["schemas"]["UpdatePositionRequest"];
                 };
             };
             responses: {
@@ -10818,9 +13294,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDesignationResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfDesignationResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfDesignationResponse"];
+                        "text/plain": components["schemas"]["ApiResponseOfPositionResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPositionResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPositionResponse"];
                     };
                 };
             };
@@ -10843,6 +13319,140 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organization/positions/{positionId}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the roles auto-granted to employees assigned this position. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    positionId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organization/positions/{positionId}/roles/{roleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Maps a role to this position; employees assigned this position auto-receive the role. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    positionId: number;
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    positionId: number;
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
             };
         };
@@ -10881,36 +13491,19 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantResponse"];
                     };
                 };
             };
         };
         put?: never;
+        /**
+         * HR-side manual creation of an applicant record (e.g., walk-in applicants).
+         *     The record has no login credential — self-service applicants must register via
+         *     `POST /api/v1/applicant/register` instead.
+         */
         post: {
             parameters: {
                 query?: never;
@@ -10920,76 +13513,21 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateEmployeeApplicantRequest"];
+                    "text/json": components["schemas"]["CreateEmployeeApplicantRequest"];
+                    "application/*+json": components["schemas"]["CreateEmployeeApplicantRequest"];
                 };
             };
             responses: {
-                /** @description Created */
-                201: {
+                /** @description OK */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
                     };
                 };
             };
@@ -11024,42 +13562,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
                     };
                 };
             };
@@ -11075,9 +13580,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateEmployeeApplicantRequest"];
+                    "text/json": components["schemas"]["UpdateEmployeeApplicantRequest"];
+                    "application/*+json": components["schemas"]["UpdateEmployeeApplicantRequest"];
                 };
             };
             responses: {
@@ -11087,64 +13592,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantResponse"];
                     };
                 };
             };
@@ -11167,39 +13617,6 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
                 };
             };
         };
@@ -11238,31 +13655,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantDocumentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantDocumentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantDocumentResponse"];
                     };
                 };
             };
@@ -11277,76 +13672,21 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateEmployeeApplicantDocumentRequest"];
+                    "text/json": components["schemas"]["CreateEmployeeApplicantDocumentRequest"];
+                    "application/*+json": components["schemas"]["CreateEmployeeApplicantDocumentRequest"];
                 };
             };
             responses: {
-                /** @description Created */
-                201: {
+                /** @description OK */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
                     };
                 };
             };
@@ -11381,42 +13721,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
                     };
                 };
             };
@@ -11432,9 +13739,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateEmployeeApplicantDocumentRequest"];
+                    "text/json": components["schemas"]["UpdateEmployeeApplicantDocumentRequest"];
+                    "application/*+json": components["schemas"]["UpdateEmployeeApplicantDocumentRequest"];
                 };
             };
             responses: {
@@ -11444,64 +13751,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantDocumentResponse"];
                     };
                 };
             };
@@ -11524,39 +13776,6 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
                 };
             };
         };
@@ -11595,31 +13814,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantStatusHistoryResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantStatusHistoryResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfEmployeeApplicantStatusHistoryResponse"];
                     };
                 };
             };
@@ -11634,76 +13831,21 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateEmployeeApplicantStatusHistoryRequest"];
+                    "text/json": components["schemas"]["CreateEmployeeApplicantStatusHistoryRequest"];
+                    "application/*+json": components["schemas"]["CreateEmployeeApplicantStatusHistoryRequest"];
                 };
             };
             responses: {
-                /** @description Created */
-                201: {
+                /** @description OK */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantStatusHistoryResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantStatusHistoryResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantStatusHistoryResponse"];
                     };
                 };
             };
@@ -11738,131 +13880,14 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfEmployeeApplicantStatusHistoryResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfEmployeeApplicantStatusHistoryResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfEmployeeApplicantStatusHistoryResponse"];
                     };
                 };
             };
         };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
+        put?: never;
         post?: never;
         delete: {
             parameters: {
@@ -11881,39 +13906,6 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
                 };
             };
         };
@@ -11952,31 +13944,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfInterviewScheduleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfInterviewScheduleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfInterviewScheduleResponse"];
                     };
                 };
             };
@@ -11991,76 +13961,21 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["CreateInterviewScheduleRequest"];
+                    "text/json": components["schemas"]["CreateInterviewScheduleRequest"];
+                    "application/*+json": components["schemas"]["CreateInterviewScheduleRequest"];
                 };
             };
             responses: {
-                /** @description Created */
-                201: {
+                /** @description OK */
+                200: {
                     headers: {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
                     };
                 };
             };
@@ -12095,42 +14010,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
                     };
                 };
             };
@@ -12146,9 +14028,9 @@ export interface paths {
             };
             requestBody: {
                 content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
+                    "application/json": components["schemas"]["UpdateInterviewScheduleRequest"];
+                    "text/json": components["schemas"]["UpdateInterviewScheduleRequest"];
+                    "application/*+json": components["schemas"]["UpdateInterviewScheduleRequest"];
                 };
             };
             responses: {
@@ -12158,64 +14040,9 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
+                        "text/plain": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfInterviewScheduleResponse"];
                     };
                 };
             };
@@ -12238,39 +14065,6 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
                 };
             };
         };
@@ -12886,165 +14680,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/sis/students": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateStudentRequest"];
-                    "text/json": components["schemas"]["CreateStudentRequest"];
-                    "application/*+json": components["schemas"]["CreateStudentRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sis/students/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateStudentRequest"];
-                    "text/json": components["schemas"]["UpdateStudentRequest"];
-                    "application/*+json": components["schemas"]["UpdateStudentRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfStudentResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v1/academic/school-years": {
         parameters: {
             query?: never;
@@ -13052,6 +14687,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Lists all school years. */
         get: {
             parameters: {
                 query?: {
@@ -13080,9 +14716,32 @@ export interface paths {
                         "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSchoolYearResponse"];
                     };
                 };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
             };
         };
         put?: never;
+        /** Creates a new school year. */
         post: {
             parameters: {
                 query?: never;
@@ -13109,6 +14768,39 @@ export interface paths {
                         "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
                     };
                 };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
             };
         };
         delete?: never;
@@ -13124,6 +14816,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /** Gets a single school year by ID. */
         get: {
             parameters: {
                 query?: never;
@@ -13146,1053 +14839,6 @@ export interface paths {
                         "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
                     };
                 };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateSchoolYearRequest"];
-                    "text/json": components["schemas"]["UpdateSchoolYearRequest"];
-                    "application/*+json": components["schemas"]["UpdateSchoolYearRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/academic-terms": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateAcademicTermRequest"];
-                    "text/json": components["schemas"]["CreateAcademicTermRequest"];
-                    "application/*+json": components["schemas"]["CreateAcademicTermRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/academic-terms/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateAcademicTermRequest"];
-                    "text/json": components["schemas"]["UpdateAcademicTermRequest"];
-                    "application/*+json": components["schemas"]["UpdateAcademicTermRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfAcademicTermResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/programs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateProgramRequest"];
-                    "text/json": components["schemas"]["CreateProgramRequest"];
-                    "application/*+json": components["schemas"]["CreateProgramRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/programs/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateProgramRequest"];
-                    "text/json": components["schemas"]["UpdateProgramRequest"];
-                    "application/*+json": components["schemas"]["UpdateProgramRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curricula": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateCurriculumRequest"];
-                    "text/json": components["schemas"]["CreateCurriculumRequest"];
-                    "application/*+json": components["schemas"]["CreateCurriculumRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curricula/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateCurriculumRequest"];
-                    "text/json": components["schemas"]["UpdateCurriculumRequest"];
-                    "application/*+json": components["schemas"]["UpdateCurriculumRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/subjects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateSubjectRequest"];
-                    "text/json": components["schemas"]["CreateSubjectRequest"];
-                    "application/*+json": components["schemas"]["CreateSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/subjects/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateSubjectRequest"];
-                    "text/json": components["schemas"]["UpdateSubjectRequest"];
-                    "application/*+json": components["schemas"]["UpdateSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSubjectResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curriculum-subjects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateCurriculumSubjectRequest"];
-                    "text/json": components["schemas"]["CreateCurriculumSubjectRequest"];
-                    "application/*+json": components["schemas"]["CreateCurriculumSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/curriculum-subjects/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateCurriculumSubjectRequest"];
-                    "text/json": components["schemas"]["UpdateCurriculumSubjectRequest"];
-                    "application/*+json": components["schemas"]["UpdateCurriculumSubjectRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfCurriculumSubjectResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/sections": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["CreateSectionRequest"];
-                    "text/json": components["schemas"]["CreateSectionRequest"];
-                    "application/*+json": components["schemas"]["CreateSectionRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/academic/sections/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": components["schemas"]["UpdateSectionRequest"];
-                    "text/json": components["schemas"]["UpdateSectionRequest"];
-                    "application/*+json": components["schemas"]["UpdateSectionRequest"];
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfSectionResponse"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
                 /** @description Unauthorized */
                 401: {
                     headers: {
@@ -14213,2172 +14859,6 @@ export interface paths {
                         "text/plain": components["schemas"]["ProblemDetails"];
                         "application/json": components["schemas"]["ProblemDetails"];
                         "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollments/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollment-subjects": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/enrollment/enrollment-subjects/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/classes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/classes/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/class-schedules": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/classes/class-schedules/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grades": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grades/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grade-components": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: {
-                    Page?: number | string;
-                    PageSize?: number | string;
-                    Search?: string;
-                    SortBy?: string;
-                    Descending?: boolean;
-                    SchoolYearId?: number | string;
-                    Status?: string;
-                };
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path?: never;
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description Created */
-                201: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Conflict */
-                409: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/grading/grade-components/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody: {
-                content: {
-                    "application/json": Record<string, never>;
-                    "text/json": Record<string, never>;
-                    "application/*+json": Record<string, never>;
-                };
-            };
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "application/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                        "text/json": components["schemas"]["ApiResponseOfDictionaryOfstringAndObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unprocessable Entity */
-                422: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        post?: never;
-        delete: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description No Content */
-                204: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content?: never;
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/avatars/{profileId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get user avatar/profile picture by profile ID (public access, no authentication required) */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    profileId: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["FileStreamResult"];
-                        "application/json": components["schemas"]["FileStreamResult"];
-                        "text/json": components["schemas"]["FileStreamResult"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/avatars/user/{userId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get user avatar by user ID (public access, no authentication required) */
-        get: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    userId: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["FileStreamResult"];
-                        "application/json": components["schemas"]["FileStreamResult"];
-                        "text/json": components["schemas"]["FileStreamResult"];
                     };
                 };
                 /** @description Not Found */
@@ -16409,7 +14889,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Gets the current school year, or 404 if none is set. */
+        /** Gets the current (active) school year, or 404 if none is set. */
         get: {
             parameters: {
                 query?: never;
@@ -16525,7 +15005,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Sets the given school year as the current one, replacing any previously-current year. */
+        /** Sets the given school year as the current one. */
         put: {
             parameters: {
                 query?: never;
@@ -16546,17 +15026,6 @@ export interface paths {
                         "text/plain": components["schemas"]["ApiResponseOfObject"];
                         "application/json": components["schemas"]["ApiResponseOfObject"];
                         "text/json": components["schemas"]["ApiResponseOfObject"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
                     };
                 };
                 /** @description Unauthorized */
@@ -16601,25 +15070,253 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/academic/programs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists all academic programs. */
+        get: {
+            parameters: {
+                query?: {
+                    Page?: number | string;
+                    PageSize?: number | string;
+                    Search?: string;
+                    SortBy?: string;
+                    Descending?: boolean;
+                    SchoolYearId?: number | string;
+                    Status?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPagedResponseOfProgramResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/academic/programs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gets a single program by ID. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    id: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfProgramResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfProgramResponse"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/avatars/{profileId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get user avatar/profile picture by profile ID (public access, no authentication required) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    profileId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FileStreamResult"];
+                        "application/json": components["schemas"]["FileStreamResult"];
+                        "text/json": components["schemas"]["FileStreamResult"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/avatars/user/{userId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get user avatar by user ID (public access, no authentication required) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    userId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["FileStreamResult"];
+                        "application/json": components["schemas"]["FileStreamResult"];
+                        "text/json": components["schemas"]["FileStreamResult"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        AcademicTermResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            /** Format: int64 */
-            schoolYearId?: number | string;
-            name: string;
-            /** Format: date */
-            startDate?: string;
-            /** Format: date */
-            endDate?: string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
         AdjustLeaveBalanceRequest: {
             /** Format: int64 */
             employeeId: number | string;
@@ -16630,29 +15327,6 @@ export interface components {
             /** Format: double */
             totalDays?: number | string;
             reason: string;
-        };
-        ApiErrorResponse: {
-            success: boolean;
-            message: string;
-            errors?: null | {
-                [key: string]: string[];
-            };
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-        };
-        ApiResponseOfAcademicTermResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["AcademicTermResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
         };
         ApiResponseOfAttendanceReportResponse: {
             success: boolean;
@@ -16709,10 +15383,10 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfboolean: {
+        ApiResponseOfAzureSyncResult: {
             success: boolean;
             message: string;
-            data: boolean;
+            data: null | components["schemas"]["AzureSyncResult"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -16720,10 +15394,10 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfCollegeResponse: {
+        ApiResponseOfboolean: {
             success: boolean;
             message: string;
-            data: null | components["schemas"]["CollegeResponse"];
+            data: boolean;
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -16746,28 +15420,6 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["CurrentUserResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfCurriculumResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["CurriculumResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfCurriculumSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["CurriculumSubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -16819,28 +15471,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfDesignationResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["DesignationResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfDictionaryOfstringAndObject: {
-            success: boolean;
-            message: string;
-            data: null | Record<string, never>;
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfDocumentReportResponse: {
             success: boolean;
             message: string;
@@ -16867,6 +15497,39 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["EducationCredentialResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfEmployeeApplicantDocumentResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["EmployeeApplicantDocumentResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfEmployeeApplicantResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["EmployeeApplicantResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfEmployeeApplicantStatusHistoryResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["EmployeeApplicantStatusHistoryResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -16940,10 +15603,32 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfHireApplicantResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["HireApplicantResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfHrDashboardResponse: {
             success: boolean;
             message: string;
             data: null | components["schemas"]["HrDashboardResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfInterviewScheduleResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["InterviewScheduleResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -16988,6 +15673,28 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["EmployeeScheduleResponse"][];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfJobApplicationResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["JobApplicationResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfJobPostingResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["JobPostingResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17061,17 +15768,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfAcademicTermResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfAcademicTermResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfAttendanceResponse: {
             success: boolean;
             message: string;
@@ -17105,17 +15801,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfCollegeResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfCollegeResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfCommunityInvolvementResponse: {
             success: boolean;
             message: string;
@@ -17127,54 +15812,10 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfCurriculumResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfCurriculumResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfCurriculumSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfCurriculumSubjectResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfDepartmentResponse: {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfDepartmentResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfDesignationResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfDesignationResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfDictionaryOfstringAndObject: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfDictionaryOfstringAndObject"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17197,6 +15838,39 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfEducationCredentialResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfEmployeeApplicantDocumentResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfEmployeeApplicantDocumentResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfEmployeeApplicantResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfEmployeeApplicantResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfEmployeeApplicantStatusHistoryResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfEmployeeApplicantStatusHistoryResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17237,17 +15911,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfEmployeeScheduleResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfEmployeeScheduleResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfEmployeeSchoolYearAssignmentResponse: {
             success: boolean;
             message: string;
@@ -17263,6 +15926,39 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfEmployeeTypeResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfInterviewScheduleResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfInterviewScheduleResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfJobApplicationResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfJobApplicationResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfJobPostingResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfJobPostingResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17314,6 +16010,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPagedResponseOfPositionResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfPositionResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfPagedResponseOfProfessionalEngagementResponse: {
             success: boolean;
             message: string;
@@ -17329,6 +16036,17 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["PagedResponseOfProfessionalOrganizationResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPagedResponseOfProfileResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PagedResponseOfProfileResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17380,17 +16098,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfSectionResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfSectionResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfStudentApplicantGuardianResponse: {
             success: boolean;
             message: string;
@@ -17435,28 +16142,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfPagedResponseOfStudentResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfStudentResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfPagedResponseOfSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["PagedResponseOfSubjectResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfPagedResponseOfUserResponse: {
             success: boolean;
             message: string;
@@ -17490,6 +16175,28 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPositionResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PositionResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfPositionRolesResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PositionRolesResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfProfessionalEngagementResponse: {
             success: boolean;
             message: string;
@@ -17505,6 +16212,17 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["ProfessionalOrganizationResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
+        ApiResponseOfProfileResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["ProfileResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17567,17 +16285,6 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
-        ApiResponseOfSectionResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["SectionResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
         ApiResponseOfStudentApplicantGuardianResponse: {
             success: boolean;
             message: string;
@@ -17615,28 +16322,6 @@ export interface components {
             success: boolean;
             message: string;
             data: null | components["schemas"]["StudentApplicantStatusHistoryResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfStudentResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["StudentResponse"];
-            traceId?: null | string;
-            /** Format: date-time */
-            responseTimestamp?: null | string;
-            /** Format: date-time */
-            timestamp?: string;
-            errors?: null | string[];
-        };
-        ApiResponseOfSubjectResponse: {
-            success: boolean;
-            message: string;
-            data: null | components["schemas"]["SubjectResponse"];
             traceId?: null | string;
             /** Format: date-time */
             responseTimestamp?: null | string;
@@ -17687,7 +16372,14 @@ export interface components {
             confirmPassword: string;
             profile: components["schemas"]["ProfileRequest"];
         };
-        ApplicantStatus: number;
+        /** @enum {string} */
+        ApplicantStatus: "Submitted" | "Screening" | "Evaluation" | "Interview" | "Approved" | "Hired" | "Enrolled" | "Rejected" | "Withdrawn";
+        /** @description Applicant-facing request to apply for a job posting. */
+        ApplyToJobRequest: {
+            /** Format: int64 */
+            jobPostingId?: number | string;
+            coverLetter?: null | string;
+        };
         ApproveLeaveRequest: {
             remarks?: null | string;
         };
@@ -17780,6 +16472,13 @@ export interface components {
             azureObjectIds?: null | string[];
             /** Format: int64 */
             employeeTypeId?: null | number | string;
+            /** Format: int64 */
+            departmentId?: null | number | string;
+            /** Format: int64 */
+            positionId?: null | number | string;
+            /** Format: date */
+            dateHired?: null | string;
+            employmentCategory?: null | components["schemas"]["EmploymentCategory"];
         };
         /** @description Summary of an import operation. */
         AzureImportResult: {
@@ -17796,11 +16495,20 @@ export interface components {
             email: string;
             reason: string;
         };
+        /** @description Summary of a sync operation that refreshes the local Azure AD user cache from Graph. */
+        AzureSyncResult: {
+            /** Format: int32 */
+            upserted: number | string;
+            /** Format: date-time */
+            syncedAt: string;
+        };
         /** @description Azure user DTO for eligible faculty users from Microsoft Graph. */
         AzureUserDto: {
             azureObjectId: string;
             displayName: string;
             email: string;
+            givenName: null | string;
+            surname: null | string;
             department: null | string;
             jobTitle: null | string;
             licenses: string[];
@@ -17824,14 +16532,8 @@ export interface components {
             /** Format: time */
             checkOut: string;
         };
-        CivilStatus: number;
-        CollegeResponse: {
-            /** Format: int64 */
-            id: number | string;
-            name: string;
-            code: string;
-            isActive: boolean;
-        };
+        /** @enum {string} */
+        CivilStatus: "Unspecified" | "Single" | "Married" | "Widowed" | "Separated";
         CommunityInvolvementRequest: {
             involvement: string;
             natureInvolvement: string;
@@ -17850,15 +16552,6 @@ export interface components {
             dateActivity: string;
             attachment: null | string;
         };
-        CreateAcademicTermRequest: {
-            /** Format: int64 */
-            schoolYearId?: number | string;
-            name: string;
-            /** Format: date */
-            startDate?: string;
-            /** Format: date */
-            endDate?: string;
-        };
         CreateAttendanceRequest: {
             /** Format: int64 */
             employeeId: number | string;
@@ -17872,59 +16565,48 @@ export interface components {
             isRestDay: boolean;
             status: null | string;
         };
-        CreateCollegeRequest: {
-            name: string;
-            code: string;
-            isActive?: boolean;
-        };
-        CreateCurriculumRequest: {
-            code: string;
-            name: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int32 */
-            effectiveYear?: number | string;
-        };
-        CreateCurriculumSubjectRequest: {
-            /** Format: int64 */
-            curriculumId?: number | string;
-            /** Format: int64 */
-            subjectId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            termSequence?: number | string;
-            isRequired?: boolean;
-        };
         CreateDepartmentRequest: {
             name: string;
             code: string;
-            isActive?: boolean;
-        };
-        CreateDesignationRequest: {
-            name: string;
-            code: string;
-            isActive?: boolean;
-        };
-        CreateEmployeeDocumentRequest: {
             /** Format: int64 */
-            employeeId: number | string;
-            documentType: string;
+            parentDepartmentId?: null | number | string;
+            isActive?: boolean;
+        };
+        CreateEmployeeApplicantDocumentRequest: {
+            /** Format: int64 */
+            employeeApplicantId?: number | string;
+            requirementName: string;
             fileName: string;
-            storedFileName: string;
-            mimeType: string;
+            storagePath: string;
+        };
+        CreateEmployeeApplicantRequest: {
             /** Format: int64 */
-            fileSize: number | string;
-            /** Format: date */
-            expiryDate: null | string;
+            profileId?: number | string;
+            profile?: null | components["schemas"]["ProfileRequest"];
+            applicationNumber?: null | string;
+            status?: null | components["schemas"]["ApplicantStatus"];
+        };
+        CreateEmployeeApplicantStatusHistoryRequest: {
+            /** Format: int64 */
+            employeeApplicantId?: number | string;
+            status?: components["schemas"]["ApplicantStatus"];
+            remarks?: null | string;
         };
         CreateEmployeeRequest: {
             employeeNumber: string;
             profile: components["schemas"]["ProfileRequest"];
+            /**
+             * @description Institutional (@spup.edu.ph) login email. If set, a login-capable User is
+             *                 auto-created for this address — distinct from Profile.PersonalEmail, which is contact
+             *                 info only and never used to create a login.
+             */
+            userEmail?: null | string;
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
-            supervisorId?: null | number | string;
+            departmentId?: number | string;
+            /** Format: int64 */
+            positionId?: number | string;
             employmentStatus?: components["schemas"]["EmploymentStatus"];
             employmentCategory?: components["schemas"]["EmploymentCategory"];
             shared?: boolean;
@@ -17962,16 +16644,49 @@ export interface components {
             employeeId: number | string;
             /** Format: int64 */
             schoolYearId: number | string;
+            /** Format: int64 */
+            departmentId: number | string;
+            /** Format: int64 */
+            positionId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
             /** Format: date */
             startDate: string;
             /** Format: date */
             endDate: null | string;
+            /** @default false */
+            isDepartmentHead: boolean;
         };
         CreateEmployeeTypeRequest: {
             name: string;
             description: null | string;
+        };
+        /**
+         * @description Used by the standalone `GET /api/v1/hrms/recruitment/interview-schedules` endpoints
+         *     where the applicant id must be supplied explicitly.
+         */
+        CreateInterviewScheduleRequest: {
+            /** Format: int64 */
+            employeeApplicantId?: number | string;
+            /** Format: int64 */
+            jobApplicationId?: null | number | string;
+            /** Format: date-time */
+            scheduledAt?: string;
+            venue?: null | string;
+            notes?: null | string;
+        };
+        CreateJobPostingRequest: {
+            title: string;
+            /** Format: int64 */
+            departmentId?: number | string;
+            description?: null | string;
+            requirements?: null | string;
+            location?: null | string;
+            employmentType?: null | string;
+            /** Format: int32 */
+            vacancyCount?: null | number | string;
+            /** Format: date */
+            applicationDeadline?: null | string;
         };
         CreateLeaveTypeRequest: {
             name: string;
@@ -17981,23 +16696,52 @@ export interface components {
             requiresMedicalCertificate?: boolean;
             isPaid?: boolean;
         };
+        /**
+         * @description Used by the nested `POST /api/v1/hrms/job-applications/{id}/interviews` endpoint.
+         *     The `employeeApplicantId` is derived server-side from the job application path parameter
+         *     and must NOT be sent in the request body.
+         */
+        CreateNestedInterviewScheduleRequest: {
+            /** Format: date-time */
+            scheduledAt: string;
+            venue?: null | string;
+            notes?: null | string;
+        };
         CreatePermissionRequest: {
             name: string;
             description?: null | string;
             module: string;
             action: string;
         };
-        CreateProgramRequest: {
+        CreatePositionRequest: {
             code: string;
             name: string;
-            educationLevel?: components["schemas"]["EducationLevel"];
-            /** Format: int64 */
-            departmentId?: number | string;
+            description?: null | string;
+            isAcademic?: boolean;
+            isActive?: boolean;
+        };
+        CreateProfileRequest: {
+            firstName?: null | string;
+            middleName?: null | string;
+            lastName?: null | string;
+            suffix?: null | string;
+            gender?: null | components["schemas"]["Gender"];
+            /** Format: date */
+            birthDate?: null | string;
+            civilStatus?: null | components["schemas"]["CivilStatus"];
+            personalEmail?: null | string;
+            phoneNumber?: null | string;
+            mobileNumber?: null | string;
+            /** Format: int32 */
+            age?: null | number | string;
+            religion?: null | string;
+            address?: null | string;
+            qualifier?: null | string;
+            profilePicture?: null | string;
         };
         CreateRoleRequest: {
             name: string;
             description?: null | string;
-            departmentIds?: (number | string)[];
             isActive?: boolean;
         };
         CreateSchoolYearRequest: {
@@ -18007,18 +16751,6 @@ export interface components {
             /** Format: date */
             endDate?: string;
             isActive?: boolean;
-        };
-        CreateSectionRequest: {
-            code: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int64 */
-            termId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            capacity?: number | string;
-            isOpen?: boolean;
         };
         CreateStudentApplicantGuardianRequest: {
             /** Format: int64 */
@@ -18052,18 +16784,6 @@ export interface components {
             status?: components["schemas"]["ApplicantStatus"];
             remarks?: null | string;
         };
-        CreateStudentRequest: {
-            /** Format: int64 */
-            profileId: number | string;
-            studentNumber: string;
-            currentStatus?: components["schemas"]["StudentStatus"];
-        };
-        CreateSubjectRequest: {
-            code: string;
-            title: string;
-            /** Format: double */
-            units?: number | string;
-        };
         CreateUserRequest: {
             username: string;
             email: string;
@@ -18082,35 +16802,8 @@ export interface components {
             azureId: null | string;
             roles: string[];
             permissions: string[];
-            departments: components["schemas"]["RoleDepartmentResponse"][];
+            positions: string[];
             isSuperAdmin: boolean;
-        };
-        CurriculumResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            code: string;
-            name: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int32 */
-            effectiveYear?: number | string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
-        CurriculumSubjectResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            /** Format: int64 */
-            curriculumId?: number | string;
-            /** Format: int64 */
-            subjectId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            termSequence?: number | string;
-            isRequired?: boolean;
         };
         DashboardBreakdownItemResponse: {
             key: string;
@@ -18153,13 +16846,9 @@ export interface components {
             name: string;
             code: string;
             isActive: boolean;
-        };
-        DesignationResponse: {
             /** Format: int64 */
-            id: number | string;
-            name: string;
-            code: string;
-            isActive: boolean;
+            parentDepartmentId: null | number | string;
+            parentDepartmentName: null | string;
         };
         DocumentReportResponse: {
             /** Format: int32 */
@@ -18175,7 +16864,8 @@ export interface components {
             /** Format: int32 */
             expiringSoon: number | string;
         };
-        EducationalAttainment: number;
+        /** @enum {string} */
+        EducationalAttainment: "Elementary" | "Secondary" | "Tertiary" | "Vocational" | "Graduate" | "Postgraduate" | "Other";
         EducationalBackgroundRequest: {
             /** Format: int64 */
             educationId: null | number | string;
@@ -18217,7 +16907,51 @@ export interface components {
             diploma: null | string;
             transcriptOfRecords: null | string;
         };
-        EducationLevel: number;
+        /** @enum {string} */
+        EducationLevel: "BasicEducation" | "SeniorHighSchool" | "College" | "GraduateSchool";
+        EmployeeApplicantDocumentResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            employeeApplicantId?: number | string;
+            requirementName: string;
+            fileName: string;
+            storagePath: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+            applicantName?: string;
+        };
+        EmployeeApplicantResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            profileId?: number | string;
+            applicationNumber?: string;
+            status?: components["schemas"]["ApplicantStatus"];
+            email?: string;
+            emailVerified?: boolean;
+            /** Format: date-time */
+            lastLoginAt?: null | string;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+            applicantName?: string;
+        };
+        EmployeeApplicantStatusHistoryResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            employeeApplicantId?: number | string;
+            status?: components["schemas"]["ApplicantStatus"];
+            remarks?: null | string;
+            /** Format: date-time */
+            createdAt?: string;
+            applicantName?: string;
+        };
         EmployeeDocumentResponse: {
             /** Format: int64 */
             id: number | string;
@@ -18239,7 +16973,8 @@ export interface components {
             /** Format: date-time */
             verifiedAt: null | string;
         };
-        EmployeeDocumentStatus: number;
+        /** @enum {string} */
+        EmployeeDocumentStatus: "Pending" | "Verified" | "Rejected" | "Expired";
         EmployeeLeaveBalanceSummaryResponse: {
             /** Format: int64 */
             employeeId: number | string;
@@ -18274,6 +17009,8 @@ export interface components {
         EmployeeResponse: {
             /** Format: int64 */
             id: number | string;
+            /** Format: int64 */
+            profileId: number | string;
             employeeNumber: string;
             firstName: string;
             middleName: null | string;
@@ -18283,6 +17020,10 @@ export interface components {
             email: string;
             mobileNumber: null | string;
             phoneNumber: null | string;
+            gender: components["schemas"]["Gender"];
+            civilStatus: components["schemas"]["CivilStatus"];
+            /** Format: date */
+            birthDate: null | string;
             /** Format: int32 */
             age: null | number | string;
             religion: null | string;
@@ -18292,7 +17033,11 @@ export interface components {
             employeeTypeId: number | string;
             employeeType: null | string;
             /** Format: int64 */
-            supervisorId: null | number | string;
+            departmentId: number | string;
+            department: null | string;
+            /** Format: int64 */
+            positionId: number | string;
+            position: null | string;
             supervisor: null | string;
             employmentStatus: components["schemas"]["EmploymentStatus"];
             employmentCategory: components["schemas"]["EmploymentCategory"];
@@ -18331,7 +17076,8 @@ export interface components {
             /** Format: date */
             endDate: null | string;
         };
-        EmployeeScheduleType: number;
+        /** @enum {string} */
+        EmployeeScheduleType: "Fixed" | "Flexible" | "Shift";
         EmployeeSchoolYearAssignmentResponse: {
             /** Format: int64 */
             id: number | string;
@@ -18342,13 +17088,24 @@ export interface components {
             /** Format: int64 */
             schoolYearId: number | string;
             schoolYear: string;
+            /** Format: int64 */
+            departmentId: number | string;
+            department: string;
+            /** Format: int64 */
+            positionId: number | string;
+            position: string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
+            isDepartmentHead: boolean;
             isActive: boolean;
             /** Format: date */
             startDate: string;
             /** Format: date */
             endDate: null | string;
+        };
+        /** @description Optional body for activate/deactivate lifecycle actions; the reason lands in the audit log. */
+        EmployeeStatusChangeRequest: {
+            reason?: null | string;
         };
         EmployeeTypeResponse: {
             /** Format: int64 */
@@ -18356,8 +17113,10 @@ export interface components {
             name: string;
             description: null | string;
         };
-        EmploymentCategory: number;
-        EmploymentStatus: number;
+        /** @enum {string} */
+        EmploymentCategory: "Regular" | "Probationary" | "Contractual" | "PartTime" | "JobOrder" | "Consultant";
+        /** @enum {string} */
+        EmploymentStatus: "Applicant" | "Active" | "Probationary" | "Contractual" | "Resigned" | "Retired" | "Terminated" | "Inactive";
         EntityDefinition: {
             key: string;
             route: string;
@@ -18381,7 +17140,43 @@ export interface components {
         ForgotPasswordRequest: {
             email: string;
         };
-        Gender: number;
+        /** @enum {string} */
+        Gender: "Unspecified" | "Female" | "Male" | "Other";
+        /**
+         * @description Payload for the hire action. Creates an Employee record from the applicant's existing Profile.
+         *     Runs in a transaction. Requires `hrms.recruitment.applications.hire`.
+         */
+        HireApplicantRequest: {
+            employeeNumber: string;
+            /** Format: int64 */
+            employeeTypeId?: null | number | string;
+            /**
+             * Format: int64
+             * @description Optional position for the new employee; can also be assigned later via a school-year assignment.
+             */
+            positionId?: null | number | string;
+            employmentCategory?: components["schemas"]["EmploymentCategory"];
+            shared?: boolean;
+            /** Format: date */
+            dateHired?: string;
+            /** Format: date */
+            dateRegularized?: null | string;
+            /** @description Optional remarks appended to the job application's internal remarks. */
+            remarks?: null | string;
+        };
+        /**
+         * @description Response after a successful hire. Wraps the updated job application (now status=Hired)
+         *     and the newly created employee/user id for immediate reference.
+         */
+        HireApplicantResponse: {
+            application: components["schemas"]["JobApplicationResponse"];
+            /** Format: int64 */
+            employeeId?: number | string;
+            employeeNumber: string;
+            /** Format: int64 */
+            userId?: number | string;
+            userEmail: string;
+        };
         HrDashboardResponse: {
             /** Format: int32 */
             totalEmployees: number | string;
@@ -18404,6 +17199,26 @@ export interface components {
             leaveTypeDefaults: {
                 [key: string]: number | string;
             };
+        };
+        InterviewScheduleResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            employeeApplicantId?: number | string;
+            applicantName?: string;
+            /**
+             * Format: int64
+             * @description Populated when this schedule is linked to a job application.
+             */
+            jobApplicationId?: null | number | string;
+            /** Format: date-time */
+            scheduledAt?: string;
+            venue?: null | string;
+            notes?: null | string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
         };
         InvitationResult: {
             /** Format: int32 */
@@ -18428,6 +17243,59 @@ export interface components {
             email: string;
             reason: string;
         };
+        JobApplicationResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            /** Format: int64 */
+            jobPostingId?: number | string;
+            jobPostingTitle: string;
+            /** Format: int64 */
+            employeeApplicantId?: number | string;
+            applicantName?: string;
+            applicantEmail?: string;
+            status?: components["schemas"]["JobApplicationStatus"];
+            coverLetter?: null | string;
+            /** @description Internal HR remarks — only returned on HR-facing endpoints. */
+            internalRemarks?: null | string;
+            /**
+             * Format: int64
+             * @description Populated after a successful hire action.
+             */
+            employeeId?: null | number | string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+        };
+        /** @enum {string} */
+        JobApplicationStatus: "Pending" | "Reviewing" | "Shortlisted" | "Rejected" | "Hired" | "Withdrawn";
+        JobPostingResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            title: string;
+            department: string;
+            /** Format: int64 */
+            departmentId?: number | string;
+            description?: null | string;
+            requirements?: null | string;
+            location?: null | string;
+            employmentType?: null | string;
+            /** Format: int32 */
+            vacancyCount?: null | number | string;
+            /** Format: date */
+            applicationDeadline?: null | string;
+            status?: components["schemas"]["JobPostingStatus"];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+            /** Format: date-time */
+            publishedAt?: null | string;
+            /** Format: date-time */
+            closedAt?: null | string;
+        };
+        /** @enum {string} */
+        JobPostingStatus: "Draft" | "Published" | "Closed" | "Cancelled";
         LeaveApplicationDetailResponse: {
             /** Format: int64 */
             id: number | string;
@@ -18476,7 +17344,8 @@ export interface components {
             submittedAtUtc: string;
             attachmentUrl: null | string;
         };
-        LeaveApplicationStatus: number;
+        /** @enum {string} */
+        LeaveApplicationStatus: "Pending" | "DeptHeadApproved" | "DeptHeadRejected" | "HrApproved" | "HrRejected" | "Cancelled";
         LeaveApprovalResponse: {
             approverLevel: string;
             /** Format: int64 */
@@ -18534,19 +17403,6 @@ export interface components {
             remarks: null | string;
             attachment: null | string;
         };
-        PagedResponseOfAcademicTermResponse: {
-            data: components["schemas"]["AcademicTermResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfAttendanceResponse: {
             data: components["schemas"]["AttendanceResponse"][];
             /** Format: int32 */
@@ -18586,19 +17442,6 @@ export interface components {
             success?: boolean;
             message?: string;
         };
-        PagedResponseOfCollegeResponse: {
-            data: components["schemas"]["CollegeResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfCommunityInvolvementResponse: {
             data: components["schemas"]["CommunityInvolvementResponse"][];
             /** Format: int32 */
@@ -18612,60 +17455,8 @@ export interface components {
             success?: boolean;
             message?: string;
         };
-        PagedResponseOfCurriculumResponse: {
-            data: components["schemas"]["CurriculumResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfCurriculumSubjectResponse: {
-            data: components["schemas"]["CurriculumSubjectResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfDepartmentResponse: {
             data: components["schemas"]["DepartmentResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfDesignationResponse: {
-            data: components["schemas"]["DesignationResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfDictionaryOfstringAndObject: {
-            data: Record<string, never>[];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -18692,6 +17483,45 @@ export interface components {
         };
         PagedResponseOfEducationCredentialResponse: {
             data: components["schemas"]["EducationCredentialResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfEmployeeApplicantDocumentResponse: {
+            data: components["schemas"]["EmployeeApplicantDocumentResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfEmployeeApplicantResponse: {
+            data: components["schemas"]["EmployeeApplicantResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfEmployeeApplicantStatusHistoryResponse: {
+            data: components["schemas"]["EmployeeApplicantStatusHistoryResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -18742,19 +17572,6 @@ export interface components {
             success?: boolean;
             message?: string;
         };
-        PagedResponseOfEmployeeScheduleResponse: {
-            data: components["schemas"]["EmployeeScheduleResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfEmployeeSchoolYearAssignmentResponse: {
             data: components["schemas"]["EmployeeSchoolYearAssignmentResponse"][];
             /** Format: int32 */
@@ -18770,6 +17587,45 @@ export interface components {
         };
         PagedResponseOfEmployeeTypeResponse: {
             data: components["schemas"]["EmployeeTypeResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfInterviewScheduleResponse: {
+            data: components["schemas"]["InterviewScheduleResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfJobApplicationResponse: {
+            data: components["schemas"]["JobApplicationResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfJobPostingResponse: {
+            data: components["schemas"]["JobPostingResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -18833,6 +17689,19 @@ export interface components {
             success?: boolean;
             message?: string;
         };
+        PagedResponseOfPositionResponse: {
+            data: components["schemas"]["PositionResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
         PagedResponseOfProfessionalEngagementResponse: {
             data: components["schemas"]["ProfessionalEngagementResponse"][];
             /** Format: int32 */
@@ -18848,6 +17717,19 @@ export interface components {
         };
         PagedResponseOfProfessionalOrganizationResponse: {
             data: components["schemas"]["ProfessionalOrganizationResponse"][];
+            /** Format: int32 */
+            page: number | string;
+            /** Format: int32 */
+            pageSize: number | string;
+            /** Format: int32 */
+            totalRecords: number | string;
+            /** Format: int32 */
+            totalPages: number | string;
+            success?: boolean;
+            message?: string;
+        };
+        PagedResponseOfProfileResponse: {
+            data: components["schemas"]["ProfileResponse"][];
             /** Format: int32 */
             page: number | string;
             /** Format: int32 */
@@ -18911,19 +17793,6 @@ export interface components {
             success?: boolean;
             message?: string;
         };
-        PagedResponseOfSectionResponse: {
-            data: components["schemas"]["SectionResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfStudentApplicantGuardianResponse: {
             data: components["schemas"]["StudentApplicantGuardianResponse"][];
             /** Format: int32 */
@@ -18976,32 +17845,6 @@ export interface components {
             success?: boolean;
             message?: string;
         };
-        PagedResponseOfStudentResponse: {
-            data: components["schemas"]["StudentResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
-        PagedResponseOfSubjectResponse: {
-            data: components["schemas"]["SubjectResponse"][];
-            /** Format: int32 */
-            page: number | string;
-            /** Format: int32 */
-            pageSize: number | string;
-            /** Format: int32 */
-            totalRecords: number | string;
-            /** Format: int32 */
-            totalPages: number | string;
-            success?: boolean;
-            message?: string;
-        };
         PagedResponseOfUserResponse: {
             data: components["schemas"]["UserResponse"][];
             /** Format: int32 */
@@ -19035,6 +17878,21 @@ export interface components {
             description: null | string;
             module: string;
             action: string;
+        };
+        PositionResponse: {
+            /** Format: int64 */
+            id: number | string;
+            code: string;
+            name: string;
+            description: null | string;
+            isAcademic: boolean;
+            isActive: boolean;
+        };
+        PositionRolesResponse: {
+            /** Format: int64 */
+            positionId: number | string;
+            position: components["schemas"]["PositionResponse"];
+            roles: components["schemas"]["RoleResponse"][];
         };
         ProblemDetails: {
             type?: null | string;
@@ -19096,6 +17954,32 @@ export interface components {
             qualifier?: null | string;
             profilePicture?: null | string;
         };
+        ProfileResponse: {
+            /** Format: int64 */
+            id?: number | string;
+            firstName: string;
+            middleName?: null | string;
+            lastName: string;
+            suffix?: null | string;
+            gender?: components["schemas"]["Gender"];
+            /** Format: date */
+            birthDate?: null | string;
+            civilStatus?: components["schemas"]["CivilStatus"];
+            personalEmail?: null | string;
+            phoneNumber?: null | string;
+            mobileNumber?: null | string;
+            /** Format: int32 */
+            age?: null | number | string;
+            religion?: null | string;
+            address?: null | string;
+            qualifier?: null | string;
+            profilePicture?: null | string;
+            isActive?: boolean;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: null | string;
+        };
         ProgramResponse: {
             /** Format: int64 */
             id?: number | string;
@@ -19112,6 +17996,7 @@ export interface components {
         RegularizeEmployeeRequest: {
             /** Format: date */
             dateRegularized: string;
+            reason?: null | string;
         };
         RejectDocumentRequest: {
             reason: string;
@@ -19139,16 +18024,13 @@ export interface components {
             datePublished: null | string;
             attachment: null | string;
         };
+        ResendVerificationRequest: {
+            email: string;
+        };
         ResetPasswordRequest: {
             token: string;
             newPassword: string;
             confirmPassword: string;
-        };
-        RoleDepartmentResponse: {
-            /** Format: int64 */
-            id: number | string;
-            code: string;
-            name: string;
         };
         RolePermissionsResponse: {
             /** Format: int64 */
@@ -19162,7 +18044,6 @@ export interface components {
             name: string;
             description: null | string;
             isActive: boolean;
-            departments: components["schemas"]["RoleDepartmentResponse"][];
         };
         SchoolYearResponse: {
             /** Format: int64 */
@@ -19178,24 +18059,6 @@ export interface components {
             /** Format: date-time */
             updatedAt?: null | string;
         };
-        SectionResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            code: string;
-            /** Format: int64 */
-            programId?: number | string;
-            /** Format: int64 */
-            termId?: number | string;
-            /** Format: int32 */
-            yearLevel?: number | string;
-            /** Format: int32 */
-            capacity?: number | string;
-            isOpen?: boolean;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
         SelfAttendancePunchRequest: {
             /** Format: date */
             attendanceDate?: null | string;
@@ -19205,13 +18068,6 @@ export interface components {
         /** @description Request to send HRMS profile completion invitations. */
         SendInvitationRequest: {
             employeeIds?: null | (number | string)[];
-        };
-        SetRoleDepartmentsRequest: {
-            /**
-             * @description The complete set of department IDs to assign to this role.
-             *     Send an empty array to remove all department associations.
-             */
-            departmentIds?: (number | string)[];
         };
         /** Format: binary */
         Stream: string;
@@ -19286,49 +18142,6 @@ export interface components {
             createdAt?: string;
             applicationNumber?: string;
         };
-        StudentResponse: {
-            /** Format: int64 */
-            id: number | string;
-            /** Format: int64 */
-            profileId: number | string;
-            studentNumber: string;
-            currentStatus: components["schemas"]["StudentStatus"];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: null | string;
-            firstName: string;
-            middleName: null | string;
-            lastName: string;
-            suffix: null | string;
-            fullName: string;
-            gender: components["schemas"]["Gender"];
-            /** Format: date */
-            birthDate: null | string;
-            civilStatus: components["schemas"]["CivilStatus"];
-            personalEmail: null | string;
-            phoneNumber: null | string;
-            mobileNumber: null | string;
-            /** Format: int32 */
-            age: null | number | string;
-            religion: null | string;
-            address: null | string;
-            qualifier: null | string;
-            profilePicture: null | string;
-        };
-        StudentStatus: number;
-        SubjectResponse: {
-            /** Format: int64 */
-            id?: number | string;
-            code: string;
-            title: string;
-            /** Format: double */
-            units?: number | string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: null | string;
-        };
         SubmitLeaveApplicationRequest: {
             /** Format: int64 */
             leaveTypeId: number | string;
@@ -19343,15 +18156,6 @@ export interface components {
             /** Format: date */
             dateSeparated: string;
             reason: null | string;
-        };
-        UpdateAcademicTermRequest: {
-            /** Format: int64 */
-            schoolYearId?: null | number | string;
-            name?: null | string;
-            /** Format: date */
-            startDate?: null | string;
-            /** Format: date */
-            endDate?: null | string;
         };
         UpdateApplicantProfileRequest: {
             firstName?: null | string;
@@ -19381,39 +18185,23 @@ export interface components {
             isRestDay: boolean;
             status: null | string;
         };
-        UpdateCollegeRequest: {
-            name: string;
-            code: string;
-            isActive?: boolean;
-        };
-        UpdateCurriculumRequest: {
-            code?: null | string;
-            name?: null | string;
-            /** Format: int64 */
-            programId?: null | number | string;
-            /** Format: int32 */
-            effectiveYear?: null | number | string;
-        };
-        UpdateCurriculumSubjectRequest: {
-            /** Format: int64 */
-            curriculumId?: null | number | string;
-            /** Format: int64 */
-            subjectId?: null | number | string;
-            /** Format: int32 */
-            yearLevel?: null | number | string;
-            /** Format: int32 */
-            termSequence?: null | number | string;
-            isRequired?: null | boolean;
-        };
         UpdateDepartmentRequest: {
             name: string;
             code: string;
+            /** Format: int64 */
+            parentDepartmentId?: null | number | string;
             isActive?: boolean;
         };
-        UpdateDesignationRequest: {
-            name: string;
-            code: string;
-            isActive?: boolean;
+        UpdateEmployeeApplicantDocumentRequest: {
+            /** Format: int64 */
+            employeeApplicantId?: null | number | string;
+            requirementName?: null | string;
+            fileName?: null | string;
+            storagePath?: null | string;
+        };
+        UpdateEmployeeApplicantRequest: {
+            status?: null | components["schemas"]["ApplicantStatus"];
+            isActive?: null | boolean;
         };
         UpdateEmployeeDocumentRequest: {
             documentType: string;
@@ -19430,10 +18218,18 @@ export interface components {
             isActive?: boolean;
             employeeNumber: string;
             profile: components["schemas"]["ProfileRequest"];
+            /**
+             * @description Institutional (@spup.edu.ph) login email. If set, a login-capable User is
+             *                 auto-created for this address — distinct from Profile.PersonalEmail, which is contact
+             *                 info only and never used to create a login.
+             */
+            userEmail?: null | string;
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
-            supervisorId?: null | number | string;
+            departmentId?: number | string;
+            /** Format: int64 */
+            positionId?: number | string;
             employmentStatus?: components["schemas"]["EmploymentStatus"];
             employmentCategory?: components["schemas"]["EmploymentCategory"];
             shared?: boolean;
@@ -19444,23 +18240,11 @@ export interface components {
             /** Format: date */
             dateSeparated?: null | string;
         };
-        UpdateEmployeeScheduleRequest: {
-            scheduleType: components["schemas"]["EmployeeScheduleType"];
-            dayOfWeek: string;
-            /** Format: time */
-            timeIn: string;
-            /** Format: time */
-            timeOut: string;
-            /** Format: time */
-            breakStart: null | string;
-            /** Format: time */
-            breakEnd: null | string;
-            /** Format: date */
-            effectiveDate: string;
-            /** Format: date */
-            endDate: null | string;
-        };
         UpdateEmployeeSchoolYearAssignmentRequest: {
+            /** Format: int64 */
+            departmentId: number | string;
+            /** Format: int64 */
+            positionId: number | string;
             status: components["schemas"]["EmploymentStatus"];
             isFaculty: boolean;
             isActive: boolean;
@@ -19468,10 +18252,38 @@ export interface components {
             startDate: string;
             /** Format: date */
             endDate: null | string;
+            /** @default false */
+            isDepartmentHead: boolean;
         };
         UpdateEmployeeTypeRequest: {
             name: string;
             description: null | string;
+        };
+        UpdateInterviewScheduleRequest: {
+            /** Format: int64 */
+            employeeApplicantId?: null | number | string;
+            /** Format: date-time */
+            scheduledAt?: null | string;
+            venue?: null | string;
+            notes?: null | string;
+        };
+        /** @description HR-facing update: change status and/or add internal remarks. */
+        UpdateJobApplicationRequest: {
+            status?: null | components["schemas"]["JobApplicationStatus"];
+            internalRemarks?: null | string;
+        };
+        UpdateJobPostingRequest: {
+            title: string;
+            /** Format: int64 */
+            departmentId?: number | string;
+            description?: null | string;
+            requirements?: null | string;
+            location?: null | string;
+            employmentType?: null | string;
+            /** Format: int32 */
+            vacancyCount?: null | number | string;
+            /** Format: date */
+            applicationDeadline?: null | string;
         };
         UpdateLeaveTypeRequest: {
             isActive?: boolean;
@@ -19482,44 +18294,49 @@ export interface components {
             requiresMedicalCertificate?: boolean;
             isPaid?: boolean;
         };
+        /** @description Used to update an interview already scoped to a job application — applicant derived from path. */
+        UpdateNestedInterviewScheduleRequest: {
+            /** Format: date-time */
+            scheduledAt?: null | string;
+            venue?: null | string;
+            notes?: null | string;
+        };
         UpdatePermissionRequest: {
             name: string;
             description?: null | string;
             module: string;
             action: string;
         };
-        UpdateProgramRequest: {
-            code?: null | string;
-            name?: null | string;
-            educationLevel?: null | components["schemas"]["EducationLevel"];
-            /** Format: int64 */
-            departmentId?: null | number | string;
+        UpdatePositionRequest: {
+            code: string;
+            name: string;
+            description?: null | string;
+            isAcademic?: boolean;
+            isActive?: boolean;
+        };
+        UpdateProfileRequest: {
+            firstName?: null | string;
+            middleName?: null | string;
+            lastName?: null | string;
+            suffix?: null | string;
+            gender?: null | components["schemas"]["Gender"];
+            /** Format: date */
+            birthDate?: null | string;
+            civilStatus?: null | components["schemas"]["CivilStatus"];
+            personalEmail?: null | string;
+            phoneNumber?: null | string;
+            mobileNumber?: null | string;
+            /** Format: int32 */
+            age?: null | number | string;
+            religion?: null | string;
+            address?: null | string;
+            qualifier?: null | string;
+            profilePicture?: null | string;
         };
         UpdateRoleRequest: {
             name: string;
             description?: null | string;
-            departmentIds?: (number | string)[];
             isActive?: boolean;
-        };
-        UpdateSchoolYearRequest: {
-            name?: null | string;
-            /** Format: date */
-            startDate?: null | string;
-            /** Format: date */
-            endDate?: null | string;
-            isActive?: null | boolean;
-        };
-        UpdateSectionRequest: {
-            code?: null | string;
-            /** Format: int64 */
-            programId?: null | number | string;
-            /** Format: int64 */
-            termId?: null | number | string;
-            /** Format: int32 */
-            yearLevel?: null | number | string;
-            /** Format: int32 */
-            capacity?: null | number | string;
-            isOpen?: null | boolean;
         };
         UpdateStudentApplicantGuardianRequest: {
             /** Format: int64 */
@@ -19546,18 +18363,6 @@ export interface components {
             isSubmitted?: null | boolean;
             fileName?: null | string;
             storagePath?: null | string;
-        };
-        UpdateStudentRequest: {
-            /** Format: int64 */
-            profileId?: null | number | string;
-            studentNumber?: null | string;
-            currentStatus?: null | components["schemas"]["StudentStatus"];
-        };
-        UpdateSubjectRequest: {
-            code?: null | string;
-            title?: null | string;
-            /** Format: double */
-            units?: null | number | string;
         };
         UpdateUserRequest: {
             username: string;
