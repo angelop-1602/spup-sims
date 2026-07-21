@@ -37,6 +37,22 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Edit3, Loader2, Plus, Save, Trash2 } from "lucide-react"
 import {
   Combobox,
@@ -134,6 +150,16 @@ export default function LeaveSettingsClient() {
   const canUpdateType = hasPermission("hrms.leaveTypes.update")
   const canDeleteType = hasPermission("hrms.leaveTypes.delete")
   const canAdjustBalance = hasPermission("hrms.leaveBalances.update")
+  const canCreateSchoolYear = hasPermission("academic.schoolYears.create")
+
+  const [isSchoolYearDialogOpen, setIsSchoolYearDialogOpen] = React.useState(false)
+  const [schoolYearForm, setSchoolYearForm] = React.useState({
+    name: "",
+    startDate: "",
+    endDate: "",
+    isActive: false,
+  })
+  const [schoolYearError, setSchoolYearError] = React.useState<string | null>(null)
 
   const [selectedType, setSelectedType] = React.useState<LeaveType | null>(null)
   const [typeForm, setTypeForm] = React.useState({
@@ -180,7 +206,7 @@ export default function LeaveSettingsClient() {
     loading: loadingCurrentSchoolYear,
   } = useApiQuery<SchoolYear>("/api/v1/academic/school-years/current")
 
-  const { data: schoolYearsPaged } = useApiQuery<PagedSchoolYears>("/api/v1/academic/school-years", {
+  const { data: schoolYearsPaged, refresh: refreshSchoolYears } = useApiQuery<PagedSchoolYears>("/api/v1/academic/school-years", {
     Page: 1,
     PageSize: 100,
     SortBy: "startDate",
@@ -210,6 +236,37 @@ export default function LeaveSettingsClient() {
   const { mutate: deleteLeaveType, loading: deletingLeaveType } = useApiMutation()
   const { mutate: adjustLeaveBalance, loading: adjustingBalance } = useApiMutation()
   const { mutate: initializeLeaveBalances, loading: initializingBalances } = useApiMutation()
+  const { mutate: createSchoolYear, loading: savingSchoolYear } = useApiMutation()
+
+  const resetSchoolYearForm = () => {
+    setSchoolYearForm({ name: "", startDate: "", endDate: "", isActive: false })
+    setSchoolYearError(null)
+  }
+
+  const handleSchoolYearSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSchoolYearError(null)
+
+    const ok = await createSchoolYear({
+      path: "/api/v1/academic/school-years",
+      method: "POST",
+      body: {
+        name: schoolYearForm.name,
+        startDate: schoolYearForm.startDate,
+        endDate: schoolYearForm.endDate,
+        isActive: schoolYearForm.isActive,
+      },
+    })
+
+    if (!ok) {
+      setSchoolYearError("Unable to create school year")
+      return
+    }
+
+    await refreshSchoolYears()
+    resetSchoolYearForm()
+    setIsSchoolYearDialogOpen(false)
+  }
 
   const resetTypeForm = () => {
     setSelectedType(null)
@@ -710,7 +767,90 @@ export default function LeaveSettingsClient() {
                 </Combobox>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="school-year">School year</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="school-year">School year</Label>
+                  {canCreateSchoolYear && (
+                    <Dialog
+                      open={isSchoolYearDialogOpen}
+                      onOpenChange={(open) => { setIsSchoolYearDialogOpen(open); if (!open) resetSchoolYearForm() }}
+                    >
+                      <DialogTrigger asChild>
+                        <Button type="button" variant="ghost" size="sm">
+                          <Plus className="mr-1 h-3.5 w-3.5" />
+                          New
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>New school year</DialogTitle>
+                          <DialogDescription>Add a school year record.</DialogDescription>
+                        </DialogHeader>
+                        <form onSubmit={handleSchoolYearSubmit} className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="school-year-name">Name</Label>
+                            <Input
+                              id="school-year-name"
+                              value={schoolYearForm.name}
+                              onChange={(e) => setSchoolYearForm((s) => ({ ...s, name: e.target.value }))}
+                              placeholder="2026-2027"
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="school-year-start">Start date</Label>
+                            <Input
+                              id="school-year-start"
+                              type="date"
+                              value={schoolYearForm.startDate}
+                              onChange={(e) => setSchoolYearForm((s) => ({ ...s, startDate: e.target.value }))}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="school-year-end">End date</Label>
+                            <Input
+                              id="school-year-end"
+                              type="date"
+                              value={schoolYearForm.endDate}
+                              onChange={(e) => setSchoolYearForm((s) => ({ ...s, endDate: e.target.value }))}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="school-year-active">Status</Label>
+                            <Select
+                              value={String(schoolYearForm.isActive)}
+                              onValueChange={(value) => setSchoolYearForm((s) => ({ ...s, isActive: value === "true" }))}
+                            >
+                              <SelectTrigger id="school-year-active">
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="true">Active</SelectItem>
+                                <SelectItem value="false">Inactive</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          {schoolYearError && (
+                            <p className="text-sm text-destructive">{schoolYearError}</p>
+                          )}
+                          <DialogFooter>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => { resetSchoolYearForm(); setIsSchoolYearDialogOpen(false) }}
+                            >
+                              Cancel
+                            </Button>
+                            <Button type="submit" disabled={savingSchoolYear}>
+                              {savingSchoolYear ? "Saving..." : "Save school year"}
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                  )}
+                </div>
                 <Input
                   id="school-year"
                   value={loadingCurrentSchoolYear ? "Loading current school year..." : selectedSchoolYearName}

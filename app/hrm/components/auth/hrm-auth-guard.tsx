@@ -20,6 +20,7 @@ type HrmAuthContextValue = {
   hasDatabaseAccess: boolean | null
   roles: string[]
   permissions: string[]
+  positions: string[]
   hasPermission: (permission: string) => boolean
   isAuthenticated: boolean
   isCheckingAccess: boolean
@@ -112,6 +113,7 @@ export function HrmAuthGuard({ children }: { children: React.ReactNode }) {
       hasDatabaseAccess,
       roles: currentUser?.roles ?? [],
       permissions: currentUser?.permissions ?? [],
+      positions: currentUser?.positions ?? [],
       hasPermission,
       isAuthenticated,
       isCheckingAccess:
