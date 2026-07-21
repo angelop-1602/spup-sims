@@ -30,28 +30,36 @@ import Link from "next/link"
 
 const PAGE_SIZE = 10
 
-const STATUS_LABELS: Record<number, string> = {
-  0: "Draft",
-  1: "Pending",
-  2: "Submitted",
-  3: "Interview",
-  4: "Hired",
-  5: "Rejected",
+// Mirrors SIS.Domain.Platform.JobApplicationStatus. The API serializes this enum as its
+// member name (e.g. "InitialScreening"), so status is compared/keyed by name, not ordinal.
+// Faculty and staff postings share the same enum but follow different pipelines:
+// Faculty: InitialScreening -> PsychologicalExam -> DemoAndDepartmentInterview -> VpAcademicInterview -> Hired
+// Staff:   InitialScreening -> PsychologicalExam -> DepartmentUnitHeadInterview -> Hired
+const STATUS_LABELS: Record<string, string> = {
+  InitialScreening: "Initial Screening",
+  PsychologicalExam: "Psychological Exam",
+  DemoAndDepartmentInterview: "Demo & Department Interview",
+  DepartmentUnitHeadInterview: "Department/Unit Head Interview",
+  VpAcademicInterview: "VP Academic Affairs Interview",
+  Hired: "Hired",
+  Rejected: "Rejected",
+  Withdrawn: "Withdrawn",
 }
 
-function resolveStatusLabel(status: number | string): string {
-  if (typeof status === "string") return status
-  return STATUS_LABELS[status] ?? `Status ${status}`
+function resolveStatusLabel(status: string): string {
+  return STATUS_LABELS[status] ?? status
 }
 
 // ponytail: same hues STATUS_STYLES used to use, as solid fills for the corner ribbon (needs to read against its own background, not the card's)
 const RIBBON_STYLES: Record<string, string> = {
-  Draft: "bg-orange-500 text-white",
-  Pending: "bg-yellow-400 text-yellow-950",
-  Submitted: "bg-purple-500 text-white",
-  Interview: "bg-blue-500 text-white",
+  "Initial Screening": "bg-orange-500 text-white",
+  "Psychological Exam": "bg-yellow-400 text-yellow-950",
+  "Demo & Department Interview": "bg-blue-500 text-white",
+  "Department/Unit Head Interview": "bg-blue-500 text-white",
+  "VP Academic Affairs Interview": "bg-purple-500 text-white",
   Hired: "bg-green-500 text-white",
   Rejected: "bg-red-500 text-white",
+  Withdrawn: "bg-neutral-500 text-white",
 }
 
 function resolveRibbonStyle(label: string): string {
@@ -62,7 +70,7 @@ interface JobApplicationListItem {
   id: number
   jobPostingId: number
   jobPostingTitle: string
-  status: number | string
+  status: string
   coverLetter: string | null
   createdAt: string
   updatedAt: string | null
@@ -83,7 +91,7 @@ interface JobApplicationDetail {
   employeeApplicantId: number
   applicantName: string
   applicantEmail: string
-  status: number | string
+  status: string
   coverLetter: string | null
   internalRemarks: string | null
   employeeId: number | null

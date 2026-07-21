@@ -9,7 +9,7 @@ export interface Job {
   postedDate: string;
   deadline: string;
   experienceLevel: 'Entry Level' | 'Mid Level' | 'Senior Level' | 'Director / Lead';
-  description: string;
+  isFaculty: boolean;
   responsibilities: string[];
   requirements: string[];
   benefits: string[];
@@ -35,8 +35,7 @@ export interface ApiJobPosting {
   closingDate?: string;
   experienceLevel?: string;
   experienceRequired?: string;
-  description?: string;
-  summary?: string;
+  isFaculty?: boolean;
   responsibilities?: string | string[];
   requirements?: string | string[];
   qualifications?: string | string[];
@@ -128,7 +127,7 @@ export function mapApiJobToJob(apiJob: ApiJobPosting): Job {
     postedDate: formatDate(postedRaw),
     deadline: formatDate(deadlineRaw),
     experienceLevel: experienceMap[rawExperience] || 'Mid Level',
-    description: apiJob.description || apiJob.summary || '',
+    isFaculty: Boolean(apiJob.isFaculty),
     responsibilities: toArray(apiJob.responsibilities),
     requirements: toArray(apiJob.requirements || apiJob.qualifications),
     benefits: toArray(apiJob.benefits || apiJob.perks),

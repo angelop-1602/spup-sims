@@ -75,12 +75,19 @@ export default function JobCard({ job, isSaved, onToggleSave, onViewDetails }: J
           <span className={`inline-flex items-center text-[11px] px-2.5 py-1 rounded-md border ${experienceStyles[job.experienceLevel]}`}>
             {job.experienceLevel}
           </span>
+          {job.isFaculty && (
+            <span className="inline-flex items-center text-[11px] px-2.5 py-1 rounded-md border border-indigo-200 bg-indigo-50 text-indigo-700 font-semibold">
+              Faculty Position
+            </span>
+          )}
         </div>
 
-        {/* Short description preview */}
-        <p className="text-neutral-500 text-xs md:text-sm mb-6 leading-relaxed line-clamp-2 font-normal">
-          {job.description}
-        </p>
+        {/* Qualifications preview */}
+        {job.requirements.length > 0 && (
+          <p className="text-neutral-500 text-xs md:text-sm mb-6 leading-relaxed line-clamp-2 font-normal">
+            {job.requirements[0]}
+          </p>
+        )}
       </div>
 
       {/* Action buttons */}

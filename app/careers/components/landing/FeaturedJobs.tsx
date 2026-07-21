@@ -172,11 +172,18 @@ export default function FeaturedJobs({
                               <span className={`${epilogue.className} text-[10px] font-semibold bg-neutral-100 text-neutral-700 px-2 py-0.5 rounded border-1 border-neutral-500`}>
                                 {job.location || "Tuguegarao City, Cagayan"}
                               </span>
+                              {job.isFaculty && (
+                                <span className={`${epilogue.className} text-[10px] font-semibold bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded border-1 border-indigo-200`}>
+                                  Faculty Position
+                                </span>
+                              )}
                             </div>
 
-                            <p className={`${epilogue.className} text-xs text-neutral-600 leading-relaxed font-normal text-left line-clamp-3`}>
-                              {job.description}
-                            </p>
+                            {job.requirements.length > 0 && (
+                              <p className={`${epilogue.className} text-xs text-neutral-600 leading-relaxed font-normal text-left line-clamp-3`}>
+                                {job.requirements[0]}
+                              </p>
+                            )}
                           </div>
 
                           {/* Action Footer */}

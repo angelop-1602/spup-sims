@@ -23,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -75,7 +76,7 @@ const EMPLOYMENT_TYPES = ["Full-time", "Part-time", "Contract", "Temporary"]
 const EMPTY_FORM: CreateJobPostingRequest = {
   title: "",
   departmentId: undefined,
-  description: null,
+  isFaculty: false,
   requirements: null,
   location: null,
   employmentType: null,
@@ -152,7 +153,7 @@ export default function JobPostingsPage() {
     setFormState({
       title: posting.title ?? "",
       departmentId: posting.departmentId ?? undefined,
-      description: posting.description ?? null,
+      isFaculty: posting.isFaculty ?? false,
       requirements: posting.requirements ?? null,
       location: posting.location ?? null,
       employmentType: posting.employmentType ?? null,
@@ -176,7 +177,7 @@ export default function JobPostingsPage() {
     const body: CreateJobPostingRequest | UpdateJobPostingRequest = {
       title: formState.title,
       departmentId: formState.departmentId || undefined,
-      description: formState.description || null,
+      isFaculty: formState.isFaculty,
       requirements: formState.requirements || null,
       location: formState.location || null,
       employmentType: formState.employmentType || null,
@@ -301,6 +302,7 @@ export default function JobPostingsPage() {
                 <TableHead>Title</TableHead>
                 <TableHead>Department</TableHead>
                 <TableHead>Type</TableHead>
+                <TableHead>Faculty</TableHead>
                 <TableHead>Vacancies</TableHead>
                 <TableHead>Deadline</TableHead>
                 <TableHead>Status</TableHead>
@@ -311,7 +313,7 @@ export default function JobPostingsPage() {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="p-6 text-center">
+                  <TableCell colSpan={8} className="p-6 text-center">
                     <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
                       <Loader2 className="h-4 w-4 animate-spin" />
                       Loading job postings...
@@ -320,13 +322,13 @@ export default function JobPostingsPage() {
                 </TableRow>
               ) : queryError ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="p-0">
+                  <TableCell colSpan={8} className="p-0">
                     <ApiErrorView error={queryError} onRetry={refresh} fullScreen />
                   </TableCell>
                 </TableRow>
               ) : postings.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="p-6 text-center text-sm text-muted-foreground">
+                  <TableCell colSpan={8} className="p-6 text-center text-sm text-muted-foreground">
                     No job postings available.
                   </TableCell>
                 </TableRow>
@@ -340,6 +342,17 @@ export default function JobPostingsPage() {
                       <TableCell className="font-medium">{posting.title}</TableCell>
                       <TableCell>{posting.department ?? "-"}</TableCell>
                       <TableCell>{posting.employmentType ?? "-"}</TableCell>
+                      <TableCell>
+                        {posting.isFaculty ? (
+                          <span className="inline-flex items-center rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700">
+                            Faculty
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
+                            Staff
+                          </span>
+                        )}
+                      </TableCell>
                       <TableCell>{posting.vacancyCount ?? "-"}</TableCell>
                       <TableCell>
                         {posting.applicationDeadline
@@ -512,6 +525,17 @@ export default function JobPostingsPage() {
                 </div>
               </div>
 
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="jp-is-faculty"
+                  checked={formState.isFaculty}
+                  onCheckedChange={(checked) => setFormState((s) => ({ ...s, isFaculty: checked === true }))}
+                />
+                <Label htmlFor="jp-is-faculty" className="font-normal">
+                  This posting is for a faculty position
+                </Label>
+              </div>
+
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="jp-location">Location</Label>
@@ -546,18 +570,7 @@ export default function JobPostingsPage() {
               </div>
 
               <div>
-                <Label htmlFor="jp-description">Description</Label>
-                <Textarea
-                  id="jp-description"
-                  value={formState.description ?? ""}
-                  onChange={(e) => setFormState((s) => ({ ...s, description: e.target.value || null }))}
-                  placeholder="Describe the role and responsibilities"
-                  rows={4}
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="jp-requirements">Requirements</Label>
+                <Label htmlFor="jp-requirements">Qualifications</Label>
                 <Textarea
                   id="jp-requirements"
                   value={formState.requirements ?? ""}

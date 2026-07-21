@@ -272,24 +272,17 @@ export default function JobDetailPage() {
                   <Clock className="w-3 h-3" />
                   {job.experienceLevel}
                 </span>
+                {job.isFaculty && (
+                  <span
+                    className={`${epilogue.className} text-[10px] font-semibold bg-indigo-50 text-indigo-700 px-3 py-1 rounded border border-indigo-200 flex items-center gap-1`}
+                  >
+                    Faculty Position
+                  </span>
+                )}
               </div>
 
               {/* Job Body */}
               <div className="px-6 md:px-8 py-8 space-y-8">
-                {/* Description */}
-                <div>
-                  <h3
-                    className={`${epilogue.className} text-sm font-bold text-neutral-400 uppercase tracking-widest mb-3`}
-                  >
-                    About this Role
-                  </h3>
-                  <p
-                    className={`${epilogue.className} text-sm text-neutral-600 leading-relaxed font-normal text-justify`}
-                  >
-                    {job.description}
-                  </p>
-                </div>
-
                 {/* Responsibilities */}
                 {job.responsibilities.length > 0 && (
                   <div className="border-t border-neutral-100 pt-6">

@@ -420,13 +420,20 @@ export default function ApplyPage() {
               <Clock className="w-3 h-3" />
               {job.experienceLevel}
             </span>
+            {job.isFaculty && (
+              <span className={`${epilogue.className} inline-flex items-center gap-1.5 text-[10px] font-semibold bg-emerald-900/50 text-emerald-100 px-2.5 py-1 rounded border border-emerald-700`}>
+                Faculty Position
+              </span>
+            )}
           </div>
         </div>
-        <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-100">
-          <p className={`${epilogue.className} text-xs text-neutral-500 leading-relaxed line-clamp-2`}>
-            {job.description}
-          </p>
-        </div>
+        {job.requirements.length > 0 && (
+          <div className="px-6 py-4 bg-neutral-50 border-t border-neutral-100">
+            <p className={`${epilogue.className} text-xs text-neutral-500 leading-relaxed line-clamp-2`}>
+              {job.requirements[0]}
+            </p>
+          </div>
+        )}
       </div>
 
       {alreadyApplied && (

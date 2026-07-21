@@ -8699,7 +8699,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/hrms/job-applications/{id}/review": {
+    "/api/v1/hrms/job-applications/{id}/advance": {
         parameters: {
             query?: never;
             header?: never;
@@ -8708,91 +8708,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mark application as Reviewing (from Pending). */
-        post: {
-            parameters: {
-                query?: never;
-                header?: never;
-                path: {
-                    id: number;
-                };
-                cookie?: never;
-            };
-            requestBody?: never;
-            responses: {
-                /** @description OK */
-                200: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ApiResponseOfJobApplicationResponse"];
-                        "application/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
-                        "text/json": components["schemas"]["ApiResponseOfJobApplicationResponse"];
-                    };
-                };
-                /** @description Bad Request */
-                400: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Unauthorized */
-                401: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Forbidden */
-                403: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-                /** @description Not Found */
-                404: {
-                    headers: {
-                        [name: string]: unknown;
-                    };
-                    content: {
-                        "text/plain": components["schemas"]["ProblemDetails"];
-                        "application/json": components["schemas"]["ProblemDetails"];
-                        "text/json": components["schemas"]["ProblemDetails"];
-                    };
-                };
-            };
-        };
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/hrms/job-applications/{id}/shortlist": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Mark application as Shortlisted (from Reviewing). */
+        /**
+         * Advance the application to the next stage of its pipeline (faculty or staff, based on the
+         *     job posting's IsFaculty flag). Cannot advance past the final interview stage — use
+         *     `/hire` once the application has reached it.
+         */
         post: {
             parameters: {
                 query?: never;
@@ -8876,7 +8796,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reject an application (from Pending, Reviewing, or Shortlisted). */
+        /** Reject an application (from any non-terminal pipeline stage). */
         post: {
             parameters: {
                 query?: never;
@@ -16670,6 +16590,7 @@ export interface components {
             employeeApplicantId?: number | string;
             /** Format: int64 */
             jobApplicationId?: null | number | string;
+            stage?: null | components["schemas"]["JobApplicationStatus"];
             /** Format: date-time */
             scheduledAt?: string;
             venue?: null | string;
@@ -16679,7 +16600,8 @@ export interface components {
             title: string;
             /** Format: int64 */
             departmentId?: number | string;
-            description?: null | string;
+            /** @description Determines which recruitment pipeline (faculty vs. staff) applications on this posting follow. */
+            isFaculty?: boolean;
             requirements?: null | string;
             location?: null | string;
             employmentType?: null | string;
@@ -16702,6 +16624,7 @@ export interface components {
          *     and must NOT be sent in the request body.
          */
         CreateNestedInterviewScheduleRequest: {
+            stage?: null | components["schemas"]["JobApplicationStatus"];
             /** Format: date-time */
             scheduledAt: string;
             venue?: null | string;
@@ -17211,6 +17134,7 @@ export interface components {
              * @description Populated when this schedule is linked to a job application.
              */
             jobApplicationId?: null | number | string;
+            stage?: null | components["schemas"]["JobApplicationStatus"];
             /** Format: date-time */
             scheduledAt?: string;
             venue?: null | string;
@@ -17268,7 +17192,7 @@ export interface components {
             updatedAt?: null | string;
         };
         /** @enum {string} */
-        JobApplicationStatus: "Pending" | "Reviewing" | "Shortlisted" | "Rejected" | "Hired" | "Withdrawn";
+        JobApplicationStatus: "InitialScreening" | "PsychologicalExam" | "DemoAndDepartmentInterview" | "DepartmentUnitHeadInterview" | "VpAcademicInterview" | "Hired" | "Rejected" | "Withdrawn";
         JobPostingResponse: {
             /** Format: int64 */
             id?: number | string;
@@ -17276,7 +17200,8 @@ export interface components {
             department: string;
             /** Format: int64 */
             departmentId?: number | string;
-            description?: null | string;
+            /** @description Determines which recruitment pipeline (faculty vs. staff) applications on this posting follow. */
+            isFaculty?: boolean;
             requirements?: null | string;
             location?: null | string;
             employmentType?: null | string;
@@ -18262,6 +18187,7 @@ export interface components {
         UpdateInterviewScheduleRequest: {
             /** Format: int64 */
             employeeApplicantId?: null | number | string;
+            stage?: null | components["schemas"]["JobApplicationStatus"];
             /** Format: date-time */
             scheduledAt?: null | string;
             venue?: null | string;
@@ -18276,7 +18202,8 @@ export interface components {
             title: string;
             /** Format: int64 */
             departmentId?: number | string;
-            description?: null | string;
+            /** @description Determines which recruitment pipeline (faculty vs. staff) applications on this posting follow. */
+            isFaculty?: boolean;
             requirements?: null | string;
             location?: null | string;
             employmentType?: null | string;
@@ -18296,6 +18223,7 @@ export interface components {
         };
         /** @description Used to update an interview already scoped to a job application — applicant derived from path. */
         UpdateNestedInterviewScheduleRequest: {
+            stage?: null | components["schemas"]["JobApplicationStatus"];
             /** Format: date-time */
             scheduledAt?: null | string;
             venue?: null | string;
