@@ -128,9 +128,22 @@ export async function request<T>(
     // ProblemDetails body ({ title, detail }), not the { success, message }
     // envelope other endpoints use — fall back to `detail`/`title` so those
     // messages aren't swallowed as a generic "Request failed (400)".
-    const problemDetails = payload as unknown as { title?: string; detail?: string } | null;
+    //
+    // Model-binding validation failures ([Required] etc., caught before FluentValidation
+    // ever runs) come back as ValidationProblemDetails instead: detail is just "One or more
+    // validation errors occurred." with the real reason in `errors: { FieldName: [messages] }`
+    // — fold those in so the actual field/reason isn't hidden behind a generic sentence.
+    const problemDetails = payload as unknown as {
+      title?: string;
+      detail?: string;
+      errors?: Record<string, string[]>;
+    } | null;
+    const fieldErrors = problemDetails?.errors
+      ? Object.values(problemDetails.errors).flat().join(" ")
+      : "";
     const message =
       (payload && typeof payload.message === "string" && payload.message) ||
+      fieldErrors ||
       (problemDetails && typeof problemDetails.detail === "string" && problemDetails.detail) ||
       (problemDetails && typeof problemDetails.title === "string" && problemDetails.title) ||
       `Request failed (${response.status})`;

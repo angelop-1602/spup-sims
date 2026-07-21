@@ -19,8 +19,8 @@ import {
   type PagedResponseOfPositionResponse,
   type PagedResponseOfEmployeeTypeResponse,
   type SchoolYearResponse,
+  type PagedResponseOfSchoolYearResponse,
   type PagedResponseOfEmployeeSchoolYearAssignmentResponse,
-  type PagedResponseOfRoleResponse,
 } from "@/lib/api"
 import {
   Dialog,
@@ -63,6 +63,16 @@ type UpdateEmployeeRequestWithDeps = UpdateEmployeeRequest & {
 
 const PAGE_SIZE = 10
 
+const EMPLOYMENT_STATUS_OPTIONS: NonNullable<EmployeeResponse["employmentStatus"]>[] = [
+  "Active",
+  "Probationary",
+  "Contractual",
+  "Resigned",
+  "Retired",
+  "Terminated",
+  "Inactive",
+]
+
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -86,27 +96,26 @@ type EmployeeForm = {
   firstName: string
   lastName: string
   email: string
+  // Only applied on create: the institutional login email, distinct from the personal
+  // email above. Backend auto-creates a login User for this address if it's @spup.edu.ph.
+  userEmail: string
   employeeNumber: string
   departmentId: number | string | null
   positionId: number | string | null
   employeeTypeId: number | string | null
   dateHired: string
-  // Only applied on create: the backend auto-creates a login User for @spup.edu.ph
-  // emails and assigns this role to it. Ignored on update, and ignored entirely if
-  // the email isn't institutional (no User gets created in that case).
-  roleId: number | string | null
 }
 
 const EMPTY_FORM: EmployeeForm = {
   firstName: "",
   lastName: "",
   email: "",
+  userEmail: "",
   employeeNumber: "",
   departmentId: null,
   positionId: null,
   employeeTypeId: null,
   dateHired: "",
-  roleId: null,
 }
 
 function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
@@ -117,11 +126,11 @@ function toCreateRequest(form: EmployeeForm): CreateEmployeeRequestWithDeps {
       lastName: form.lastName,
       personalEmail: form.email,
     },
+    userEmail: form.userEmail || null,
     departmentId: Number(form.departmentId),
     positionId: Number(form.positionId),
     employeeTypeId: Number(form.employeeTypeId),
     dateHired: form.dateHired,
-    roleId: form.roleId ? Number(form.roleId) : null,
   }
 }
 
@@ -180,10 +189,6 @@ export default function EmployeesPage() {
   // position, type, dates, status). The backend silently ignores profile field changes from
   // callers lacking this permission, so the form must not present them as editable either.
   const canEditProfile = hasPermission("core.profiles.update")
-  // Shown only on the create form — lets HR pick a role for the login User the
-  // backend auto-creates when the new employee's email is institutional. Gated by
-  // the same permission that lets the identity/roles list endpoint be called.
-  const canAssignRole = hasPermission("identity.roles.view")
   // Department Head is the only role with hrms.employees.view but not .create —
   // restrict them to the roster of the department they currently head. Headship
   // is scoped per school year (EmployeeSchoolYearAssignmentResponse.isDepartmentHead),
@@ -214,6 +219,11 @@ export default function EmployeesPage() {
   const [search, setSearch] = useState("")
   const [debouncedSearch, setDebouncedSearch] = useState("")
   const [page, setPage] = useState(1)
+  const [filterDepartmentId, setFilterDepartmentId] = useState("")
+  const [filterPositionId, setFilterPositionId] = useState("")
+  const [filterEmployeeTypeId, setFilterEmployeeTypeId] = useState("")
+  const [filterStatus, setFilterStatus] = useState("")
+  const [filterSchoolYearId, setFilterSchoolYearId] = useState("")
 
   // Dialog state
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -246,12 +256,18 @@ export default function EmployeesPage() {
       Page: page,
       PageSize: PAGE_SIZE,
       Search: debouncedSearch || undefined,
-      DepartmentId: isDepartmentScoped ? headedDepartmentId ?? undefined : undefined,
+      DepartmentId: isDepartmentScoped
+        ? headedDepartmentId ?? undefined
+        : filterDepartmentId ? Number(filterDepartmentId) : undefined,
+      PositionId: filterPositionId ? Number(filterPositionId) : undefined,
+      EmployeeTypeId: filterEmployeeTypeId ? Number(filterEmployeeTypeId) : undefined,
+      EmploymentStatus: filterStatus || undefined,
+      SchoolYearId: filterSchoolYearId ? Number(filterSchoolYearId) : undefined,
     },
     { enabled: !isDepartmentScoped || Boolean(headedDepartmentId) },
   )
 
-  const { mutate: saveEmployee, loading: saving } = useApiMutation()
+  const { mutate: saveEmployee, loading: saving, lastErrorRef: saveEmployeeErrorRef } = useApiMutation()
   const { mutate: deleteEmployee, loading: deleting } = useApiMutation()
   const { mutate: sendInvite } = useApiMutation()
 
@@ -276,17 +292,35 @@ export default function EmployeesPage() {
   )
   const employeeTypes = employeeTypesData?.data ?? []
 
-  // Fetch roles for the create form's role picker
-  const { data: rolesData } = useApiQuery<PagedResponseOfRoleResponse>(
-    canAssignRole ? "/api/v1/identity/roles" : null,
-    { Page: 1, PageSize: 100, SortBy: "id" },
+  // Fetch school years for the filter dropdown
+  const { data: schoolYearsData } = useApiQuery<PagedResponseOfSchoolYearResponse>(
+    "/api/v1/academic/school-years",
+    { Page: 1, PageSize: 100, SortBy: "startDate", Descending: true },
   )
-  const roles = (rolesData?.data ?? []).filter((role) => role.isActive !== false)
+  const schoolYears = schoolYearsData?.data ?? []
 
   const employees = employeesPaged?.data ?? []
   const totalPages = Number(employeesPaged?.totalPages ?? 1)
   const totalRecords = employeesPaged?.totalRecords ?? 0
-  const hasActiveFilters = Boolean(search)
+  const hasActiveFilters = Boolean(
+    search || filterDepartmentId || filterPositionId || filterEmployeeTypeId || filterStatus || filterSchoolYearId,
+  )
+  const activeFilterCount =
+    Number(Boolean(filterDepartmentId)) +
+    Number(Boolean(filterPositionId)) +
+    Number(Boolean(filterEmployeeTypeId)) +
+    Number(Boolean(filterStatus)) +
+    Number(Boolean(filterSchoolYearId))
+
+  function clearFilters() {
+    setFilterDepartmentId("")
+    setFilterPositionId("")
+    setFilterEmployeeTypeId("")
+    setFilterStatus("")
+    setFilterSchoolYearId("")
+    setSearch("")
+    setPage(1)
+  }
 
   function openCreateDialog() {
     setSelectedEmployee(null)
@@ -301,12 +335,12 @@ export default function EmployeesPage() {
       firstName: employee.firstName ?? "",
       lastName: employee.lastName ?? "",
       email: employee.email ?? "",
+      userEmail: "",
       employeeNumber: employee.employeeNumber ?? "",
       departmentId: employee.departmentId ?? null,
       positionId: employee.positionId ?? null,
       employeeTypeId: employee.employeeTypeId ?? null,
       dateHired: employee.dateHired ?? "",
-      roleId: null,
     })
     setFormError(null)
     setIsDialogOpen(true)
@@ -324,7 +358,10 @@ export default function EmployeesPage() {
     const body = selectedEmployee ? toUpdateRequest(formState, selectedEmployee) : toCreateRequest(formState)
     const ok = await saveEmployee({ path, method, body })
     if (!ok) {
-      setFormError("Unable to save employee.")
+      // Position changes can fail on a real business rule now — e.g. assigning the Department
+      // Head position when someone else already actively heads that department this school
+      // year — so surface the backend's actual message instead of a generic one.
+      setFormError(saveEmployeeErrorRef.current?.message || "Unable to save employee.")
       return
     }
 
@@ -375,6 +412,123 @@ export default function EmployeesPage() {
             placeholder: "Search employees by name",
             label: "Search employees",
           }}
+          filters={
+            <div className="space-y-4">
+              {!isDepartmentScoped && (
+                <div className="space-y-2">
+                  <Label htmlFor="filter-department">Department</Label>
+                  <Select
+                    value={filterDepartmentId || "all"}
+                    onValueChange={(value) => {
+                      setFilterDepartmentId(value === "all" ? "" : value)
+                      setPage(1)
+                    }}
+                  >
+                    <SelectTrigger id="filter-department">
+                      <SelectValue placeholder="All departments" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All departments</SelectItem>
+                      {departments.map((department) => (
+                        <SelectItem key={String(department.id)} value={String(department.id)}>
+                          {department.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label htmlFor="filter-position">Position</Label>
+                <Select
+                  value={filterPositionId || "all"}
+                  onValueChange={(value) => {
+                    setFilterPositionId(value === "all" ? "" : value)
+                    setPage(1)
+                  }}
+                >
+                  <SelectTrigger id="filter-position">
+                    <SelectValue placeholder="All positions" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All positions</SelectItem>
+                    {positions.map((position) => (
+                      <SelectItem key={String(position.id)} value={String(position.id)}>
+                        {position.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="filter-employee-type">Employee type</Label>
+                <Select
+                  value={filterEmployeeTypeId || "all"}
+                  onValueChange={(value) => {
+                    setFilterEmployeeTypeId(value === "all" ? "" : value)
+                    setPage(1)
+                  }}
+                >
+                  <SelectTrigger id="filter-employee-type">
+                    <SelectValue placeholder="All employee types" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All employee types</SelectItem>
+                    {employeeTypes.map((employeeType) => (
+                      <SelectItem key={String(employeeType.id)} value={String(employeeType.id)}>
+                        {employeeType.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="filter-status">Employment status</Label>
+                <Select
+                  value={filterStatus || "all"}
+                  onValueChange={(value) => {
+                    setFilterStatus(value === "all" ? "" : value)
+                    setPage(1)
+                  }}
+                >
+                  <SelectTrigger id="filter-status">
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    {EMPLOYMENT_STATUS_OPTIONS.map((status) => (
+                      <SelectItem key={status} value={status}>
+                        {status}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="filter-school-year">School year</Label>
+                <Select
+                  value={filterSchoolYearId || "all"}
+                  onValueChange={(value) => {
+                    setFilterSchoolYearId(value === "all" ? "" : value)
+                    setPage(1)
+                  }}
+                >
+                  <SelectTrigger id="filter-school-year">
+                    <SelectValue placeholder="All school years" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All school years</SelectItem>
+                    {schoolYears.map((schoolYear) => (
+                      <SelectItem key={String(schoolYear.id)} value={String(schoolYear.id)}>
+                        {schoolYear.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          }
+          activeFilterCount={activeFilterCount}
           actions={
             canCreate ? (
               <Button onClick={openCreateDialog}>
@@ -384,10 +538,7 @@ export default function EmployeesPage() {
             ) : undefined
           }
           hasActiveFilters={hasActiveFilters}
-          onClearFilters={() => {
-            setSearch("")
-            setPage(1)
-          }}
+          onClearFilters={clearFilters}
           loading={loading}
           loadingLabel="Loading employees"
           loadingSkeleton={{ columns: 6, rows: 8 }}
@@ -607,10 +758,26 @@ export default function EmployeesPage() {
                       type="email"
                       value={formState.email}
                       onChange={(e) => setFormState((s) => ({ ...s, email: e.target.value }))}
-                      placeholder="juan@spup.edu.ph"
+                      placeholder="juan.delacruz@gmail.com"
                       required
                     />
                   </div>
+                  {!selectedEmployee && (
+                    <div className="space-y-2">
+                      <Label htmlFor="emp-user-email">User email (login)</Label>
+                      <Input
+                        id="emp-user-email"
+                        type="email"
+                        value={formState.userEmail}
+                        onChange={(e) => setFormState((s) => ({ ...s, userEmail: e.target.value }))}
+                        placeholder="juan.delacruz@spup.edu.ph"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Optional. If an @spup.edu.ph address, a login account is created
+                        automatically for it — distinct from the personal email above.
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
               {selectedEmployee && !canEditProfile && (
@@ -620,12 +787,13 @@ export default function EmployeesPage() {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="emp-number">Employee number</Label>
+                <Label htmlFor="emp-number">Employee number <span className="text-destructive">*</span></Label>
                 <Input
                   id="emp-number"
                   value={formState.employeeNumber}
                   onChange={(e) => setFormState((s) => ({ ...s, employeeNumber: e.target.value }))}
                   placeholder="EMP-0001"
+                  required
                 />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -696,30 +864,13 @@ export default function EmployeesPage() {
                   />
                 </div>
               </div>
-              {!selectedEmployee && canAssignRole && (
-                <div className="space-y-2">
-                  <Label htmlFor="emp-role">Role</Label>
-                  <Select
-                    value={formState.roleId != null ? String(formState.roleId) : ""}
-                    onValueChange={(value) => setFormState((s) => ({ ...s, roleId: value || null }))}
-                  >
-                    <SelectTrigger id="emp-role">
-                      <SelectValue placeholder="No role (assign later)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={String(role.id)} value={String(role.id)}>
-                          {role.name ?? ""}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-muted-foreground">
-                    Only applies if the email above is an @spup.edu.ph address — that&apos;s
-                    the only case a login account gets created automatically.
-                  </p>
-                </div>
-              )}
+              <p className="text-xs text-muted-foreground">
+                Roles are granted automatically based on the position selected above — see
+                Roles &amp; Permissions → Position Roles to manage that mapping. Assigning{" "}
+                <strong>Department Head</strong> makes this employee the actual head of their
+                department for the current school year — it will be rejected if someone else
+                already holds that department this year.
+              </p>
               {formError && (
                 <p className="text-sm text-destructive">{formError}</p>
               )}

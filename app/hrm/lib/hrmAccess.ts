@@ -67,6 +67,7 @@ function parseCurrentUser(payload: unknown): CurrentUser | null {
 
   const roles = getStringArray(payload.roles)
   const permissions = getStringArray(payload.permissions)
+  const positions = getStringArray(payload.positions)
 
   if (!roles.length && !Array.isArray(payload.roles)) {
     return null
@@ -83,6 +84,7 @@ function parseCurrentUser(payload: unknown): CurrentUser | null {
     azureId: getNullableString(payload.azureId),
     roles,
     permissions,
+    positions,
     isSuperAdmin: payload.isSuperAdmin === true,
   }
 }

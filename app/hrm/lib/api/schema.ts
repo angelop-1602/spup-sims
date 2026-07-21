@@ -2428,6 +2428,7 @@ export interface paths {
                     IsActive?: boolean;
                     DateHiredFrom?: string;
                     DateHiredTo?: string;
+                    SchoolYearId?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -7434,6 +7435,7 @@ export interface paths {
                     IsActive?: boolean;
                     DateHiredFrom?: string;
                     DateHiredTo?: string;
+                    SchoolYearId?: number | string;
                 };
                 header?: never;
                 path?: never;
@@ -13325,6 +13327,140 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/organization/positions/{positionId}/roles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the roles auto-granted to employees assigned this position. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    positionId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organization/positions/{positionId}/roles/{roleId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Maps a role to this position; employees assigned this position auto-receive the role. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    positionId: number;
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfPositionRolesResponse"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    positionId: number;
+                    roleId: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/recruitment/employee-applicants": {
         parameters: {
             query?: never;
@@ -14605,7 +14741,68 @@ export interface paths {
             };
         };
         put?: never;
-        post?: never;
+        /** Creates a new school year. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["CreateSchoolYearRequest"];
+                    "text/json": components["schemas"]["CreateSchoolYearRequest"];
+                    "application/*+json": components["schemas"]["CreateSchoolYearRequest"];
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "application/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                        "text/json": components["schemas"]["ApiResponseOfSchoolYearResponse"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Unauthorized */
+                401: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Forbidden */
+                403: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
         delete?: never;
         options?: never;
         head?: never;
@@ -15989,6 +16186,17 @@ export interface components {
             timestamp?: string;
             errors?: null | string[];
         };
+        ApiResponseOfPositionRolesResponse: {
+            success: boolean;
+            message: string;
+            data: null | components["schemas"]["PositionRolesResponse"];
+            traceId?: null | string;
+            /** Format: date-time */
+            responseTimestamp?: null | string;
+            /** Format: date-time */
+            timestamp?: string;
+            errors?: null | string[];
+        };
         ApiResponseOfProfessionalEngagementResponse: {
             success: boolean;
             message: string;
@@ -16387,6 +16595,12 @@ export interface components {
         CreateEmployeeRequest: {
             employeeNumber: string;
             profile: components["schemas"]["ProfileRequest"];
+            /**
+             * @description Institutional (@spup.edu.ph) login email. If set, a login-capable User is
+             *                 auto-created for this address — distinct from Profile.PersonalEmail, which is contact
+             *                 info only and never used to create a login.
+             */
+            userEmail?: null | string;
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
@@ -16402,12 +16616,6 @@ export interface components {
             dateRegularized?: null | string;
             /** Format: date */
             dateSeparated?: null | string;
-            /**
-             * Format: int64
-             * @description Role to assign if this employee's institutional email causes a login User
-             *                 to be auto-created. Ignored otherwise (and ignored entirely on update).
-             */
-            roleId?: null | number | string;
         };
         CreateEmployeeScheduleRequest: {
             /** Format: int64 */
@@ -16536,6 +16744,14 @@ export interface components {
             description?: null | string;
             isActive?: boolean;
         };
+        CreateSchoolYearRequest: {
+            name: string;
+            /** Format: date */
+            startDate?: string;
+            /** Format: date */
+            endDate?: string;
+            isActive?: boolean;
+        };
         CreateStudentApplicantGuardianRequest: {
             /** Format: int64 */
             studentApplicantId?: number | string;
@@ -16586,6 +16802,7 @@ export interface components {
             azureId: null | string;
             roles: string[];
             permissions: string[];
+            positions: string[];
             isSuperAdmin: boolean;
         };
         DashboardBreakdownItemResponse: {
@@ -17671,6 +17888,12 @@ export interface components {
             isAcademic: boolean;
             isActive: boolean;
         };
+        PositionRolesResponse: {
+            /** Format: int64 */
+            positionId: number | string;
+            position: components["schemas"]["PositionResponse"];
+            roles: components["schemas"]["RoleResponse"][];
+        };
         ProblemDetails: {
             type?: null | string;
             title?: null | string;
@@ -17995,6 +18218,12 @@ export interface components {
             isActive?: boolean;
             employeeNumber: string;
             profile: components["schemas"]["ProfileRequest"];
+            /**
+             * @description Institutional (@spup.edu.ph) login email. If set, a login-capable User is
+             *                 auto-created for this address — distinct from Profile.PersonalEmail, which is contact
+             *                 info only and never used to create a login.
+             */
+            userEmail?: null | string;
             /** Format: int64 */
             employeeTypeId?: number | string;
             /** Format: int64 */
@@ -18010,12 +18239,6 @@ export interface components {
             dateRegularized?: null | string;
             /** Format: date */
             dateSeparated?: null | string;
-            /**
-             * Format: int64
-             * @description Role to assign if this employee's institutional email causes a login User
-             *                 to be auto-created. Ignored otherwise (and ignored entirely on update).
-             */
-            roleId?: null | number | string;
         };
         UpdateEmployeeSchoolYearAssignmentRequest: {
             /** Format: int64 */
