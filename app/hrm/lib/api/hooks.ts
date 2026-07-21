@@ -2,6 +2,15 @@
 
 import * as React from "react"
 import { request, useAuthorizedHeaders, ApiError } from "./client"
+import { notifyFailed } from "@/lib/notifications"
+
+/** Shared error toast for every failed request — HTTP status as the description when
+ * available, so the toast carries the same detail as the inline/console error. */
+function notifyRequestFailed(error: Error) {
+  notifyFailed(error.message, {
+    description: error instanceof ApiError ? `HTTP ${error.status}` : undefined,
+  })
+}
 
 type QueryOptions = {
   /** When false, the query is not executed until this becomes true. */
@@ -56,6 +65,7 @@ export function useApiQuery<T>(
       const error = err instanceof Error ? err : new Error(String(err))
       setError(error)
       onErrorRef.current?.(error)
+      notifyRequestFailed(error)
     } finally {
       setLoading(false)
     }
@@ -113,6 +123,7 @@ export function useApiMutation() {
         const error = err instanceof Error ? err : new Error(String(err))
         lastErrorRef.current = error
         setError(error)
+        notifyRequestFailed(error)
         return false
       } finally {
         setLoading(false)

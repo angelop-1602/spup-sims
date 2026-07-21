@@ -3,6 +3,7 @@
 import React from "react"
 import { Loader2, ArrowLeft, FileText } from "lucide-react"
 import { useApiClient, type components } from "@/lib/api"
+import { notifyFailed } from "@/lib/notifications"
 import Link from "next/link"
 import { useParams, useSearchParams } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -202,8 +203,10 @@ export default function ProfileDetailPage() {
       ])
 
       if (profileResult.status === "rejected") {
-        setFetchError(profileResult.reason instanceof Error ? profileResult.reason : new Error(String(profileResult.reason)))
+        const error = profileResult.reason instanceof Error ? profileResult.reason : new Error(String(profileResult.reason))
+        setFetchError(error)
         setProfile(null)
+        notifyFailed(error.message)
       } else {
         setProfile(profileResult.value)
       }
@@ -211,11 +214,13 @@ export default function ProfileDetailPage() {
       setStatusHistory(historyResult.status === "fulfilled" ? historyResult.value?.data ?? [] : [])
       setInterviews(interviewsResult.status === "fulfilled" ? interviewsResult.value?.data ?? [] : [])
     } catch (err) {
-      setFetchError(err instanceof Error ? err : new Error(String(err)))
+      const error = err instanceof Error ? err : new Error(String(err))
+      setFetchError(error)
       setProfile(null)
       setDocuments([])
       setStatusHistory([])
       setInterviews([])
+      notifyFailed(error.message)
     } finally {
       setIsLoading(false)
     }
